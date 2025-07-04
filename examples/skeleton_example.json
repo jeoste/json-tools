@@ -1,0 +1,33 @@
+{
+  "user": {
+    "id": null,
+    "email": "",
+    "firstName": "",
+    "lastName": "",
+    "age": null,
+    "isActive": null,
+    "createdAt": "",
+    "address": {
+      "street": "",
+      "city": "",
+      "postalCode": "",
+      "country": ""
+    },
+    "phoneNumbers": [],
+    "tags": [],
+    "preferences": {
+      "theme": "",
+      "notifications": null,
+      "language": ""
+    }
+  },
+  "company": {
+    "id": null,
+    "name": "",
+    "website": "",
+    "employees": [],
+    "foundedYear": null,
+    "isPublic": null
+  },
+  "orders": []
+} 

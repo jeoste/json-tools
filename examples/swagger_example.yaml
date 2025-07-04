@@ -1,0 +1,137 @@
+openapi: 3.0.0
+info:
+  title: API Exemple
+  version: 1.0.0
+  description: Exemple d'API pour démontrer la génération de données
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          minimum: 1
+          maximum: 10000
+        email:
+          type: string
+          format: email
+          pattern: '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$'
+        firstName:
+          type: string
+          minLength: 2
+          maxLength: 50
+        lastName:
+          type: string
+          minLength: 2
+          maxLength: 50
+        age:
+          type: integer
+          minimum: 18
+          maximum: 120
+        isActive:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        address:
+          $ref: '#/components/schemas/Address'
+        phoneNumbers:
+          type: array
+          items:
+            type: string
+            pattern: '^[+]?[0-9]{10,15}$'
+          minItems: 0
+          maxItems: 3
+        tags:
+          type: array
+          items:
+            type: string
+            enum: ["premium", "standard", "basic", "vip"]
+          minItems: 1
+          maxItems: 5
+        preferences:
+          $ref: '#/components/schemas/UserPreferences'
+    
+    Address:
+      type: object
+      properties:
+        street:
+          type: string
+          minLength: 5
+          maxLength: 100
+        city:
+          type: string
+          minLength: 2
+          maxLength: 50
+        postalCode:
+          type: string
+          pattern: '^[0-9]{5}$'
+        country:
+          type: string
+          enum: ["France", "Canada", "Belgique", "Suisse"]
+    
+    UserPreferences:
+      type: object
+      properties:
+        theme:
+          type: string
+          enum: ["light", "dark", "auto"]
+        notifications:
+          type: boolean
+        language:
+          type: string
+          enum: ["fr", "en", "es", "de"]
+    
+    Company:
+      type: object
+      properties:
+        id:
+          type: integer
+          minimum: 1
+          maximum: 50000
+        name:
+          type: string
+          minLength: 2
+          maxLength: 100
+        website:
+          type: string
+          format: uri
+        employees:
+          type: array
+          items:
+            $ref: '#/components/schemas/User'
+          minItems: 1
+          maxItems: 10
+        foundedYear:
+          type: integer
+          minimum: 1900
+          maximum: 2024
+        isPublic:
+          type: boolean
+    
+    Order:
+      type: object
+      properties:
+        id:
+          type: integer
+          minimum: 1
+        userId:
+          type: integer
+          minimum: 1
+        amount:
+          type: number
+          minimum: 0.01
+          maximum: 99999.99
+        status:
+          type: string
+          enum: ["pending", "processing", "shipped", "delivered", "cancelled"]
+        createdAt:
+          type: string
+          format: date-time
+        items:
+          type: array
+          items:
+            type: string
+          minItems: 1
+          maxItems: 20 

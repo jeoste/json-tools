@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Générateur de Données JSON de Test</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- En-tête -->
+        <header class="header">
+            <h1>
+                <span class="icon">🔧</span>
+                Générateur de Données JSON de Test
+            </h1>
+            <p class="subtitle">Générez des données de test à partir d'un squelette JSON et d'un schéma Swagger/OpenAPI</p>
+        </header>
+
+        <!-- Formulaire principal -->
+        <main class="main-content">
+            <div class="form-section">
+                <h2>Configuration</h2>
+                
+                <!-- Fichier squelette -->
+                <div class="input-group">
+                    <label for="skeleton-file">
+                        <span class="label-text">Fichier squelette JSON</span>
+                        <span class="required">*</span>
+                    </label>
+                    <div class="file-input-wrapper">
+                        <input type="text" id="skeleton-file" class="file-path" placeholder="Aucun fichier sélectionné" readonly>
+                        <button type="button" id="browse-skeleton" class="btn btn-secondary">
+                            <span class="icon">📁</span>
+                            Parcourir
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Fichier Swagger -->
+                <div class="input-group">
+                    <label for="swagger-file">
+                        <span class="label-text">Fichier Swagger/OpenAPI</span>
+                        <span class="optional">(optionnel)</span>
+                    </label>
+                    <div class="file-input-wrapper">
+                        <input type="text" id="swagger-file" class="file-path" placeholder="Aucun fichier sélectionné" readonly>
+                        <button type="button" id="browse-swagger" class="btn btn-secondary">
+                            <span class="icon">📁</span>
+                            Parcourir
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Boutons d'action -->
+                <div class="actions">
+                    <button type="button" id="generate-btn" class="btn btn-primary" disabled>
+                        <span class="icon">⚡</span>
+                        Générer les données
+                    </button>
+                    <button type="button" id="save-btn" class="btn btn-success" disabled>
+                        <span class="icon">💾</span>
+                        Sauvegarder
+                    </button>
+                </div>
+            </div>
+
+            <!-- Zone de prévisualisation -->
+            <div class="preview-section">
+                <div class="preview-header">
+                    <h2>Prévisualisation</h2>
+                    <div class="preview-actions">
+                        <button type="button" id="copy-btn" class="btn btn-small" disabled>
+                            <span class="icon">📋</span>
+                            Copier
+                        </button>
+                        <button type="button" id="format-btn" class="btn btn-small" disabled>
+                            <span class="icon">🎨</span>
+                            Formater
+                        </button>
+                    </div>
+                </div>
+                <div class="preview-content">
+                    <pre id="json-preview" class="json-preview">
+                        <div class="empty-state">
+                            <span class="icon">📄</span>
+                            <p>Aucune donnée générée</p>
+                            <p class="empty-state-subtitle">Sélectionnez un fichier squelette et cliquez sur "Générer"</p>
+                        </div>
+                    </pre>
+                </div>
+            </div>
+        </main>
+
+        <!-- Barre de statut -->
+        <footer class="status-bar">
+            <div class="status-info">
+                <span id="status-text">Prêt</span>
+            </div>
+            <div class="loading-indicator" id="loading" style="display: none;">
+                <span class="spinner"></span>
+                <span>Génération en cours...</span>
+            </div>
+        </footer>
+    </div>
+
+    <!-- Scripts -->
+    <script src="renderer.js"></script>
+</body>
+</html> 

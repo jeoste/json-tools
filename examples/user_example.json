@@ -1,0 +1,20 @@
+{
+  "firstName": "",
+  "lastName" : "",
+  "age"      : null,
+  "address"  : {
+    "streetAddress": "",
+    "city"         : "",
+    "postalCode"   : ""
+  },
+  "phoneNumbers": [
+    {
+      "type"  : "",
+      "number": ""
+    },
+    {
+      "type"  : "",
+      "number": ""
+    }
+  ]
+} 

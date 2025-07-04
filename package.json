@@ -1,0 +1,48 @@
+{
+  "name": "genieration",
+  "version": "0.1.0",
+  "description": "Générateur de données JSON de test à partir d'un squelette JSON et d'un schéma Swagger/OpenAPI",
+  "main": "app.py",
+  "scripts": {
+    "electron": "cd electron && npm start",
+    "electron:dev": "cd electron && npm run dev",
+    "electron:install": "cd electron && npm install",
+    "electron:build": "cd electron && npm run build",
+    "electron:build-win": "cd electron && npm run build-win",
+    "electron:build-mac": "cd electron && npm run build-mac",
+    "electron:build-linux": "cd electron && npm run build-linux",
+    "tkinter": "python src/main.py",
+    "cli": "python src/cli_generate.py",
+    "test": "python -m pytest tests/ -v",
+    "install": "pip install -r requirements.txt && npm run electron:install",
+    "dev": "npm run electron:dev",
+    "start": "npm run electron"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/votre-username/genieration.git"
+  },
+  "keywords": [
+    "json",
+    "test-data",
+    "generator",
+    "swagger",
+    "openapi",
+    "faker",
+    "electron",
+    "desktop-app"
+  ],
+  "author": "Votre nom",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/votre-username/genieration/issues"
+  },
+  "homepage": "https://github.com/votre-username/genieration#readme",
+  "engines": {
+    "node": ">=16.0.0",
+    "python": ">=3.7.0"
+  },
+  "devDependencies": {
+    "concurrently": "^8.0.0"
+  }
+} 
