@@ -1,7 +1,7 @@
 {
-  "name": "genieration-electron",
+  "name": "jsonnymous-electron",
   "version": "1.0.0",
-  "description": "Générateur de données JSON de test moderne - Interface Electron",
+  "description": "JSONnymous - Générateur de données JSON de test moderne - Interface Electron",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
@@ -12,8 +12,8 @@
     "pack": "electron-builder --dir"
   },
   "author": {
-    "name": "Genieration Team",
-    "email": "contact@genieration.com"
+    "name": "JSONnymous Team",
+    "email": "jeoffrey039@gmail.com"
   },
   "license": "MIT",
   "devDependencies": {
@@ -24,9 +24,9 @@
     "fs-extra": "^11.0.0"
   },
   "build": {
-    "appId": "com.genieration.json-generator",
-    "productName": "Genieration JSON Generator",
-    "copyright": "Copyright © 2025 Genieration Team",
+    "appId": "com.jsonnymous.json-generator",
+    "productName": "JSONnymous JSON Generator",
+    "copyright": "Copyright © 2025 JSONnymous Team",
     "icon": "assets/icon.ico",
     "directories": {
       "output": "dist",
@@ -70,8 +70,8 @@
           "arch": ["x64"]
         }
       ],
-      "artifactName": "Genieration-Setup-${version}.${ext}",
-      "publisherName": "Genieration Team",
+      "artifactName": "JSONnymous-Setup-${version}.${ext}",
+      "publisherName": "JSONnymous Team",
       "verifyUpdateCodeSignature": false,
       "requestedExecutionLevel": "asInvoker"
     },
@@ -81,8 +81,8 @@
       "allowElevation": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "Genieration JSON Generator",
-      "artifactName": "Genieration-Setup-${version}.${ext}",
+      "shortcutName": "JSONnymous JSON Generator",
+      "artifactName": "JSONnymous-Setup-${version}.${ext}",
       "deleteAppDataOnUninstall": false
     }
   }

@@ -8,14 +8,21 @@ let mainWindow;
 let isDev = process.env.NODE_ENV === 'development';
 let pythonPath = 'python';
 
-// Détecter si on est en mode développement ou empaquetage
+// Check if running in packaged mode
 const isPackaged = app.isPackaged;
 
-// Ajout : nom de l'exécutable autonome et fonction utilitaire
-const backendExeName = 'backend.exe';
-const getBackendPath = () => path.join(process.resourcesPath, backendExeName);
+// Get backend path (for packaged version)
+const getBackendPath = () => {
+  if (isPackaged) {
+    // In packaged mode, use the embedded backend.exe
+    return path.join(process.resourcesPath, 'backend.exe');
+  } else {
+    // In development mode, use Python script
+    return path.join(__dirname, '..', 'src', 'cli_generate.py');
+  }
+};
 
-// Chemins pour les ressources
+// Paths for resources
 const getResourcePath = (relativePath) => {
   if (isPackaged) {
     return path.join(process.resourcesPath, relativePath);
@@ -24,75 +31,13 @@ const getResourcePath = (relativePath) => {
   }
 };
 
-// Fonction pour vérifier et installer Python si nécessaire
-async function checkPythonInstallation() {
-  return new Promise((resolve) => {
-    // Essayer différentes commandes Python
-    const pythonCommands = ['python', 'python3', 'py'];
-    
-    const tryPython = (index) => {
-      if (index >= pythonCommands.length) {
-        resolve(false);
-        return;
-      }
-      
-      const cmd = pythonCommands[index];
-      const pythonProcess = spawn(cmd, ['--version'], { shell: true });
-      
-      pythonProcess.on('close', (code) => {
-        if (code === 0) {
-          pythonPath = cmd;
-          resolve(true);
-        } else {
-          tryPython(index + 1);
-        }
-      });
-      
-      pythonProcess.on('error', () => {
-        tryPython(index + 1);
-      });
-    };
-    
-    tryPython(0);
-  });
-}
-
-// Fonction pour installer les dépendances Python
-async function installPythonDependencies() {
-  return new Promise((resolve, reject) => {
-    const requirementsPath = getResourcePath('requirements.txt');
-    
-    if (!fs.existsSync(requirementsPath)) {
-      resolve(true); // Pas de requirements.txt, on continue
-      return;
-    }
-    
-    const installProcess = spawn(pythonPath, ['-m', 'pip', 'install', '-r', requirementsPath], {
-      shell: true,
-      stdio: 'pipe'
-    });
-    
-    installProcess.on('close', (code) => {
-      if (code === 0) {
-        resolve(true);
-      } else {
-        reject(new Error(`Installation des dépendances Python échouée (code ${code})`));
-      }
-    });
-    
-    installProcess.on('error', (error) => {
-      reject(error);
-    });
-  });
-}
-
+// Create main window
 function createWindow() {
-  // Create main window
   mainWindow = new BrowserWindow({
-    width: 1200,
-    height: 800,
-    minWidth: 800,
-    minHeight: 600,
+    width: 1400,
+    height: 900,
+    minWidth: 1200,
+    minHeight: 700,
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
@@ -100,18 +45,17 @@ function createWindow() {
     },
     icon: path.join(__dirname, 'assets', 'icon.png'),
     show: false,
-    titleBarStyle: 'default',
-    autoHideMenuBar: true // Masquer la barre de menu par défaut
+    titleBarStyle: 'default'
   });
 
-  // Load user interface
+  // Load the application
   mainWindow.loadFile(path.join(__dirname, 'renderer', 'index.html'));
 
-  // Show window once ready
+  // Show window when ready
   mainWindow.once('ready-to-show', () => {
     mainWindow.show();
     
-    // Vérifier Python au démarrage
+    // Check Python and dependencies
     checkPythonAndDependencies();
   });
 
@@ -121,15 +65,100 @@ function createWindow() {
     return { action: 'deny' };
   });
 
-  // Open DevTools in development mode
-  if (isDev) {
+  // Development mode: open DevTools
+  if (!isPackaged) {
     mainWindow.webContents.openDevTools();
   }
 }
 
-// Fonction pour vérifier Python et les dépendances
+// App event handlers
+app.whenReady().then(createWindow);
+
+app.on('window-all-closed', () => {
+  if (process.platform !== 'darwin') {
+    app.quit();
+  }
+});
+
+app.on('activate', () => {
+  if (BrowserWindow.getAllWindows().length === 0) {
+    createWindow();
+  }
+});
+
+// Security: prevent new window creation
+app.on('web-contents-created', (event, contents) => {
+  contents.on('new-window', (event, navigationUrl) => {
+    event.preventDefault();
+    shell.openExternal(navigationUrl);
+  });
+});
+
+// Check Python installation
+async function checkPythonInstallation() {
+  return new Promise((resolve) => {
+    const pythonCommands = ['python', 'python3', 'py'];
+    
+    let index = 0;
+    
+    function tryNextCommand() {
+      if (index >= pythonCommands.length) {
+        resolve(false);
+        return;
+      }
+      
+      const command = pythonCommands[index];
+      const child = spawn(command, ['--version'], { shell: true });
+      
+      child.on('close', (code) => {
+        if (code === 0) {
+          pythonPath = command;
+          resolve(true);
+        } else {
+          index++;
+          tryNextCommand();
+        }
+      });
+      
+      child.on('error', () => {
+        index++;
+        tryNextCommand();
+      });
+    }
+    
+    tryNextCommand();
+  });
+}
+
+// Install Python dependencies
+async function installPythonDependencies() {
+  return new Promise((resolve, reject) => {
+    const requirementsPath = getResourcePath('requirements.txt');
+    
+    if (!fs.existsSync(requirementsPath)) {
+      resolve();
+      return;
+    }
+    
+    const child = spawn(pythonPath, ['-m', 'pip', 'install', '-r', requirementsPath], { shell: true });
+    
+    child.on('close', (code) => {
+      if (code === 0) {
+        resolve();
+      } else {
+        reject(new Error('Failed to install Python dependencies'));
+      }
+    });
+    
+    child.on('error', (error) => {
+      reject(error);
+    });
+  });
+}
+
+// Check Python and dependencies
 async function checkPythonAndDependencies() {
-  // En mode packagé, nous utilisons backend.exe (Python embarqué), donc pas de vérification nécessaire
+  // In packaged mode, we use backend.exe (embedded Python), so no check needed
   if (isPackaged) {
     mainWindow.webContents.send('python-ready');
     return;
@@ -139,99 +168,100 @@ async function checkPythonAndDependencies() {
     
     if (!pythonInstalled) {
       dialog.showErrorBox(
-        'Python requis',
-        'Python n\'est pas installé sur votre système.\n\nVeuillez installer Python 3.7+ depuis https://python.org\n\nN\'oubliez pas de cocher "Add Python to PATH" lors de l\'installation.'
+        'Python Required',
+        'Python is not installed on your system.\n\nPlease install Python 3.7+ from https://python.org\n\nDon\'t forget to check "Add Python to PATH" during installation.'
       );
       app.quit();
       return;
     }
     
-    // Installer les dépendances Python
+    // Install Python dependencies
     await installPythonDependencies();
     
-    // Notifier que tout est prêt
+    // Notify that everything is ready
     mainWindow.webContents.send('python-ready');
     
   } catch (error) {
     dialog.showErrorBox(
-      'Erreur d\'initialisation',
-      `Impossible d'initialiser Python:\n${error.message}`
+      'Initialization Error',
+      `Unable to initialize Python:\n${error.message}`
     );
   }
 }
 
-// This method will be called when Electron has finished initialization
-app.whenReady().then(() => {
-  createWindow();
-
-  app.on('activate', () => {
-    // On macOS, recreate a window when the dock icon is clicked
-    if (BrowserWindow.getAllWindows().length === 0) {
-      createWindow();
-    }
-  });
-});
-
-// Quit when all windows are closed
-app.on('window-all-closed', () => {
-  if (process.platform !== 'darwin') {
-    app.quit();
-  }
-});
-
-// Security: Prevent new window creation
-app.on('web-contents-created', (event, contents) => {
-  contents.on('new-window', (event, url) => {
-    event.preventDefault();
-    shell.openExternal(url);
-  });
-});
-
-// IPC handlers for communication with renderer
-
-// Open file dialog
+// File dialog handler
 ipcMain.handle('open-file-dialog', async (event, options) => {
   const result = await dialog.showOpenDialog(mainWindow, {
     properties: ['openFile'],
     filters: options.filters || [
       { name: 'All Files', extensions: ['*'] }
-    ]
+    ],
+    title: options.title || 'Select a file'
   });
   
-  return result.canceled ? null : result.filePaths[0];
+  if (result.canceled) {
+    return null;
+  }
+  
+  return result.filePaths[0];
 });
 
-// Open save dialog
+// Save file dialog handler
 ipcMain.handle('save-file-dialog', async (event, options) => {
   const result = await dialog.showSaveDialog(mainWindow, {
-    defaultPath: options.defaultPath || 'generated_data.json',
     filters: options.filters || [
       { name: 'JSON Files', extensions: ['json'] },
       { name: 'All Files', extensions: ['*'] }
-    ]
+    ],
+    defaultPath: options.defaultPath || 'generated_data.json',
+    title: options.title || 'Save file'
   });
   
-  return result.canceled ? null : result.filePath;
+  if (result.canceled) {
+    return null;
+  }
+  
+  return result.filePath;
 });
 
-// Generate JSON data via Python script
+// Read file handler
+ipcMain.handle('read-file', async (event, filePath) => {
+  try {
+    const content = await fs.readFile(filePath, 'utf8');
+    return { success: true, content };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+});
+
+// Write file handler
+ipcMain.handle('write-file', async (event, filePath, content) => {
+  try {
+    await fs.writeFile(filePath, content, 'utf8');
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+});
+
+// Generate JSON data from file via Python script
 ipcMain.handle('generate-json', async (event, { skeletonPath, swaggerPath }) => {
   return new Promise((resolve, reject) => {
     let command;
     let args = [];
 
     if (isPackaged) {
-      // Utilise l'exécutable autonome embarqué
+      // Use embedded standalone executable
       command = getBackendPath();
       args = ['--skeleton', skeletonPath, '--pretty'];
       if (swaggerPath) {
         args.push('--swagger', swaggerPath);
       }
     } else {
-      // En développement : appelle l'interpréteur Python avec le script CLI
+      // In development: call Python interpreter with CLI script
       const pythonScriptPath = getResourcePath('src/cli_generate.py');
       if (!fs.existsSync(pythonScriptPath)) {
-        reject(new Error('Script Python introuvable'));
+        reject(new Error('Python script not found'));
         return;
       }
       command = pythonPath;
@@ -257,18 +287,18 @@ ipcMain.handle('generate-json', async (event, { skeletonPath, swaggerPath }) => 
     child.on('close', (code) => {
       if (code === 0) {
         try {
-          const jsonData = JSON.parse(output);
-          resolve(jsonData);
+          const result = JSON.parse(output);
+          resolve({ success: true, data: result });
         } catch (parseError) {
-          reject(new Error(`Erreur de parsing JSON: ${parseError.message}`));
+          reject(new Error(`Invalid JSON output: ${parseError.message}`));
         }
       } else {
-        reject(new Error(`Erreur backend (code ${code}): ${errorOutput}`));
+        reject(new Error(`Process exited with code ${code}: ${errorOutput}`));
       }
     });
 
     child.on('error', (error) => {
-      reject(new Error(`Erreur d'exécution backend: ${error.message}`));
+      reject(error);
     });
   });
 });
@@ -293,17 +323,17 @@ ipcMain.handle('generate-json-from-content', async (event, { skeletonContent, sw
       let args = [];
 
       if (isPackaged) {
-        // Utilise l'exécutable autonome embarqué
+        // Use embedded standalone executable
         command = getBackendPath();
         args = ['--skeleton', tempFile, '--pretty'];
         if (swaggerPath) {
           args.push('--swagger', swaggerPath);
         }
       } else {
-        // En développement : appelle l'interpréteur Python avec le script CLI
+        // In development: call Python interpreter with CLI script
         const pythonScriptPath = getResourcePath('src/cli_generate.py');
         if (!fs.existsSync(pythonScriptPath)) {
-          reject(new Error('Script Python introuvable'));
+          reject(new Error('Python script not found'));
           return;
         }
         command = pythonPath;
@@ -327,59 +357,35 @@ ipcMain.handle('generate-json-from-content', async (event, { skeletonContent, sw
       });
 
       child.on('close', (code) => {
-        // Clean up temp file
-        if (tempFile && fs.existsSync(tempFile)) {
-          fs.unlinkSync(tempFile);
-        }
-        
         if (code === 0) {
           try {
-            const jsonData = JSON.parse(output);
-            resolve(jsonData);
+            const result = JSON.parse(output);
+            resolve({ success: true, data: result });
           } catch (parseError) {
-            reject(new Error(`Erreur de parsing JSON: ${parseError.message}`));
+            reject(new Error(`Invalid JSON output: ${parseError.message}`));
           }
         } else {
-          reject(new Error(`Erreur backend (code ${code}): ${errorOutput}`));
+          reject(new Error(`Process exited with code ${code}: ${errorOutput}`));
         }
       });
 
       child.on('error', (error) => {
-        // Clean up temp file
-        if (tempFile && fs.existsSync(tempFile)) {
-          fs.unlinkSync(tempFile);
-        }
-        reject(new Error(`Erreur d'exécution backend: ${error.message}`));
+        reject(error);
       });
       
     } catch (error) {
-      // Clean up temp file on error
+      reject(error);
+    } finally {
+      // Clean up temporary file
       if (tempFile && fs.existsSync(tempFile)) {
-        fs.unlinkSync(tempFile);
+        try {
+          await fs.unlink(tempFile);
+        } catch (cleanupError) {
+          console.error('Failed to clean up temporary file:', cleanupError);
+        }
       }
-      reject(new Error(`Erreur de préparation: ${error.message}`));
     }
   });
-});
-
-// Save data to file
-ipcMain.handle('save-json-file', async (event, { filePath, data }) => {
-  try {
-    await fs.writeJson(filePath, data, { spaces: 2 });
-    return { success: true };
-  } catch (error) {
-    return { success: false, error: error.message };
-  }
-});
-
-// Read JSON file for preview
-ipcMain.handle('read-json-file', async (event, filePath) => {
-  try {
-    const data = await fs.readJson(filePath);
-    return { success: true, data };
-  } catch (error) {
-    return { success: false, error: error.message };
-  }
 });
 
 // Get example files
@@ -388,7 +394,7 @@ ipcMain.handle('get-examples', async () => {
     const examplesPath = getResourcePath('examples');
     
     if (!fs.existsSync(examplesPath)) {
-      return { success: false, error: 'Dossier examples introuvable' };
+      return { success: false, error: 'Examples folder not found' };
     }
     
     const files = await fs.readdir(examplesPath);
@@ -405,727 +411,648 @@ ipcMain.handle('get-examples', async () => {
   }
 });
 
-// Handler for error messages
-ipcMain.handle('show-error', async (event, { title, message }) => {
-  dialog.showErrorBox(title, message);
-});
-
-// Handler for information messages
-ipcMain.handle('show-info', async (event, { title, message }) => {
-  dialog.showMessageBox(mainWindow, {
-    type: 'info',
-    title: title,
-    message: message,
-    buttons: ['OK']
-  });
-});
-
-// Open external link
-ipcMain.handle('open-external', async (event, url) => {
-  shell.openExternal(url);
-});
-
-// Analyze JSON data for sensitive fields
-ipcMain.handle('analyze-json', async (event, filePath) => {
-  return new Promise((resolve, reject) => {
-    let command;
-    let args = [];
-
-    if (isPackaged) {
-      // Utilise l'exécutable autonome embarqué
-      command = getBackendPath();
-      args = ['--analyze', filePath, '--pretty'];
-    } else {
-      // En développement : appelle l'interpréteur Python avec le script CLI
-      const pythonScriptPath = getResourcePath('src/cli_generate.py');
-      if (!fs.existsSync(pythonScriptPath)) {
-        reject(new Error('Script Python introuvable'));
-        return;
-      }
-      command = pythonPath;
-      args = [pythonScriptPath, '--analyze', filePath, '--pretty'];
-    }
-
-    const child = spawn(command, args, { shell: true });
-
-    let output = '';
-    let errorOutput = '';
-
-    child.stdout.on('data', (data) => {
-      output += data.toString();
-    });
-
-    child.stderr.on('data', (data) => {
-      errorOutput += data.toString();
-    });
-
-    child.on('close', (code) => {
-      if (code === 0) {
-        try {
-          const analysisData = JSON.parse(output);
-          resolve(analysisData);
-        } catch (parseError) {
-          reject(new Error(`Erreur de parsing JSON: ${parseError.message}`));
-        }
-      } else {
-        reject(new Error(`Erreur backend (code ${code}): ${errorOutput}`));
-      }
-    });
-
-    child.on('error', (error) => {
-      reject(new Error(`Erreur d'exécution backend: ${error.message}`));
-    });
-  });
-});
-
-// Analyze JSON data from content for sensitive fields
-ipcMain.handle('analyze-json-from-content', async (event, content) => {
-  return new Promise(async (resolve, reject) => {
-    let tempFile = null;
-    
-    try {
-      // Create temporary file with the JSON content
-      const tempDir = os.tmpdir();
-      tempFile = path.join(tempDir, `analyze_${Date.now()}.json`);
-      
-      // Validate JSON content
-      JSON.parse(content);
-      
-      // Write content to temporary file
-      await fs.writeFile(tempFile, content, 'utf8');
-      
-      let command;
-      let args = [];
-
-      if (isPackaged) {
-        // Utilise l'exécutable autonome embarqué
-        command = getBackendPath();
-        args = ['--analyze', tempFile, '--pretty'];
-      } else {
-        // En développement : appelle l'interpréteur Python avec le script CLI
-        const pythonScriptPath = getResourcePath('src/cli_generate.py');
-        if (!fs.existsSync(pythonScriptPath)) {
-          reject(new Error('Script Python introuvable'));
-          return;
-        }
-        command = pythonPath;
-        args = [pythonScriptPath, '--analyze', tempFile, '--pretty'];
-      }
-
-      const child = spawn(command, args, { shell: true });
-
-      let output = '';
-      let errorOutput = '';
-
-      child.stdout.on('data', (data) => {
-        output += data.toString();
-      });
-
-      child.stderr.on('data', (data) => {
-        errorOutput += data.toString();
-      });
-
-      child.on('close', (code) => {
-        // Clean up temp file
-        if (tempFile && fs.existsSync(tempFile)) {
-          fs.unlinkSync(tempFile);
-        }
-        
-        if (code === 0) {
-          try {
-            const analysisData = JSON.parse(output);
-            resolve(analysisData);
-          } catch (parseError) {
-            reject(new Error(`Erreur de parsing JSON: ${parseError.message}`));
-          }
-        } else {
-          reject(new Error(`Erreur backend (code ${code}): ${errorOutput}`));
-        }
-      });
-
-      child.on('error', (error) => {
-        // Clean up temp file
-        if (tempFile && fs.existsSync(tempFile)) {
-          fs.unlinkSync(tempFile);
-        }
-        reject(new Error(`Erreur d'exécution backend: ${error.message}`));
-      });
-      
-    } catch (error) {
-      // Clean up temp file on error
-      if (tempFile && fs.existsSync(tempFile)) {
-        fs.unlinkSync(tempFile);
-      }
-      reject(new Error(`Erreur de préparation: ${error.message}`));
-    }
-  });
-});
-
-// Anonymize JSON data
-ipcMain.handle('anonymize-json', async (event, filePath) => {
-  return new Promise((resolve, reject) => {
-    let command;
-    let args = [];
-
-    if (isPackaged) {
-      // Utilise l'exécutable autonome embarqué
-      command = getBackendPath();
-      args = ['--anonymize', filePath, '--pretty'];
-    } else {
-      // En développement : appelle l'interpréteur Python avec le script CLI
-      const pythonScriptPath = getResourcePath('src/cli_generate.py');
-      if (!fs.existsSync(pythonScriptPath)) {
-        reject(new Error('Script Python introuvable'));
-        return;
-      }
-      command = pythonPath;
-      args = [pythonScriptPath, '--anonymize', filePath, '--pretty'];
-    }
-
-    const child = spawn(command, args, { shell: true });
-
-    let output = '';
-    let errorOutput = '';
-
-    child.stdout.on('data', (data) => {
-      output += data.toString();
-    });
-
-    child.stderr.on('data', (data) => {
-      errorOutput += data.toString();
-    });
-
-    child.on('close', (code) => {
-      if (code === 0) {
-        try {
-          const anonymizedData = JSON.parse(output);
-          resolve(anonymizedData);
-        } catch (parseError) {
-          reject(new Error(`Erreur de parsing JSON: ${parseError.message}`));
-        }
-      } else {
-        reject(new Error(`Erreur backend (code ${code}): ${errorOutput}`));
-      }
-    });
-
-    child.on('error', (error) => {
-      reject(new Error(`Erreur d'exécution backend: ${error.message}`));
-    });
-  });
-});
-
-// Anonymize JSON data from content
-ipcMain.handle('anonymize-json-from-content', async (event, content) => {
-  return new Promise(async (resolve, reject) => {
-    let tempFile = null;
-    
-    try {
-      // Create temporary file with the JSON content
-      const tempDir = os.tmpdir();
-      tempFile = path.join(tempDir, `anonymize_${Date.now()}.json`);
-      
-      // Validate JSON content
-      JSON.parse(content);
-      
-      // Write content to temporary file
-      await fs.writeFile(tempFile, content, 'utf8');
-      
-      let command;
-      let args = [];
-
-      if (isPackaged) {
-        // Utilise l'exécutable autonome embarqué
-        command = getBackendPath();
-        args = ['--anonymize', tempFile, '--pretty'];
-      } else {
-        // En développement : appelle l'interpréteur Python avec le script CLI
-        const pythonScriptPath = getResourcePath('src/cli_generate.py');
-        if (!fs.existsSync(pythonScriptPath)) {
-          reject(new Error('Script Python introuvable'));
-          return;
-        }
-        command = pythonPath;
-        args = [pythonScriptPath, '--anonymize', tempFile, '--pretty'];
-      }
-
-      const child = spawn(command, args, { shell: true });
-
-      let output = '';
-      let errorOutput = '';
-
-      child.stdout.on('data', (data) => {
-        output += data.toString();
-      });
-
-      child.stderr.on('data', (data) => {
-        errorOutput += data.toString();
-      });
-
-      child.on('close', (code) => {
-        // Clean up temp file
-        if (tempFile && fs.existsSync(tempFile)) {
-          fs.unlinkSync(tempFile);
-        }
-        
-        if (code === 0) {
-          try {
-            const anonymizedData = JSON.parse(output);
-            resolve(anonymizedData);
-          } catch (parseError) {
-            reject(new Error(`Erreur de parsing JSON: ${parseError.message}`));
-          }
-        } else {
-          reject(new Error(`Erreur backend (code ${code}): ${errorOutput}`));
-        }
-      });
-
-      child.on('error', (error) => {
-        // Clean up temp file
-        if (tempFile && fs.existsSync(tempFile)) {
-          fs.unlinkSync(tempFile);
-        }
-        reject(new Error(`Erreur d'exécution backend: ${error.message}`));
-      });
-      
-    } catch (error) {
-      // Clean up temp file on error
-      if (tempFile && fs.existsSync(tempFile)) {
-        fs.unlinkSync(tempFile);
-      }
-      reject(new Error(`Erreur de préparation: ${error.message}`));
-    }
-  });
-});
-
-// Unified handler for data generation
-ipcMain.handle('generate-data', async (event, requestData) => {
+// Load example file
+ipcMain.handle('load-example', async (event, examplePath) => {
   try {
-    const { skeleton_path, skeleton_content, swagger_path } = requestData;
-    
-    let result;
-    if (skeleton_path) {
-      // Use file-based generation
-      result = await new Promise((resolve, reject) => {
-        let command;
-        let args = [];
-
-        if (isPackaged) {
-          command = getBackendPath();
-          args = ['--skeleton', skeleton_path, '--pretty'];
-          if (swagger_path) {
-            args.push('--swagger', swagger_path);
-          }
-        } else {
-          const pythonScriptPath = getResourcePath('src/cli_generate.py');
-          if (!fs.existsSync(pythonScriptPath)) {
-            reject(new Error('Script Python introuvable'));
-            return;
-          }
-          command = pythonPath;
-          args = [pythonScriptPath, '--skeleton', skeleton_path, '--pretty'];
-          if (swagger_path) {
-            args.push('--swagger', swagger_path);
-          }
-        }
-
-        const child = spawn(command, args, { shell: true });
-
-        let output = '';
-        let errorOutput = '';
-
-        child.stdout.on('data', (data) => {
-          output += data.toString();
-        });
-
-        child.stderr.on('data', (data) => {
-          errorOutput += data.toString();
-        });
-
-        child.on('close', (code) => {
-          if (code === 0) {
-            try {
-              const jsonData = JSON.parse(output);
-              resolve(jsonData);
-            } catch (parseError) {
-              reject(new Error(`Erreur de parsing JSON: ${parseError.message}`));
-            }
-          } else {
-            reject(new Error(`Erreur backend (code ${code}): ${errorOutput}`));
-          }
-        });
-
-        child.on('error', (error) => {
-          reject(new Error(`Erreur d'exécution backend: ${error.message}`));
-        });
-      });
-    } else if (skeleton_content) {
-      // Use content-based generation
-      result = await new Promise(async (resolve, reject) => {
-        let tempFile = null;
-        
-        try {
-          const tempDir = os.tmpdir();
-          tempFile = path.join(tempDir, `skeleton_${Date.now()}.json`);
-          
-          JSON.parse(skeleton_content);
-          await fs.writeFile(tempFile, skeleton_content, 'utf8');
-          
-          let command;
-          let args = [];
-
-          if (isPackaged) {
-            command = getBackendPath();
-            args = ['--skeleton', tempFile, '--pretty'];
-            if (swagger_path) {
-              args.push('--swagger', swagger_path);
-            }
-          } else {
-            const pythonScriptPath = getResourcePath('src/cli_generate.py');
-            if (!fs.existsSync(pythonScriptPath)) {
-              reject(new Error('Script Python introuvable'));
-              return;
-            }
-            command = pythonPath;
-            args = [pythonScriptPath, '--skeleton', tempFile, '--pretty'];
-            if (swagger_path) {
-              args.push('--swagger', swagger_path);
-            }
-          }
-
-          const child = spawn(command, args, { shell: true });
-
-          let output = '';
-          let errorOutput = '';
-
-          child.stdout.on('data', (data) => {
-            output += data.toString();
-          });
-
-          child.stderr.on('data', (data) => {
-            errorOutput += data.toString();
-          });
-
-          child.on('close', (code) => {
-            if (tempFile && fs.existsSync(tempFile)) {
-              fs.unlinkSync(tempFile);
-            }
-            
-            if (code === 0) {
-              try {
-                const jsonData = JSON.parse(output);
-                resolve(jsonData);
-              } catch (parseError) {
-                reject(new Error(`Erreur de parsing JSON: ${parseError.message}`));
-              }
-            } else {
-              reject(new Error(`Erreur backend (code ${code}): ${errorOutput}`));
-            }
-          });
-
-          child.on('error', (error) => {
-            if (tempFile && fs.existsSync(tempFile)) {
-              fs.unlinkSync(tempFile);
-            }
-            reject(new Error(`Erreur d'exécution backend: ${error.message}`));
-          });
-          
-        } catch (error) {
-          if (tempFile && fs.existsSync(tempFile)) {
-            fs.unlinkSync(tempFile);
-          }
-          reject(new Error(`Erreur de préparation: ${error.message}`));
-        }
-      });
-    } else {
-      throw new Error('Aucune donnée skeleton fournie');
-    }
-    
-    return { success: true, data: result };
+    const content = await fs.readFile(examplePath, 'utf8');
+    return { success: true, content };
   } catch (error) {
     return { success: false, error: error.message };
   }
 });
 
-// Unified handler for data analysis
-ipcMain.handle('analyze-data', async (event, requestData) => {
+// Copy to clipboard
+ipcMain.handle('copy-to-clipboard', async (event, text) => {
   try {
-    const { data_path, data_content } = requestData;
-    
-    let result;
-    if (data_path) {
-      // Use file-based analysis - call the existing analyze-json handler logic
-      result = await new Promise((resolve, reject) => {
-        let command;
-        let args = [];
-
-        if (isPackaged) {
-          command = getBackendPath();
-          args = ['--analyze', data_path, '--pretty'];
-        } else {
-          const pythonScriptPath = getResourcePath('src/cli_generate.py');
-          if (!fs.existsSync(pythonScriptPath)) {
-            reject(new Error('Script Python introuvable'));
-            return;
-          }
-          command = pythonPath;
-          args = [pythonScriptPath, '--analyze', data_path, '--pretty'];
-        }
-
-        const child = spawn(command, args, { shell: true });
-
-        let output = '';
-        let errorOutput = '';
-
-        child.stdout.on('data', (data) => {
-          output += data.toString();
-        });
-
-        child.stderr.on('data', (data) => {
-          errorOutput += data.toString();
-        });
-
-        child.on('close', (code) => {
-          if (code === 0) {
-            try {
-              const analysisData = JSON.parse(output);
-              resolve(analysisData);
-            } catch (parseError) {
-              reject(new Error(`Erreur de parsing JSON: ${parseError.message}`));
-            }
-          } else {
-            reject(new Error(`Erreur backend (code ${code}): ${errorOutput}`));
-          }
-        });
-
-        child.on('error', (error) => {
-          reject(new Error(`Erreur d'exécution backend: ${error.message}`));
-        });
-      });
-    } else if (data_content) {
-      // Use content-based analysis
-      result = await new Promise(async (resolve, reject) => {
-        let tempFile = null;
-        
-        try {
-          const tempDir = os.tmpdir();
-          tempFile = path.join(tempDir, `analyze_${Date.now()}.json`);
-          
-          JSON.parse(data_content);
-          await fs.writeFile(tempFile, data_content, 'utf8');
-          
-          let command;
-          let args = [];
-
-          if (isPackaged) {
-            command = getBackendPath();
-            args = ['--analyze', tempFile, '--pretty'];
-          } else {
-            const pythonScriptPath = getResourcePath('src/cli_generate.py');
-            if (!fs.existsSync(pythonScriptPath)) {
-              reject(new Error('Script Python introuvable'));
-              return;
-            }
-            command = pythonPath;
-            args = [pythonScriptPath, '--analyze', tempFile, '--pretty'];
-          }
-
-          const child = spawn(command, args, { shell: true });
-
-          let output = '';
-          let errorOutput = '';
-
-          child.stdout.on('data', (data) => {
-            output += data.toString();
-          });
-
-          child.stderr.on('data', (data) => {
-            errorOutput += data.toString();
-          });
-
-          child.on('close', (code) => {
-            if (tempFile && fs.existsSync(tempFile)) {
-              fs.unlinkSync(tempFile);
-            }
-            
-            if (code === 0) {
-              try {
-                const analysisData = JSON.parse(output);
-                resolve(analysisData);
-              } catch (parseError) {
-                reject(new Error(`Erreur de parsing JSON: ${parseError.message}`));
-              }
-            } else {
-              reject(new Error(`Erreur backend (code ${code}): ${errorOutput}`));
-            }
-          });
-
-          child.on('error', (error) => {
-            if (tempFile && fs.existsSync(tempFile)) {
-              fs.unlinkSync(tempFile);
-            }
-            reject(new Error(`Erreur d'exécution backend: ${error.message}`));
-          });
-          
-        } catch (error) {
-          if (tempFile && fs.existsSync(tempFile)) {
-            fs.unlinkSync(tempFile);
-          }
-          reject(new Error(`Erreur de préparation: ${error.message}`));
-        }
-      });
-    } else {
-      throw new Error('Aucune donnée fournie pour l\'analyse');
-    }
-    
-    return { success: true, analysis: result };
-  } catch (error) {
-    return { success: false, error: error.message };
-  }
-});
-
-// Unified handler for data anonymization
-ipcMain.handle('anonymize-data', async (event, requestData) => {
-  try {
-    const { data_path, data_content, analyze_first } = requestData;
-    
-    let result;
-    if (data_path) {
-      // Use file-based anonymization
-      result = await new Promise((resolve, reject) => {
-        let command;
-        let args = [];
-
-        if (isPackaged) {
-          command = getBackendPath();
-          args = ['--anonymize', data_path, '--pretty'];
-        } else {
-          const pythonScriptPath = getResourcePath('src/cli_generate.py');
-          if (!fs.existsSync(pythonScriptPath)) {
-            reject(new Error('Script Python introuvable'));
-            return;
-          }
-          command = pythonPath;
-          args = [pythonScriptPath, '--anonymize', data_path, '--pretty'];
-        }
-
-        const child = spawn(command, args, { shell: true });
-
-        let output = '';
-        let errorOutput = '';
-
-        child.stdout.on('data', (data) => {
-          output += data.toString();
-        });
-
-        child.stderr.on('data', (data) => {
-          errorOutput += data.toString();
-        });
-
-        child.on('close', (code) => {
-          if (code === 0) {
-            try {
-              const anonymizedData = JSON.parse(output);
-              resolve(anonymizedData);
-            } catch (parseError) {
-              reject(new Error(`Erreur de parsing JSON: ${parseError.message}`));
-            }
-          } else {
-            reject(new Error(`Erreur backend (code ${code}): ${errorOutput}`));
-          }
-        });
-
-        child.on('error', (error) => {
-          reject(new Error(`Erreur d'exécution backend: ${error.message}`));
-        });
-      });
-    } else if (data_content) {
-      // Use content-based anonymization
-      result = await new Promise(async (resolve, reject) => {
-        let tempFile = null;
-        
-        try {
-          const tempDir = os.tmpdir();
-          tempFile = path.join(tempDir, `anonymize_${Date.now()}.json`);
-          
-          JSON.parse(data_content);
-          await fs.writeFile(tempFile, data_content, 'utf8');
-          
-          let command;
-          let args = [];
-
-          if (isPackaged) {
-            command = getBackendPath();
-            args = ['--anonymize', tempFile, '--pretty'];
-          } else {
-            const pythonScriptPath = getResourcePath('src/cli_generate.py');
-            if (!fs.existsSync(pythonScriptPath)) {
-              reject(new Error('Script Python introuvable'));
-              return;
-            }
-            command = pythonPath;
-            args = [pythonScriptPath, '--anonymize', tempFile, '--pretty'];
-          }
-
-          const child = spawn(command, args, { shell: true });
-
-          let output = '';
-          let errorOutput = '';
-
-          child.stdout.on('data', (data) => {
-            output += data.toString();
-          });
-
-          child.stderr.on('data', (data) => {
-            errorOutput += data.toString();
-          });
-
-          child.on('close', (code) => {
-            if (tempFile && fs.existsSync(tempFile)) {
-              fs.unlinkSync(tempFile);
-            }
-            
-            if (code === 0) {
-              try {
-                const anonymizedData = JSON.parse(output);
-                resolve(anonymizedData);
-              } catch (parseError) {
-                reject(new Error(`Erreur de parsing JSON: ${parseError.message}`));
-              }
-            } else {
-              reject(new Error(`Erreur backend (code ${code}): ${errorOutput}`));
-            }
-          });
-
-          child.on('error', (error) => {
-            if (tempFile && fs.existsSync(tempFile)) {
-              fs.unlinkSync(tempFile);
-            }
-            reject(new Error(`Erreur d'exécution backend: ${error.message}`));
-          });
-          
-        } catch (error) {
-          if (tempFile && fs.existsSync(tempFile)) {
-            fs.unlinkSync(tempFile);
-          }
-          reject(new Error(`Erreur de préparation: ${error.message}`));
-        }
-      });
-    } else {
-      throw new Error('Aucune donnée fournie pour l\'anonymisation');
-    }
-    
-    return { success: true, data: result };
-  } catch (error) {
-    return { success: false, error: error.message };
-  }
-});
-
-// Unified handler for file saving
-ipcMain.handle('save-file', async (event, { filePath, data }) => {
-  try {
-    await fs.writeFile(filePath, data, 'utf8');
+    const { clipboard } = require('electron');
+    clipboard.writeText(text);
     return { success: true };
   } catch (error) {
     return { success: false, error: error.message };
   }
+});
+
+// Show item in folder
+ipcMain.handle('show-item-in-folder', async (event, filePath) => {
+  try {
+    shell.showItemInFolder(filePath);
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+});
+
+// Open external link
+ipcMain.handle('open-external', async (event, url) => {
+  try {
+    await shell.openExternal(url);
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+});
+
+// Check if file exists
+ipcMain.handle('file-exists', async (event, filePath) => {
+  try {
+    const exists = await fs.pathExists(filePath);
+    return { success: true, exists };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+});
+
+// Get file stats
+ipcMain.handle('get-file-stats', async (event, filePath) => {
+  try {
+    const stats = await fs.stat(filePath);
+    return { 
+      success: true, 
+      stats: {
+        size: stats.size,
+        mtime: stats.mtime,
+        isFile: stats.isFile(),
+        isDirectory: stats.isDirectory()
+      }
+    };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+});
+
+// Create directory
+ipcMain.handle('create-directory', async (event, dirPath) => {
+  try {
+    await fs.ensureDir(dirPath);
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+});
+
+// Delete file or directory
+ipcMain.handle('delete-path', async (event, targetPath) => {
+  try {
+    await fs.remove(targetPath);
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+});
+
+// Get app version
+ipcMain.handle('get-app-version', async () => {
+  return { success: true, version: app.getVersion() };
+});
+
+// Get system info
+ipcMain.handle('get-system-info', async () => {
+  return {
+    success: true,
+    info: {
+      platform: process.platform,
+      arch: process.arch,
+      nodeVersion: process.version,
+      electronVersion: process.versions.electron,
+      chromeVersion: process.versions.chrome
+    }
+  };
+});
+
+// Quit application
+ipcMain.handle('quit-app', async () => {
+  app.quit();
+});
+
+// Restart application
+ipcMain.handle('restart-app', async () => {
+  app.relaunch();
+  app.quit();
+});
+
+// Show message box
+ipcMain.handle('show-message-box', async (event, options) => {
+  try {
+    const result = await dialog.showMessageBox(mainWindow, options);
+    return { success: true, result };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+});
+
+// Show error box
+ipcMain.handle('show-error-box', async (event, title, content) => {
+  try {
+    dialog.showErrorBox(title, content);
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+});
+
+// Minimize window
+ipcMain.handle('minimize-window', async () => {
+  try {
+    if (mainWindow) {
+      mainWindow.minimize();
+    }
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+});
+
+// Maximize window
+ipcMain.handle('maximize-window', async () => {
+  try {
+    if (mainWindow) {
+      if (mainWindow.isMaximized()) {
+        mainWindow.unmaximize();
+      } else {
+        mainWindow.maximize();
+      }
+    }
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+});
+
+// Close window
+ipcMain.handle('close-window', async () => {
+  try {
+    if (mainWindow) {
+      mainWindow.close();
+    }
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+});
+
+// Get window state
+ipcMain.handle('get-window-state', async () => {
+  try {
+    if (mainWindow) {
+      return {
+        success: true,
+        state: {
+          isMaximized: mainWindow.isMaximized(),
+          isMinimized: mainWindow.isMinimized(),
+          isFullScreen: mainWindow.isFullScreen(),
+          bounds: mainWindow.getBounds()
+        }
+      };
+    }
+    return { success: false, error: 'Window not found' };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+});
+
+// Set window bounds
+ipcMain.handle('set-window-bounds', async (event, bounds) => {
+  try {
+    if (mainWindow) {
+      mainWindow.setBounds(bounds);
+    }
+    return { success: true };
+  } catch (error) {
+    return { success: false, error: error.message };
+  }
+});
+
+// New unified handlers for the updated interface
+ipcMain.handle('generate-data', async (event, requestData) => {
+  const { skeleton_path, skeleton_content, swagger_path } = requestData;
+  
+  let result;
+  
+  if (skeleton_path) {
+    // Use file-based generation
+    result = await new Promise((resolve, reject) => {
+      let command;
+      let args = [];
+
+      if (isPackaged) {
+        command = getBackendPath();
+        args = ['--skeleton', skeleton_path, '--pretty'];
+        if (swagger_path) {
+          args.push('--swagger', swagger_path);
+        }
+      } else {
+        const pythonScriptPath = getResourcePath('src/cli_generate.py');
+        if (!fs.existsSync(pythonScriptPath)) {
+          reject(new Error('Python script not found'));
+          return;
+        }
+        command = pythonPath;
+        args = [pythonScriptPath, '--skeleton', skeleton_path, '--pretty'];
+        if (swagger_path) {
+          args.push('--swagger', swagger_path);
+        }
+      }
+
+      const child = spawn(command, args, { shell: true });
+
+      let output = '';
+      let errorOutput = '';
+
+      child.stdout.on('data', (data) => {
+        output += data.toString();
+      });
+
+      child.stderr.on('data', (data) => {
+        errorOutput += data.toString();
+      });
+
+      child.on('close', (code) => {
+        if (code === 0) {
+          try {
+            const result = JSON.parse(output);
+            resolve({ success: true, data: result });
+          } catch (parseError) {
+            reject(new Error(`Invalid JSON output: ${parseError.message}`));
+          }
+        } else {
+          reject(new Error(`Process exited with code ${code}: ${errorOutput}`));
+        }
+      });
+
+      child.on('error', (error) => {
+        reject(error);
+      });
+    });
+  } else if (skeleton_content) {
+    // Use content-based generation
+    result = await new Promise(async (resolve, reject) => {
+      let tempFile = null;
+      
+      try {
+        const tempDir = os.tmpdir();
+        tempFile = path.join(tempDir, `skeleton_${Date.now()}.json`);
+        
+        JSON.parse(skeleton_content);
+        await fs.writeFile(tempFile, skeleton_content, 'utf8');
+        
+        let command;
+        let args = [];
+
+        if (isPackaged) {
+          command = getBackendPath();
+          args = ['--skeleton', tempFile, '--pretty'];
+          if (swagger_path) {
+            args.push('--swagger', swagger_path);
+          }
+        } else {
+          const pythonScriptPath = getResourcePath('src/cli_generate.py');
+          if (!fs.existsSync(pythonScriptPath)) {
+            reject(new Error('Python script not found'));
+            return;
+          }
+          command = pythonPath;
+          args = [pythonScriptPath, '--skeleton', tempFile, '--pretty'];
+          if (swagger_path) {
+            args.push('--swagger', swagger_path);
+          }
+        }
+
+        const child = spawn(command, args, { shell: true });
+
+        let output = '';
+        let errorOutput = '';
+
+        child.stdout.on('data', (data) => {
+          output += data.toString();
+        });
+
+        child.stderr.on('data', (data) => {
+          errorOutput += data.toString();
+        });
+
+        child.on('close', async (code) => {
+          // Clean up temp file after process completion
+          if (tempFile && fs.existsSync(tempFile)) {
+            try {
+              await fs.unlink(tempFile);
+            } catch (cleanupError) {
+              console.error('Failed to clean up temporary file:', cleanupError);
+            }
+          }
+          
+          if (code === 0) {
+            try {
+              const result = JSON.parse(output);
+              resolve({ success: true, data: result });
+            } catch (parseError) {
+              reject(new Error(`Invalid JSON output: ${parseError.message}`));
+            }
+          } else {
+            reject(new Error(`Process exited with code ${code}: ${errorOutput}`));
+          }
+        });
+
+        child.on('error', async (error) => {
+          // Clean up temp file on error
+          if (tempFile && fs.existsSync(tempFile)) {
+            try {
+              await fs.unlink(tempFile);
+            } catch (cleanupError) {
+              console.error('Failed to clean up temporary file:', cleanupError);
+            }
+          }
+          reject(error);
+        });
+        
+      } catch (error) {
+        reject(error);
+      }
+    });
+  } else {
+    result = { success: false, error: 'No skeleton data provided' };
+  }
+  
+  return result;
+});
+
+// Analyze data for sensitive fields
+ipcMain.handle('analyze-data', async (event, requestData) => {
+  const { data_path, data_content } = requestData;
+  
+  let result;
+  
+  if (data_path) {
+    // Use file-based analysis
+    result = await new Promise((resolve, reject) => {
+      let command;
+      let args = [];
+
+      if (isPackaged) {
+        command = getBackendPath();
+        args = ['--analyze', data_path, '--pretty'];
+      } else {
+        const pythonScriptPath = getResourcePath('src/cli_generate.py');
+        if (!fs.existsSync(pythonScriptPath)) {
+          reject(new Error('Python script not found'));
+          return;
+        }
+        command = pythonPath;
+        args = [pythonScriptPath, '--analyze', data_path, '--pretty'];
+      }
+
+      const child = spawn(command, args, { shell: true });
+
+      let output = '';
+      let errorOutput = '';
+
+      child.stdout.on('data', (data) => {
+        output += data.toString();
+      });
+
+      child.stderr.on('data', (data) => {
+        errorOutput += data.toString();
+      });
+
+      child.on('close', (code) => {
+        if (code === 0) {
+          try {
+            const result = JSON.parse(output);
+            resolve({ success: true, analysis: result });
+          } catch (parseError) {
+            reject(new Error(`Invalid JSON output: ${parseError.message}`));
+          }
+        } else {
+          reject(new Error(`Process exited with code ${code}: ${errorOutput}`));
+        }
+      });
+
+      child.on('error', (error) => {
+        reject(error);
+      });
+    });
+  } else if (data_content) {
+    // Use content-based analysis
+    result = await new Promise(async (resolve, reject) => {
+      let tempFile = null;
+      
+      try {
+        const tempDir = os.tmpdir();
+        tempFile = path.join(tempDir, `data_${Date.now()}.json`);
+        
+        JSON.parse(data_content);
+        await fs.writeFile(tempFile, data_content, 'utf8');
+        
+        let command;
+        let args = [];
+
+        if (isPackaged) {
+          command = getBackendPath();
+          args = ['--analyze', tempFile, '--pretty'];
+        } else {
+          const pythonScriptPath = getResourcePath('src/cli_generate.py');
+          if (!fs.existsSync(pythonScriptPath)) {
+            reject(new Error('Python script not found'));
+            return;
+          }
+          command = pythonPath;
+          args = [pythonScriptPath, '--analyze', tempFile, '--pretty'];
+        }
+
+        const child = spawn(command, args, { shell: true });
+
+        let output = '';
+        let errorOutput = '';
+
+        child.stdout.on('data', (data) => {
+          output += data.toString();
+        });
+
+        child.stderr.on('data', (data) => {
+          errorOutput += data.toString();
+        });
+
+        child.on('close', async (code) => {
+          // Clean up temp file after process completion
+          if (tempFile && fs.existsSync(tempFile)) {
+            try {
+              await fs.unlink(tempFile);
+            } catch (cleanupError) {
+              console.error('Failed to clean up temporary file:', cleanupError);
+            }
+          }
+          
+          if (code === 0) {
+            try {
+              const result = JSON.parse(output);
+              resolve({ success: true, analysis: result });
+            } catch (parseError) {
+              reject(new Error(`Invalid JSON output: ${parseError.message}`));
+            }
+          } else {
+            reject(new Error(`Process exited with code ${code}: ${errorOutput}`));
+          }
+        });
+
+        child.on('error', async (error) => {
+          // Clean up temp file on error
+          if (tempFile && fs.existsSync(tempFile)) {
+            try {
+              await fs.unlink(tempFile);
+            } catch (cleanupError) {
+              console.error('Failed to clean up temporary file:', cleanupError);
+            }
+          }
+          reject(error);
+        });
+        
+      } catch (error) {
+        reject(error);
+      }
+    });
+  } else {
+    result = { success: false, error: 'No data provided for analysis' };
+  }
+  
+  return result;
+});
+
+// Anonymize data
+ipcMain.handle('anonymize-data', async (event, requestData) => {
+  const { data_path, data_content, analyze_first } = requestData;
+  
+  let result;
+  
+  if (data_path) {
+    // Use file-based anonymization
+    result = await new Promise((resolve, reject) => {
+      let command;
+      let args = [];
+
+      if (isPackaged) {
+        command = getBackendPath();
+        args = ['--anonymize', data_path, '--pretty'];
+      } else {
+        const pythonScriptPath = getResourcePath('src/cli_generate.py');
+        if (!fs.existsSync(pythonScriptPath)) {
+          reject(new Error('Python script not found'));
+          return;
+        }
+        command = pythonPath;
+        args = [pythonScriptPath, '--anonymize', data_path, '--pretty'];
+      }
+
+      const child = spawn(command, args, { shell: true });
+
+      let output = '';
+      let errorOutput = '';
+
+      child.stdout.on('data', (data) => {
+        output += data.toString();
+      });
+
+      child.stderr.on('data', (data) => {
+        errorOutput += data.toString();
+      });
+
+      child.on('close', (code) => {
+        if (code === 0) {
+          try {
+            const result = JSON.parse(output);
+            resolve({ success: true, data: result });
+          } catch (parseError) {
+            reject(new Error(`Invalid JSON output: ${parseError.message}`));
+          }
+        } else {
+          reject(new Error(`Process exited with code ${code}: ${errorOutput}`));
+        }
+      });
+
+      child.on('error', (error) => {
+        reject(error);
+      });
+    });
+  } else if (data_content) {
+    // Use content-based anonymization
+    result = await new Promise(async (resolve, reject) => {
+      let tempFile = null;
+      
+      try {
+        const tempDir = os.tmpdir();
+        tempFile = path.join(tempDir, `data_${Date.now()}.json`);
+        
+        JSON.parse(data_content);
+        await fs.writeFile(tempFile, data_content, 'utf8');
+        
+        let command;
+        let args = [];
+
+        if (isPackaged) {
+          command = getBackendPath();
+          args = ['--anonymize', tempFile, '--pretty'];
+        } else {
+          const pythonScriptPath = getResourcePath('src/cli_generate.py');
+          if (!fs.existsSync(pythonScriptPath)) {
+            reject(new Error('Python script not found'));
+            return;
+          }
+          command = pythonPath;
+          args = [pythonScriptPath, '--anonymize', tempFile, '--pretty'];
+        }
+
+        const child = spawn(command, args, { shell: true });
+
+        let output = '';
+        let errorOutput = '';
+
+        child.stdout.on('data', (data) => {
+          output += data.toString();
+        });
+
+        child.stderr.on('data', (data) => {
+          errorOutput += data.toString();
+        });
+
+        child.on('close', async (code) => {
+          // Clean up temp file after process completion
+          if (tempFile && fs.existsSync(tempFile)) {
+            try {
+              await fs.unlink(tempFile);
+            } catch (cleanupError) {
+              console.error('Failed to clean up temporary file:', cleanupError);
+            }
+          }
+          
+          if (code === 0) {
+            try {
+              const result = JSON.parse(output);
+              resolve({ success: true, data: result });
+            } catch (parseError) {
+              reject(new Error(`Invalid JSON output: ${parseError.message}`));
+            }
+          } else {
+            reject(new Error(`Process exited with code ${code}: ${errorOutput}`));
+          }
+        });
+
+        child.on('error', async (error) => {
+          // Clean up temp file on error
+          if (tempFile && fs.existsSync(tempFile)) {
+            try {
+              await fs.unlink(tempFile);
+            } catch (cleanupError) {
+              console.error('Failed to clean up temporary file:', cleanupError);
+            }
+          }
+          reject(error);
+        });
+        
+      } catch (error) {
+        reject(error);
+      }
+    });
+  } else {
+    result = { success: false, error: 'No data provided for anonymization' };
+  }
+  
+  return result;
 });

@@ -11,6 +11,12 @@ let currentAnonymizeMode = 'file'; // 'file' or 'content'
 let anonymizedData = null;
 let sensitiveFieldsAnalysis = null;
 
+// Format states for toggle functionality
+let formatStates = {
+    'json-preview': 'formatted', // 'formatted' or 'minified'
+    'anonymized-preview': 'formatted'
+};
+
 // DOM elements
 const skeletonFileInput = document.getElementById('skeleton-file');
 const skeletonTextarea = document.getElementById('skeleton-textarea');
@@ -43,6 +49,7 @@ const analyzeFirstCheckbox = document.getElementById('analyze-first');
 const anonymizedPreview = document.getElementById('anonymized-preview');
 const copyAnonymizedBtn = document.getElementById('copy-anonymized-btn');
 const formatAnonymizedBtn = document.getElementById('format-anonymized-btn');
+
 
 // Initialization
 document.addEventListener('DOMContentLoaded', () => {
@@ -110,7 +117,7 @@ function switchView(viewId) {
     
     // Update current mode
     currentMode = viewId;
-    updateStatus(`Mode ${viewId === 'generate' ? 'génération' : 'anonymisation'} sélectionné`);
+    updateStatus(`${viewId === 'generate' ? 'Generation' : 'Anonymization'} mode selected`);
     updateUI();
 }
 
@@ -140,11 +147,11 @@ function switchTab(tabId) {
         if (currentSkeletonMode === 'file') {
             skeletonContent = null;
             skeletonTextarea.value = '';
-            updateStatus('Mode fichier sélectionné');
+            updateStatus('File mode selected');
         } else {
             skeletonPath = null;
             skeletonFileInput.value = '';
-            updateStatus('Mode contenu sélectionné');
+            updateStatus('Content mode selected');
         }
     } else if (tabId === 'anonymize-file' || tabId === 'anonymize-content') {
         // Update anonymize mode
@@ -154,11 +161,11 @@ function switchTab(tabId) {
         if (currentAnonymizeMode === 'file') {
             anonymizeContent = null;
             anonymizeTextarea.value = '';
-            updateStatus('Mode fichier sélectionné');
+            updateStatus('File mode selected');
         } else {
             anonymizeFilePath = null;
             anonymizeFileInput.value = '';
-            updateStatus('Mode contenu sélectionné');
+            updateStatus('Content mode selected');
         }
     }
     
@@ -173,22 +180,22 @@ async function browseFile(type) {
         
         if (type === 'skeleton') {
             filters = [
-                { name: 'Fichiers JSON', extensions: ['json'] },
-                { name: 'Tous les fichiers', extensions: ['*'] }
+                { name: 'JSON Files', extensions: ['json'] },
+                { name: 'All Files', extensions: ['*'] }
             ];
-            title = 'Sélectionner un fichier JSON skeleton';
+            title = 'Select a JSON skeleton file';
         } else if (type === 'anonymize') {
             filters = [
-                { name: 'Fichiers JSON', extensions: ['json'] },
-                { name: 'Tous les fichiers', extensions: ['*'] }
+                { name: 'JSON Files', extensions: ['json'] },
+                { name: 'All Files', extensions: ['*'] }
             ];
-            title = 'Sélectionner un fichier JSON à anonymiser';
+            title = 'Select a JSON file to anonymize';
         } else {
             filters = [
-                { name: 'Fichiers Swagger', extensions: ['yaml', 'yml', 'json'] },
-                { name: 'Tous les fichiers', extensions: ['*'] }
+                { name: 'Swagger Files', extensions: ['yaml', 'yml', 'json'] },
+                { name: 'All Files', extensions: ['*'] }
             ];
-            title = 'Sélectionner un fichier Swagger/OpenAPI';
+            title = 'Select a Swagger/OpenAPI file';
         }
         
         const filePath = await window.electronAPI.openFileDialog({ filters, title });
@@ -197,20 +204,20 @@ async function browseFile(type) {
             if (type === 'skeleton') {
                 skeletonPath = filePath;
                 skeletonFileInput.value = getFileName(filePath);
-                updateStatus(`Skeleton sélectionné: ${getFileName(filePath)}`);
+                updateStatus(`Skeleton selected: ${getFileName(filePath)}`);
             } else if (type === 'anonymize') {
                 anonymizeFilePath = filePath;
                 anonymizeFileInput.value = getFileName(filePath);
-                updateStatus(`Fichier à anonymiser sélectionné: ${getFileName(filePath)}`);
+                updateStatus(`File to anonymize selected: ${getFileName(filePath)}`);
             } else {
                 swaggerPath = filePath;
                 swaggerFileInput.value = getFileName(filePath);
-                updateStatus(`Swagger sélectionné: ${getFileName(filePath)}`);
+                updateStatus(`Swagger selected: ${getFileName(filePath)}`);
             }
             updateUI();
         }
     } catch (error) {
-        showError('Erreur de sélection', `Impossible de sélectionner le fichier: ${error.message}`);
+        showError('Selection Error', `Unable to select file: ${error.message}`);
     }
 }
 
@@ -221,7 +228,7 @@ async function generateData() {
                            (currentSkeletonMode === 'content' && skeletonContent);
     
     if (!hasSkeletonData) {
-        showError('Erreur', 'Veuillez sélectionner un fichier JSON skeleton ou coller du contenu JSON.');
+        showError('Error', 'Please select a JSON skeleton file or paste JSON content.');
         return;
     }
     
@@ -230,12 +237,12 @@ async function generateData() {
         try {
             JSON.parse(skeletonContent);
         } catch (error) {
-            showError('Erreur JSON', 'Le contenu JSON collé n\'est pas valide.');
+            showError('JSON Error', 'The pasted JSON content is not valid.');
             return;
         }
     }
     
-    showLoading(true, 'Génération des données en cours...');
+    showLoading(true, 'Generating data...');
     
     try {
         const requestData = {
@@ -249,12 +256,12 @@ async function generateData() {
         if (result.success) {
             generatedData = result.data;
             displayGeneratedData(generatedData);
-            updateStatus('Données générées avec succès');
+            updateStatus('Data generated successfully');
         } else {
-            showError('Erreur de génération', result.error);
+            showError('Generation Error', result.error);
         }
     } catch (error) {
-        showError('Erreur', `Erreur lors de la génération: ${error.message}`);
+        showError('Error', `Error during generation: ${error.message}`);
     } finally {
         showLoading(false);
         updateUI();
@@ -267,7 +274,7 @@ async function analyzeData() {
                    (currentAnonymizeMode === 'content' && anonymizeContent);
     
     if (!hasData) {
-        showError('Erreur', 'Veuillez sélectionner un fichier JSON ou coller du contenu JSON.');
+        showError('Error', 'Please select a JSON file or paste JSON content.');
         return;
     }
     
@@ -276,12 +283,12 @@ async function analyzeData() {
         try {
             JSON.parse(anonymizeContent);
         } catch (error) {
-            showError('Erreur JSON', 'Le contenu JSON collé n\'est pas valide.');
+            showError('JSON Error', 'The pasted JSON content is not valid.');
             return;
         }
     }
     
-    showLoading(true, 'Analyse des données en cours...');
+    showLoading(true, 'Analyzing data...');
     
     try {
         const requestData = {
@@ -294,12 +301,12 @@ async function analyzeData() {
         if (result.success) {
             sensitiveFieldsAnalysis = result.analysis;
             displayAnalysisResults(sensitiveFieldsAnalysis);
-            updateStatus('Analyse terminée');
+            updateStatus('Analysis completed');
         } else {
-            showError('Erreur d\'analyse', result.error);
+            showError('Analysis Error', result.error);
         }
     } catch (error) {
-        showError('Erreur', `Erreur lors de l'analyse: ${error.message}`);
+        showError('Error', `Error during analysis: ${error.message}`);
     } finally {
         showLoading(false);
         updateUI();
@@ -312,7 +319,7 @@ async function anonymizeData() {
                    (currentAnonymizeMode === 'content' && anonymizeContent);
     
     if (!hasData) {
-        showError('Erreur', 'Veuillez sélectionner un fichier JSON ou coller du contenu JSON.');
+        showError('Error', 'Please select a JSON file or paste JSON content.');
         return;
     }
     
@@ -321,12 +328,12 @@ async function anonymizeData() {
         try {
             JSON.parse(anonymizeContent);
         } catch (error) {
-            showError('Erreur JSON', 'Le contenu JSON collé n\'est pas valide.');
+            showError('JSON Error', 'The pasted JSON content is not valid.');
             return;
         }
     }
     
-    showLoading(true, 'Anonymisation des données en cours...');
+    showLoading(true, 'Anonymizing data...');
     
     try {
         const requestData = {
@@ -340,12 +347,12 @@ async function anonymizeData() {
         if (result.success) {
             anonymizedData = result.data;
             displayAnonymizedData(anonymizedData);
-            updateStatus('Données anonymisées avec succès');
+            updateStatus('Data anonymized successfully');
         } else {
-            showError('Erreur d\'anonymisation', result.error);
+            showError('Anonymization Error', result.error);
         }
     } catch (error) {
-        showError('Erreur', `Erreur lors de l'anonymisation: ${error.message}`);
+        showError('Error', `Error during anonymization: ${error.message}`);
     } finally {
         showLoading(false);
         updateUI();
@@ -355,79 +362,79 @@ async function anonymizeData() {
 // Save anonymized data
 async function saveAnonymizedData() {
     if (!anonymizedData) {
-        showError('Erreur', 'Aucune donnée anonymisée à sauvegarder.');
+        showError('Error', 'No anonymized data to save.');
         return;
     }
     
     try {
         const filePath = await window.electronAPI.saveFileDialog({
             filters: [
-                { name: 'Fichiers JSON', extensions: ['json'] },
-                { name: 'Tous les fichiers', extensions: ['*'] }
+                { name: 'JSON Files', extensions: ['json'] },
+                { name: 'All Files', extensions: ['*'] }
             ],
-            title: 'Sauvegarder les données anonymisées'
+            title: 'Save anonymized data'
         });
         
         if (filePath) {
             const result = await window.electronAPI.saveFile(filePath, JSON.stringify(anonymizedData, null, 2));
             
             if (result.success) {
-                updateStatus(`Données anonymisées sauvegardées: ${getFileName(filePath)}`);
+                updateStatus(`Anonymized data saved: ${getFileName(filePath)}`);
             } else {
-                showError('Erreur de sauvegarde', result.error);
+                showError('Save Error', result.error);
             }
         }
     } catch (error) {
-        showError('Erreur', `Erreur lors de la sauvegarde: ${error.message}`);
+        showError('Error', `Error during save: ${error.message}`);
     }
 }
 
 // Save data
 async function saveData() {
     if (!generatedData) {
-        showError('Erreur', 'Aucune donnée à sauvegarder.');
+        showError('Error', 'No data to save.');
         return;
     }
     
     try {
         const filePath = await window.electronAPI.saveFileDialog({
             filters: [
-                { name: 'Fichiers JSON', extensions: ['json'] },
-                { name: 'Tous les fichiers', extensions: ['*'] }
+                { name: 'JSON Files', extensions: ['json'] },
+                { name: 'All Files', extensions: ['*'] }
             ],
-            title: 'Sauvegarder les données générées'
+            title: 'Save generated data'
         });
         
         if (filePath) {
             const result = await window.electronAPI.saveFile(filePath, JSON.stringify(generatedData, null, 2));
             
             if (result.success) {
-                updateStatus(`Données sauvegardées: ${getFileName(filePath)}`);
+                updateStatus(`Data saved: ${getFileName(filePath)}`);
             } else {
-                showError('Erreur de sauvegarde', result.error);
+                showError('Save Error', result.error);
             }
         }
     } catch (error) {
-        showError('Erreur', `Erreur lors de la sauvegarde: ${error.message}`);
+        showError('Error', `Error during save: ${error.message}`);
     }
 }
 
 // Copy to clipboard
 async function copyToClipboard(data) {
     if (!data) {
-        showError('Erreur', 'Aucune donnée à copier.');
+        showError('Error', 'No data to copy.');
         return;
     }
     
     try {
         await navigator.clipboard.writeText(JSON.stringify(data, null, 2));
-        updateStatus('Données copiées dans le presse-papiers');
+        updateStatus('Data copied to clipboard');
     } catch (error) {
-        showError('Erreur', `Erreur lors de la copie: ${error.message}`);
+        showError('Error', `Error during copy: ${error.message}`);
     }
 }
 
-// Format JSON
+// Toggle JSON format between formatted and minified
 function formatJson(previewId) {
     const preview = document.getElementById(previewId);
     if (!preview) return;
@@ -436,12 +443,70 @@ function formatJson(previewId) {
     if (!data) return;
     
     try {
-        const formatted = JSON.stringify(data, null, 2);
-        const highlighted = highlightJson(formatted);
+        const currentState = formatStates[previewId];
+        let jsonString;
+        let statusMessage;
+        
+        if (currentState === 'formatted') {
+            // Switch to minified
+            jsonString = JSON.stringify(data);
+            formatStates[previewId] = 'minified';
+            statusMessage = 'JSON minified';
+        } else {
+            // Switch to formatted
+            jsonString = JSON.stringify(data, null, 2);
+            formatStates[previewId] = 'formatted';
+            statusMessage = 'JSON formatted';
+        }
+        
+        const highlighted = highlightJson(jsonString);
         preview.innerHTML = highlighted;
-        updateStatus('JSON formaté');
+        updateStatus(statusMessage);
+        
+        // Update button text to reflect next action
+        updateFormatButtonText(previewId);
     } catch (error) {
-        showError('Erreur', `Erreur lors du formatage: ${error.message}`);
+        showError('Error', `Error during formatting: ${error.message}`);
+    }
+}
+
+// Update format button text based on current state
+function updateFormatButtonText(previewId) {
+    const currentState = formatStates[previewId];
+    let buttonText;
+    let buttonIcon;
+    
+    if (currentState === 'formatted') {
+        buttonText = 'Minify';
+        // Icon for minify (compress)
+        buttonIcon = '<path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"/><path d="M9 9h6v6H9z"/>';
+    } else {
+        buttonText = 'Format';
+        // Icon for format (expand/beautify)
+        buttonIcon = '<path d="M4 7V4a2 2 0 0 1 2-2h8.5L20 7.5V20a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-3"/><path d="M14 2v6h6"/><path d="M10.5 12.5L13 15l-2.5 2.5"/><path d="M7.5 15h5.5"/>';
+    }
+    
+    // Update the appropriate button
+    if (previewId === 'json-preview') {
+        const formatBtn = document.getElementById('format-btn');
+        if (formatBtn) {
+            const icon = formatBtn.querySelector('.btn-icon');
+            const textNode = formatBtn.lastChild;
+            if (icon) icon.innerHTML = buttonIcon;
+            if (textNode && textNode.nodeType === Node.TEXT_NODE) {
+                textNode.textContent = ` ${buttonText}`;
+            }
+        }
+    } else if (previewId === 'anonymized-preview') {
+        const formatBtn = document.getElementById('format-anonymized-btn');
+        if (formatBtn) {
+            const icon = formatBtn.querySelector('.btn-icon');
+            const textNode = formatBtn.lastChild;
+            if (icon) icon.innerHTML = buttonIcon;
+            if (textNode && textNode.nodeType === Node.TEXT_NODE) {
+                textNode.textContent = ` ${buttonText}`;
+            }
+        }
     }
 }
 
@@ -449,8 +514,10 @@ function formatJson(previewId) {
 function displayGeneratedData(data) {
     const preview = document.getElementById('json-preview');
     if (preview) {
+        formatStates['json-preview'] = 'formatted'; // Reset to formatted state
         const highlighted = highlightJson(JSON.stringify(data, null, 2));
         preview.innerHTML = highlighted;
+        updateFormatButtonText('json-preview');
     }
 }
 
@@ -458,19 +525,19 @@ function displayGeneratedData(data) {
 function displayAnalysisResults(analysis) {
     const preview = document.getElementById('anonymized-preview');
     if (preview) {
-        let output = "=== ANALYSE DES CHAMPS SENSIBLES ===\n\n";
+        let output = "=== SENSITIVE FIELDS ANALYSIS ===\n\n";
         
         if (analysis.sensitive_fields && analysis.sensitive_fields.length > 0) {
-            output += "Champs sensibles détectés:\n";
+            output += "Detected sensitive fields:\n";
             analysis.sensitive_fields.forEach(field => {
-                output += `- ${field.path}: ${field.type} (confiance: ${field.confidence})\n`;
+                output += `- ${field.path}: ${field.type} (confidence: ${field.confidence})\n`;
             });
         } else {
-            output += "Aucun champ sensible détecté.\n";
+            output += "No sensitive fields detected.\n";
         }
         
         if (analysis.recommendations && analysis.recommendations.length > 0) {
-            output += "\nRecommandations:\n";
+            output += "\nRecommendations:\n";
             analysis.recommendations.forEach(rec => {
                 output += `- ${rec}\n`;
             });
@@ -484,10 +551,14 @@ function displayAnalysisResults(analysis) {
 function displayAnonymizedData(data) {
     const preview = document.getElementById('anonymized-preview');
     if (preview) {
+        formatStates['anonymized-preview'] = 'formatted'; // Reset to formatted state
         const highlighted = highlightJson(JSON.stringify(data, null, 2));
         preview.innerHTML = highlighted;
+        updateFormatButtonText('anonymized-preview');
     }
 }
+
+
 
 // Highlight JSON
 function highlightJson(jsonString) {
@@ -537,7 +608,7 @@ function updateUI() {
 }
 
 // Show loading
-function showLoading(show, message = 'Traitement en cours...') {
+function showLoading(show, message = 'Processing...') {
     if (loadingOverlay) {
         loadingOverlay.style.display = show ? 'flex' : 'none';
     }

@@ -1,88 +1,93 @@
 #!/usr/bin/env python3
 """
-CLI interface for the test JSON data generator.
-Used by the Electron interface to communicate with the Python backend.
+Command line interface for JSONnymous data generation.
 """
 
 import argparse
 import json
-import sys
 import os
-from pathlib import Path
+import sys
+from typing import Dict, Any
 
 from data_generator import DataGenerator
-from swagger_parser import SwaggerParser
-from json_processor import JSONProcessor
 from data_anonymizer import DataAnonymizer
+from json_processor import JSONProcessor
+from swagger_parser import SwaggerParser
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Test JSON Data Generator - CLI Interface")
-    parser.add_argument("--skeleton", help="Path to the JSON skeleton file")
-    parser.add_argument("--swagger", help="Path to the Swagger/OpenAPI file (optional)")
-    parser.add_argument("--output", help="Path to the output file (optional)")
-    parser.add_argument("--pretty", action="store_true", help="Indented JSON formatting")
-    parser.add_argument("--anonymize", help="Path to the JSON file to anonymize (alternative to --skeleton)")
-    parser.add_argument("--analyze", help="Path to the JSON file to analyze for sensitive fields")
+    parser = argparse.ArgumentParser(
+        description="Generate realistic JSON data from a skeleton and optional Swagger schema"
+    )
+    
+    # Main arguments
+    parser.add_argument('--skeleton', '-s', type=str, help='Path to JSON skeleton file')
+    parser.add_argument('--swagger', '-w', type=str, help='Path to Swagger/OpenAPI schema file')
+    parser.add_argument('--output', '-o', type=str, help='Output file path (default: stdout)')
+    parser.add_argument('--pretty', '-p', action='store_true', help='Pretty print JSON output')
+    
+    # Anonymization mode
+    parser.add_argument('--anonymize', '-a', type=str, help='Path to JSON file to anonymize')
+    parser.add_argument('--analyze', type=str, help='Path to JSON file to analyze for sensitive fields')
     
     args = parser.parse_args()
     
     try:
-        # Mode d'anonymisation
+        # Anonymization mode
         if args.anonymize:
             if not os.path.exists(args.anonymize):
-                raise FileNotFoundError(f"Le fichier à anonymiser '{args.anonymize}' n'existe pas.")
+                raise FileNotFoundError(f"The file to anonymize '{args.anonymize}' does not exist.")
             
-            # Charger le fichier JSON à anonymiser
+            # Load the JSON file to anonymize
             with open(args.anonymize, 'r', encoding='utf-8') as f:
                 data_to_anonymize = json.load(f)
             
-            # Anonymiser les données
+            # Anonymize the data
             anonymizer = DataAnonymizer()
             anonymized_data = anonymizer.anonymize_json(data_to_anonymize)
             
-            # Sortie des données anonymisées
+            # Output the anonymized data
             if args.output:
                 with open(args.output, 'w', encoding='utf-8') as f:
                     json.dump(anonymized_data, f, indent=2 if args.pretty else None, ensure_ascii=False)
-                print(f"Données anonymisées sauvegardées dans {args.output}", file=sys.stderr)
+                print(f"Anonymized data saved to {args.output}", file=sys.stderr)
             else:
                 json.dump(anonymized_data, sys.stdout, indent=2 if args.pretty else None, ensure_ascii=False)
             
             return
         
-        # Mode d'analyse des champs sensibles
+        # Sensitive fields analysis mode
         if args.analyze:
             if not os.path.exists(args.analyze):
-                raise FileNotFoundError(f"Le fichier à analyser '{args.analyze}' n'existe pas.")
+                raise FileNotFoundError(f"The file to analyze '{args.analyze}' does not exist.")
             
-            # Charger le fichier JSON à analyser
+            # Load the JSON file to analyze
             with open(args.analyze, 'r', encoding='utf-8') as f:
                 data_to_analyze = json.load(f)
             
-            # Analyser les champs sensibles
+            # Analyze sensitive fields
             anonymizer = DataAnonymizer()
             sensitive_fields = anonymizer.get_sensitive_fields(data_to_analyze)
             
-            # Sortie de l'analyse
+            # Output the analysis
             analysis_result = {
                 "sensitive_fields": sensitive_fields,
                 "total_fields": len(sensitive_fields),
-                "message": f"Trouvé {len(sensitive_fields)} champ(s) sensible(s)"
+                "message": f"Found {len(sensitive_fields)} sensitive field(s)"
             }
             
             if args.output:
                 with open(args.output, 'w', encoding='utf-8') as f:
                     json.dump(analysis_result, f, indent=2 if args.pretty else None, ensure_ascii=False)
-                print(f"Analyse sauvegardée dans {args.output}", file=sys.stderr)
+                print(f"Analysis saved to {args.output}", file=sys.stderr)
             else:
                 json.dump(analysis_result, sys.stdout, indent=2 if args.pretty else None, ensure_ascii=False)
             
             return
         
-        # Mode de génération (mode par défaut)
+        # Generation mode (default mode)
         if not args.skeleton:
-            raise ValueError("L'option --skeleton est requise pour la génération de données.")
+            raise ValueError("The --skeleton option is required for data generation.")
         
         # Check skeleton file existence
         if not os.path.exists(args.skeleton):
@@ -97,30 +102,29 @@ def main():
         if args.swagger:
             if not os.path.exists(args.swagger):
                 raise FileNotFoundError(f"The Swagger file '{args.swagger}' does not exist.")
-            swagger_parser = SwaggerParser()
-            swagger_schema = swagger_parser.load_swagger(args.swagger)
-        
-        # Initialize components
-        data_generator = DataGenerator()
-        json_processor = JSONProcessor()
-        
-        # Generate data
-        generated_data = json_processor.process_json(skeleton, swagger_schema, data_generator)
-        
-        # Output data
-        if args.output:
-            # Save to file
-            with open(args.output, 'w', encoding='utf-8') as f:
-                json.dump(generated_data, f, indent=2 if args.pretty else None, ensure_ascii=False)
-            print(f"Data saved to {args.output}", file=sys.stderr)
-        else:
-            # Output to stdout for Electron
-            json.dump(generated_data, sys.stdout, indent=2 if args.pretty else None, ensure_ascii=False)
             
+            parser = SwaggerParser()
+            swagger_schema = parser.load_swagger(args.swagger)
+        
+        # Initialize data generator
+        generator = DataGenerator()
+        
+        # Process JSON with processor
+        processor = JSONProcessor()
+        result = processor.process_json(skeleton, swagger_schema, generator)
+        
+        # Output result
+        if args.output:
+            with open(args.output, 'w', encoding='utf-8') as f:
+                json.dump(result, f, indent=2 if args.pretty else None, ensure_ascii=False)
+            print(f"Generated data saved to {args.output}", file=sys.stderr)
+        else:
+            json.dump(result, sys.stdout, indent=2 if args.pretty else None, ensure_ascii=False)
+    
     except Exception as e:
-        print(f"Error: {str(e)}", file=sys.stderr)
+        print(f"Error: {e}", file=sys.stderr)
         sys.exit(1)
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main() 

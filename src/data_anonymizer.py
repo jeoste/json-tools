@@ -1,6 +1,6 @@
 """
-Module d'anonymisation des données JSON.
-Permet de mélanger les données sensibles tout en gardant la structure.
+JSON data anonymization module.
+Allows mixing sensitive data while keeping the structure.
 """
 
 import json
@@ -11,18 +11,18 @@ import re
 
 
 class DataAnonymizer:
-    """Anonymiseur de données JSON."""
+    """JSON data anonymizer."""
     
-    def __init__(self, locale: str = 'fr_FR'):
+    def __init__(self, locale: str = 'en_US'):
         """
-        Initialise l'anonymiseur avec un locale spécifique.
+        Initialize the anonymizer with a specific locale.
         
         Args:
-            locale: Locale pour la génération (défaut français)
+            locale: Locale for generation (default English)
         """
         self.fake = Faker(locale)
         
-        # Pools de données anonymisées
+        # Anonymized data pools
         self.pools = {
             'firstNames': [self.fake.first_name() for _ in range(100)],
             'lastNames': [self.fake.last_name() for _ in range(100)],
@@ -37,11 +37,11 @@ class DataAnonymizer:
             'urls': [self.fake.url() for _ in range(100)],
             'sentences': [self.fake.sentence() for _ in range(100)],
             'paragraphs': [self.fake.paragraph() for _ in range(100)],
-            'dates': [self.fake.date().isoformat() for _ in range(100)],
-            'datetimes': [self.fake.date_time().isoformat() for _ in range(100)]
+            'dates': [self.fake.date_between(start_date='-30y', end_date='today').isoformat() for _ in range(100)],
+            'datetimes': [self.fake.date_time_between(start_date='-30y', end_date='now').isoformat() for _ in range(100)]
         }
         
-        # Définir des patterns pour identifier les champs sensibles
+        # Define patterns to identify sensitive fields
         self.sensitive_patterns = {
             'firstName': ['prenom', 'firstname', 'fname', 'given_name', 'first_name'],
             'lastName': ['nom', 'lastname', 'lname', 'surname', 'last_name', 'family_name'],
@@ -50,7 +50,7 @@ class DataAnonymizer:
             'address': ['adresse', 'address', 'addr'],
             'street': ['rue', 'street', 'street_address', 'voie'],
             'city': ['ville', 'city', 'localite'],
-            'postcode': ['code_postal', 'postal_code', 'zip', 'zip_code', 'postcode'],
+            'postcode': ['code_postal', 'postal_code', 'zip', 'zip_code', 'postcode', 'postalcode'],
             'country': ['pays', 'country', 'nation'],
             'company': ['entreprise', 'company', 'societe', 'organization'],
             'url': ['url', 'website', 'site', 'lien'],
@@ -61,15 +61,15 @@ class DataAnonymizer:
     
     def anonymize_json(self, data: Union[Dict, List, str]) -> Union[Dict, List, str]:
         """
-        Anonymise un objet JSON en mélangeant les données sensibles.
+        Anonymize a JSON object by mixing sensitive data.
         
         Args:
-            data: Données JSON à anonymiser (dict, liste ou string JSON)
+            data: JSON data to anonymize (dict, list or JSON string)
             
         Returns:
-            Données anonymisées
+            Anonymized data
         """
-        # Si c'est une string JSON, la parser
+        # If it's a JSON string, parse it
         if isinstance(data, str):
             try:
                 parsed_data = json.loads(data)
@@ -78,96 +78,55 @@ class DataAnonymizer:
             except json.JSONDecodeError:
                 return data
         
-        # Sinon, traiter directement
+        # Otherwise, process directly
         return self._anonymize_recursive(data)
     
-    def _anonymize_recursive(self, data: Any, current_path: str = "") -> Any:
+    def _anonymize_recursive(self, data: Any) -> Any:
         """
-        Anonymise récursivement une structure de données.
+        Recursively anonymize a data structure.
         
         Args:
-            data: Données à anonymiser
-            current_path: Chemin actuel dans la structure
+            data: Data to anonymize
             
         Returns:
-            Données anonymisées
+            Anonymized data
         """
         if isinstance(data, dict):
-            result = {}
-            
+            anonymized = {}
             for key, value in data.items():
-                new_path = f"{current_path}.{key}" if current_path else key
-                
-                # Anonymiser la valeur si le champ est sensible
-                if self._is_sensitive_field(key) and self._is_anonymizable_value(value):
-                    result[key] = self._anonymize_field(key, value)
+                if isinstance(value, str) and value.strip():
+                    # Anonymize string values based on field name
+                    anonymized[key] = self._anonymize_field(key, value)
                 else:
-                    # Traitement récursif pour les objets et listes
-                    result[key] = self._anonymize_recursive(value, new_path)
-            
-            return result
+                    # Recursive processing for objects and lists
+                    anonymized[key] = self._anonymize_recursive(value)
+            return anonymized
         
         elif isinstance(data, list):
-            return [self._anonymize_recursive(item, f"{current_path}[{i}]") 
-                   for i, item in enumerate(data)]
+            return [self._anonymize_recursive(item) for item in data]
         
         else:
-            # Valeur primitive - retourner telle quelle
+            # Keep other types as is (numbers, booleans, null)
             return data
-    
-    def _is_sensitive_field(self, field_name: str) -> bool:
-        """
-        Détermine si un champ est sensible et doit être anonymisé.
-        
-        Args:
-            field_name: Nom du champ
-            
-        Returns:
-            True si le champ est sensible
-        """
-        field_name_lower = field_name.lower()
-        
-        # Vérifier tous les patterns
-        for category, patterns in self.sensitive_patterns.items():
-            if any(pattern in field_name_lower for pattern in patterns):
-                return True
-        
-        return False
-    
-    def _is_anonymizable_value(self, value: Any) -> bool:
-        """
-        Détermine si une valeur peut être anonymisée.
-        
-        Args:
-            value: Valeur à tester
-            
-        Returns:
-            True si la valeur peut être anonymisée
-        """
-        # Seulement les strings non vides
-        if isinstance(value, str) and value.strip():
-            return True
-        
-        return False
     
     def _anonymize_field(self, field_name: str, value: str) -> str:
         """
-        Anonymise une valeur selon le type de champ.
+        Anonymize a field based on its name and value.
         
         Args:
-            field_name: Nom du champ
-            value: Valeur à anonymiser
+            field_name: Field name
+            value: Field value
             
         Returns:
-            Valeur anonymisée
+            Anonymized value
         """
         field_name_lower = field_name.lower()
         
-        # Prénom
+        # First name
         if any(pattern in field_name_lower for pattern in self.sensitive_patterns['firstName']):
             return random.choice(self.pools['firstNames'])
         
-        # Nom
+        # Last name
         elif any(pattern in field_name_lower for pattern in self.sensitive_patterns['lastName']):
             return random.choice(self.pools['lastNames'])
         
@@ -175,31 +134,31 @@ class DataAnonymizer:
         elif any(pattern in field_name_lower for pattern in self.sensitive_patterns['email']):
             return random.choice(self.pools['emails'])
         
-        # Téléphone
+        # Phone
         elif any(pattern in field_name_lower for pattern in self.sensitive_patterns['phone']):
             return random.choice(self.pools['phones'])
         
-        # Adresse complète
+        # Address
         elif any(pattern in field_name_lower for pattern in self.sensitive_patterns['address']):
             return random.choice(self.pools['addresses'])
         
-        # Rue
+        # Street
         elif any(pattern in field_name_lower for pattern in self.sensitive_patterns['street']):
             return random.choice(self.pools['streets'])
         
-        # Ville
+        # City
         elif any(pattern in field_name_lower for pattern in self.sensitive_patterns['city']):
             return random.choice(self.pools['cities'])
         
-        # Code postal
+        # Postal code
         elif any(pattern in field_name_lower for pattern in self.sensitive_patterns['postcode']):
             return random.choice(self.pools['postcodes'])
         
-        # Pays
+        # Country
         elif any(pattern in field_name_lower for pattern in self.sensitive_patterns['country']):
             return random.choice(self.pools['countries'])
         
-        # Entreprise
+        # Company
         elif any(pattern in field_name_lower for pattern in self.sensitive_patterns['company']):
             return random.choice(self.pools['companies'])
         
@@ -207,7 +166,7 @@ class DataAnonymizer:
         elif any(pattern in field_name_lower for pattern in self.sensitive_patterns['url']):
             return random.choice(self.pools['urls'])
         
-        # Description/commentaire
+        # Description/comment
         elif any(pattern in field_name_lower for pattern in self.sensitive_patterns['description']):
             if len(value) > 100:
                 return random.choice(self.pools['paragraphs'])
@@ -216,26 +175,26 @@ class DataAnonymizer:
         
         # Date
         elif any(pattern in field_name_lower for pattern in self.sensitive_patterns['date']):
-            # Essayer de préserver le format
+            # Try to preserve format
             if 'T' in value or ':' in value:
                 return random.choice(self.pools['datetimes'])
             else:
                 return random.choice(self.pools['dates'])
         
-        # Par défaut, mélanger avec des données génériques
+        # Default: mix with generic data
         return self._anonymize_generic_string(value)
     
     def _anonymize_generic_string(self, value: str) -> str:
         """
-        Anonymise une chaîne générique.
+        Anonymize a generic string.
         
         Args:
-            value: Valeur à anonymiser
+            value: Value to anonymize
             
         Returns:
-            Valeur anonymisée
+            Anonymized value
         """
-        # Préserver la longueur approximative
+        # Preserve approximate length
         if len(value) <= 10:
             return self.fake.word()
         elif len(value) <= 50:
@@ -245,11 +204,11 @@ class DataAnonymizer:
     
     def add_to_pool(self, pool_name: str, values: List[str]):
         """
-        Ajoute des valeurs à un pool d'anonymisation.
+        Add values to an anonymization pool.
         
         Args:
-            pool_name: Nom du pool
-            values: Valeurs à ajouter
+            pool_name: Pool name
+            values: Values to add
         """
         if pool_name not in self.pools:
             self.pools[pool_name] = []
@@ -258,44 +217,65 @@ class DataAnonymizer:
     
     def get_sensitive_fields(self, data: Union[Dict, List, str]) -> List[str]:
         """
-        Retourne la liste des champs sensibles détectés.
+        Analyze data to identify sensitive fields.
         
         Args:
-            data: Données à analyser
+            data: Data to analyze
             
         Returns:
-            Liste des champs sensibles trouvés
+            List of sensitive field names
         """
-        sensitive_fields = []
-        
-        # Si c'est une string JSON, la parser
+        # If it's a JSON string, parse it
         if isinstance(data, str):
             try:
                 data = json.loads(data)
             except json.JSONDecodeError:
-                return sensitive_fields
+                return []
         
-        self._collect_sensitive_fields(data, sensitive_fields)
-        return list(set(sensitive_fields))  # Supprimer les doublons
+        sensitive_fields = []
+        self._find_sensitive_fields_recursive(data, sensitive_fields)
+        return list(set(sensitive_fields))  # Remove duplicates
     
-    def _collect_sensitive_fields(self, data: Any, sensitive_fields: List[str], current_path: str = ""):
+    def _find_sensitive_fields_recursive(self, data: Any, sensitive_fields: List[str], prefix: str = ""):
         """
-        Collecte récursivement les champs sensibles.
+        Recursively find sensitive fields in data.
         
         Args:
-            data: Données à analyser
-            sensitive_fields: Liste à remplir
-            current_path: Chemin actuel
+            data: Data to analyze
+            sensitive_fields: List to store sensitive field names
+            prefix: Current field path prefix
         """
         if isinstance(data, dict):
             for key, value in data.items():
-                new_path = f"{current_path}.{key}" if current_path else key
+                field_path = f"{prefix}.{key}" if prefix else key
                 
-                if self._is_sensitive_field(key) and self._is_anonymizable_value(value):
-                    sensitive_fields.append(new_path)
+                if isinstance(value, str) and value.strip():
+                    # Check if this field is sensitive
+                    if self._is_sensitive_field(key):
+                        sensitive_fields.append(field_path)
                 
-                self._collect_sensitive_fields(value, sensitive_fields, new_path)
+                # Recursive processing
+                self._find_sensitive_fields_recursive(value, sensitive_fields, field_path)
         
         elif isinstance(data, list):
             for i, item in enumerate(data):
-                self._collect_sensitive_fields(item, sensitive_fields, f"{current_path}[{i}]") 
+                item_path = f"{prefix}[{i}]" if prefix else f"[{i}]"
+                self._find_sensitive_fields_recursive(item, sensitive_fields, item_path)
+    
+    def _is_sensitive_field(self, field_name: str) -> bool:
+        """
+        Check if a field is considered sensitive.
+        
+        Args:
+            field_name: Field name to check
+            
+        Returns:
+            True if the field is sensitive
+        """
+        field_name_lower = field_name.lower()
+        
+        for pattern_list in self.sensitive_patterns.values():
+            if any(pattern in field_name_lower for pattern in pattern_list):
+                return True
+        
+        return False 

@@ -249,6 +249,11 @@ body {
     height: 100%;
 }
 
+.preview-panel {
+    min-width: 50%;
+    flex: 1.2;
+}
+
 /* Cartes */
 .card {
     background-color: var(--bg-card);
@@ -279,6 +284,8 @@ body {
     display: flex;
     gap: var(--spacing-sm);
 }
+
+
 
 .card-content {
     flex: 1;
@@ -555,6 +562,7 @@ body {
     overflow: hidden;
     display: flex;
     flex-direction: column;
+    min-height: 400px;
 }
 
 .json-preview {
@@ -564,12 +572,14 @@ body {
     border-radius: var(--radius-lg);
     padding: var(--spacing-lg);
     font-family: var(--font-mono);
-    font-size: 13px;
-    line-height: 1.4;
+    font-size: 12px;
+    line-height: 1.5;
     color: var(--text-primary);
     overflow: auto;
     white-space: pre-wrap;
     word-wrap: break-word;
+    max-height: 70vh;
+    min-height: 300px;
 }
 
 /* État vide */

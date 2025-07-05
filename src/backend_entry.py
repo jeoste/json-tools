@@ -1,12 +1,10 @@
+#!/usr/bin/env python3
 """
-Point d'entrée pour l'exécutable autonome (backend.exe) compilé avec PyInstaller.
-Il délègue simplement à la fonction main du module cli_generate afin de conserver
-exactement la même interface en ligne de commande :
-
-    backend.exe --skeleton PATH [--swagger PATH] [--output PATH] [--pretty]
-
-Ainsi, aucun changement n'est nécessaire côté Electron : on appelle juste
-backend.exe avec les mêmes arguments que précédemment.
+Entry point for the packaged backend.
+This file serves as the main entry point when the Python backend is packaged as a standalone executable.
+It simply calls the CLI module with the same arguments.
+This way, no changes are needed on the Electron side: we just call
+the backend.exe with the same arguments as before.
 """
 
 from __future__ import annotations

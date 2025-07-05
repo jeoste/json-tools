@@ -14,12 +14,12 @@ from typing import Any, Dict, List, Optional
 class DataGenerator:
     """Coherent anonymized data generator."""
     
-    def __init__(self, locale: str = 'fr_FR'):
+    def __init__(self, locale: str = 'en_US'):
         """
         Initialize the generator with a specific locale.
         
         Args:
-            locale: Locale for generation (default French)
+            locale: Locale for generation (default English)
         """
         self.fake = Faker(locale)
         Faker.seed(42)  # For reproducibility
@@ -69,123 +69,139 @@ class DataGenerator:
         elif any(keyword in field_name_lower for keyword in ['phone', 'telephone', 'tel']):
             return self._get_cached_or_generate(f"phone_{field_name}", self.fake.phone_number)
         
-        elif any(keyword in field_name_lower for keyword in ['nom', 'name', 'surname']):
+        elif any(keyword in field_name_lower for keyword in ['name', 'surname', 'lastname']):
             return self._get_cached_or_generate(f"name_{field_name}", self.fake.last_name)
         
-        elif any(keyword in field_name_lower for keyword in ['prenom', 'firstname', 'given']):
+        elif any(keyword in field_name_lower for keyword in ['firstname', 'given']):
             return self._get_cached_or_generate(f"firstname_{field_name}", self.fake.first_name)
         
-        elif any(keyword in field_name_lower for keyword in ['address', 'adresse']):
+        elif any(keyword in field_name_lower for keyword in ['address', 'addr']):
             return self._get_cached_or_generate(f"address_{field_name}", self.fake.address)
         
-        elif any(keyword in field_name_lower for keyword in ['city', 'ville']):
+        elif any(keyword in field_name_lower for keyword in ['city']):
             return self._get_cached_or_generate(f"city_{field_name}", self.fake.city)
         
         elif any(keyword in field_name_lower for keyword in ['postal', 'zip']):
             return self._get_cached_or_generate(f"postal_{field_name}", self.fake.postcode)
         
-        elif any(keyword in field_name_lower for keyword in ['country', 'pays']):
+        elif any(keyword in field_name_lower for keyword in ['country']):
             return self._get_cached_or_generate(f"country_{field_name}", self.fake.country)
         
-        elif any(keyword in field_name_lower for keyword in ['company', 'entreprise']):
+        elif any(keyword in field_name_lower for keyword in ['company']):
             return self._get_cached_or_generate(f"company_{field_name}", self.fake.company)
         
-        elif any(keyword in field_name_lower for keyword in ['url', 'website', 'site']):
+        elif any(keyword in field_name_lower for keyword in ['url', 'website']):
             return self._get_cached_or_generate(f"url_{field_name}", self.fake.url)
-        
-        elif any(keyword in field_name_lower for keyword in ['uuid', 'id', 'identifier']):
-            return self._get_cached_or_generate(f"uuid_{field_name}", lambda: str(uuid.uuid4()))
         
         elif any(keyword in field_name_lower for keyword in ['date', 'created', 'updated']):
             return self._get_cached_or_generate(f"date_{field_name}", 
-                                               lambda: self.fake.date_time_between(start_date='-1y', end_date='now').isoformat())
+                                              lambda: self.fake.date_between(start_date='-2y', end_date='today').isoformat())
         
-        elif any(keyword in field_name_lower for keyword in ['description', 'comment']):
-            return self._get_cached_or_generate(f"text_{field_name}", 
-                                               lambda: self.fake.sentence(nb_words=10))
+        elif any(keyword in field_name_lower for keyword in ['datetime', 'timestamp']):
+            return self._get_cached_or_generate(f"datetime_{field_name}", 
+                                              lambda: self.fake.date_time_between(start_date='-2y', end_date='now').isoformat())
         
-        # Format constraints
-        if 'pattern' in constraints:
-            return self._generate_pattern_string(constraints['pattern'])
+        elif any(keyword in field_name_lower for keyword in ['id', 'uuid']):
+            return str(uuid.uuid4())
         
-        # Length constraints
-        min_length = constraints.get('minLength', 1)
-        max_length = constraints.get('maxLength', 50)
+        elif any(keyword in field_name_lower for keyword in ['description', 'comment', 'note']):
+            return self._get_cached_or_generate(f"description_{field_name}", 
+                                              lambda: self.fake.paragraph(nb_sentences=3))
         
+        elif any(keyword in field_name_lower for keyword in ['title', 'subject']):
+            return self._get_cached_or_generate(f"title_{field_name}", 
+                                              lambda: self.fake.sentence(nb_words=4).rstrip('.'))
+        
+        # Check constraints
         if 'enum' in constraints:
             return random.choice(constraints['enum'])
         
-        # Default generation
-        return self.fake.lexify('?' * random.randint(min_length, max_length))
+        if 'pattern' in constraints:
+            return self._generate_from_pattern(constraints['pattern'])
+        
+        if 'minLength' in constraints or 'maxLength' in constraints:
+            min_len = constraints.get('minLength', 5)
+            max_len = constraints.get('maxLength', 20)
+            return self.fake.text(max_nb_chars=max_len)[:max_len]
+        
+        # Default: generate a generic word
+        return self._get_cached_or_generate(f"word_{field_name}", self.fake.word)
     
     def _generate_integer(self, constraints: Dict) -> int:
-        """Generate an integer according to constraints."""
-        minimum = constraints.get('minimum', 0)
-        maximum = constraints.get('maximum', 1000)
+        """Generate an integer with constraints."""
+        min_val = constraints.get('minimum', 0)
+        max_val = constraints.get('maximum', 1000)
         
-        if 'enum' in constraints:
-            return random.choice(constraints['enum'])
+        if 'multipleOf' in constraints:
+            multiple = constraints['multipleOf']
+            return random.randint(min_val // multiple, max_val // multiple) * multiple
         
-        return random.randint(minimum, maximum)
+        return random.randint(min_val, max_val)
     
     def _generate_number(self, constraints: Dict) -> float:
-        """Generate a decimal number according to constraints."""
-        minimum = constraints.get('minimum', 0.0)
-        maximum = constraints.get('maximum', 1000.0)
+        """Generate a number with constraints."""
+        min_val = constraints.get('minimum', 0.0)
+        max_val = constraints.get('maximum', 1000.0)
         
-        if 'enum' in constraints:
-            return random.choice(constraints['enum'])
-        
-        return round(random.uniform(minimum, maximum), 2)
+        return round(random.uniform(min_val, max_val), 2)
     
     def _generate_boolean(self) -> bool:
-        """Generate a boolean."""
+        """Generate a random boolean."""
         return random.choice([True, False])
     
     def _generate_array(self, field_name: str, constraints: Dict) -> List[Any]:
-        """Generate an array according to constraints."""
+        """Generate an array with constraints."""
         min_items = constraints.get('minItems', 1)
         max_items = constraints.get('maxItems', 5)
-        items_schema = constraints.get('items', {})
         
-        size = random.randint(min_items, max_items)
+        items_count = random.randint(min_items, max_items)
         
-        # Element type
-        item_type = items_schema.get('type', 'string')
+        if 'items' in constraints:
+            item_schema = constraints['items']
+            item_type = item_schema.get('type', 'string')
+            
+            return [self.generate_by_type(item_type, f"{field_name}_item", item_schema) 
+                   for _ in range(items_count)]
         
-        return [self.generate_by_type(item_type, field_name, items_schema) 
-                for _ in range(size)]
+        # Default: generate strings
+        return [self.fake.word() for _ in range(items_count)]
     
     def _generate_object(self, constraints: Dict) -> Dict[str, Any]:
-        """Generate an object according to constraints."""
-        properties = constraints.get('properties', {})
+        """Generate an object with constraints."""
+        if 'properties' in constraints:
+            obj = {}
+            for prop_name, prop_schema in constraints['properties'].items():
+                prop_type = prop_schema.get('type', 'string')
+                obj[prop_name] = self.generate_by_type(prop_type, prop_name, prop_schema)
+            return obj
         
-        result = {}
-        for prop_name, prop_schema in properties.items():
-            prop_type = prop_schema.get('type', 'string')
-            result[prop_name] = self.generate_by_type(prop_type, prop_name, prop_schema)
-        
-        return result
+        # Default: empty object
+        return {}
     
-    def _generate_pattern_string(self, pattern: str) -> str:
-        """Generate a string according to a regex pattern."""
-        # Simplification: some common patterns
+    def _generate_from_pattern(self, pattern: str) -> str:
+        """Generate a string matching a regex pattern (simplified)."""
+        # Simple pattern matching - can be extended
         if pattern == r'^\d{4}-\d{2}-\d{2}$':
-            return self.fake.date().strftime('%Y-%m-%d')
-        elif pattern == r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$':
-            return self.fake.email()
-        elif pattern == r'^\d{10}$':
-            return ''.join([str(random.randint(0, 9)) for _ in range(10)])
+            return self.fake.date().isoformat()
+        elif pattern == r'^\d{3}-\d{3}-\d{4}$':
+            return f"{random.randint(100, 999)}-{random.randint(100, 999)}-{random.randint(1000, 9999)}"
+        elif pattern == r'^[A-Z]{2}\d{4}$':
+            return f"{random.choice('ABCDEFGHIJKLMNOPQRSTUVWXYZ')}{random.choice('ABCDEFGHIJKLMNOPQRSTUVWXYZ')}{random.randint(1000, 9999)}"
         else:
-            # Generic pattern
-            return self.fake.lexify(pattern)
+            # Default: generate a generic string
+            return self.fake.word()
     
-    def _get_cached_or_generate(self, key: str, generator_func) -> Any:
-        """Retrieve a value from cache or generate it."""
+    def _get_cached_or_generate(self, key: str, generator_func) -> str:
+        """Get cached data or generate new one."""
         if key not in self._cached_data:
             self._cached_data[key] = generator_func()
         return self._cached_data[key]
     
-    def reset_cache(self):
-        """Reset the cache."""
-        self._cached_data = {} 
+    def clear_cache(self):
+        """Clear the generation cache."""
+        self._cached_data.clear()
+    
+    def set_seed(self, seed: int):
+        """Set the random seed for reproducible generation."""
+        Faker.seed(seed)
+        random.seed(seed) 

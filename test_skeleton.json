@@ -1,0 +1,25 @@
+{
+  "firstName": "",
+  "lastName" : "",
+  "age"      : null,
+  "isActive" : false,
+  "company"  : "",
+  "email"   : "",
+  "address"  : {
+    "country"      : "",
+    "state"        : "",
+    "streetAddress": "",
+    "city"         : "",
+    "postalCode"   : ""
+  },
+  "phoneNumbers": [
+    {
+      "type"  : "",
+      "number": ""
+    },
+    {
+      "type"  : "",
+      "number": ""
+    }
+  ]
+} 
