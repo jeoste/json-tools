@@ -3,13 +3,17 @@ let skeletonPath = null;
 let skeletonContent = null;
 let swaggerPath = null;
 let generatedData = null;
-let currentSkeletonMode = 'file'; // 'file' or 'content'
+let currentSkeletonMode = 'content'; // 'file' or 'content'
 let currentMode = 'generate'; // 'generate' or 'anonymize'
 let anonymizeFilePath = null;
 let anonymizeContent = null;
-let currentAnonymizeMode = 'file'; // 'file' or 'content'
+let currentAnonymizeMode = 'content'; // 'file' or 'content'
 let anonymizedData = null;
 let sensitiveFieldsAnalysis = null;
+let validatorContent = null;
+let validatorFilePath = null;
+let currentValidatorMode = 'content'; // 'file' or 'content'
+let validationResult = null;
 
 // Format states for toggle functionality
 let formatStates = {
@@ -50,6 +54,22 @@ const anonymizedPreview = document.getElementById('anonymized-preview');
 const copyAnonymizedBtn = document.getElementById('copy-anonymized-btn');
 const formatAnonymizedBtn = document.getElementById('format-anonymized-btn');
 
+// Validator elements
+const validatorFileInput = document.getElementById('validator-file');
+const validatorTextarea = document.getElementById('validator-textarea');
+const browseValidatorBtn = document.getElementById('browse-validator');
+const validateBtn = document.getElementById('validate-btn');
+const formatJsonBtn = document.getElementById('format-json-btn');
+const clearValidatorBtn = document.getElementById('clear-validator-btn');
+const copyFormattedBtn = document.getElementById('copy-formatted-btn');
+const validatorPreview = document.getElementById('validator-preview');
+const validationStatus = document.getElementById('validation-status');
+const validationErrors = document.getElementById('validation-errors');
+const validationInfo = document.getElementById('validation-info');
+const errorList = document.getElementById('error-list');
+const autoValidateCheckbox = document.getElementById('auto-validate');
+const formatOnValidCheckbox = document.getElementById('format-on-valid');
+
 
 // Initialization
 document.addEventListener('DOMContentLoaded', () => {
@@ -81,10 +101,20 @@ function initializeEventListeners() {
         updateUI();
     });
     
+    // Validator textarea
+    validatorTextarea.addEventListener('input', () => {
+        validatorContent = validatorTextarea.value.trim();
+        if (autoValidateCheckbox.checked) {
+            debounceValidation();
+        }
+        updateUI();
+    });
+    
     // Browse files
     browseSkeletonBtn.addEventListener('click', () => browseFile('skeleton'));
     browseSwaggerBtn.addEventListener('click', () => browseFile('swagger'));
     browseAnonymizeBtn.addEventListener('click', () => browseFile('anonymize'));
+    browseValidatorBtn.addEventListener('click', () => browseFile('validator'));
     
     // Main actions
     generateBtn.addEventListener('click', generateData);
@@ -98,6 +128,12 @@ function initializeEventListeners() {
     saveAnonymizedBtn.addEventListener('click', saveAnonymizedData);
     copyAnonymizedBtn.addEventListener('click', () => copyToClipboard(anonymizedData));
     formatAnonymizedBtn.addEventListener('click', () => formatJson('anonymized-preview'));
+    
+    // Validator actions
+    validateBtn.addEventListener('click', validateJson);
+    formatJsonBtn.addEventListener('click', formatValidatorJson);
+    clearValidatorBtn.addEventListener('click', clearValidator);
+    copyFormattedBtn.addEventListener('click', () => copyToClipboard(validationResult?.formatted || validatorContent));
     
     // Keyboard shortcuts
     document.addEventListener('keydown', handleKeyboardShortcuts);
@@ -117,7 +153,12 @@ function switchView(viewId) {
     
     // Update current mode
     currentMode = viewId;
-    updateStatus(`${viewId === 'generate' ? 'Generation' : 'Anonymization'} mode selected`);
+    let modeText = 'Generation';
+    if (viewId === 'anonymize') modeText = 'Anonymization';
+    else if (viewId === 'validator') modeText = 'JSON Validator';
+    else if (viewId === 'swagger') modeText = 'Swagger API';
+    
+    updateStatus(`${modeText} mode selected`);
     updateUI();
 }
 
@@ -167,6 +208,20 @@ function switchTab(tabId) {
             anonymizeFileInput.value = '';
             updateStatus('Content mode selected');
         }
+    } else if (tabId === 'validator-file' || tabId === 'validator-content') {
+        // Update validator mode
+        currentValidatorMode = tabId === 'validator-file' ? 'file' : 'content';
+        
+        // Reset data for the previous mode
+        if (currentValidatorMode === 'file') {
+            validatorContent = null;
+            validatorTextarea.value = '';
+            updateStatus('File mode selected');
+        } else {
+            validatorFilePath = null;
+            validatorFileInput.value = '';
+            updateStatus('Content mode selected');
+        }
     }
     
     updateUI();
@@ -190,6 +245,12 @@ async function browseFile(type) {
                 { name: 'All Files', extensions: ['*'] }
             ];
             title = 'Select a JSON file to anonymize';
+        } else if (type === 'validator') {
+            filters = [
+                { name: 'JSON Files', extensions: ['json'] },
+                { name: 'All Files', extensions: ['*'] }
+            ];
+            title = 'Select a JSON file to validate';
         } else {
             filters = [
                 { name: 'Swagger Files', extensions: ['yaml', 'yml', 'json'] },
@@ -209,6 +270,21 @@ async function browseFile(type) {
                 anonymizeFilePath = filePath;
                 anonymizeFileInput.value = getFileName(filePath);
                 updateStatus(`File to anonymize selected: ${getFileName(filePath)}`);
+            } else if (type === 'validator') {
+                validatorFilePath = filePath;
+                validatorFileInput.value = getFileName(filePath);
+                try {
+                    validatorContent = await window.electronAPI.readFile(filePath);
+                    validatorTextarea.value = validatorContent;
+                    updateStatus(`File to validate selected: ${getFileName(filePath)}`);
+                    
+                    // Auto-validate if option is enabled
+                    if (autoValidateCheckbox.checked) {
+                        validateJson();
+                    }
+                } catch (error) {
+                    showError('File Error', `Unable to read file: ${error.message}`);
+                }
             } else {
                 swaggerPath = filePath;
                 swaggerFileInput.value = getFileName(filePath);
@@ -670,6 +746,14 @@ function handleKeyboardShortcuts(event) {
                 event.preventDefault();
                 switchView('anonymize');
                 break;
+            case '3':
+                event.preventDefault();
+                switchView('swagger');
+                break;
+            case '4':
+                event.preventDefault();
+                switchView('validator');
+                break;
         }
     }
 }
@@ -683,4 +767,284 @@ window.addEventListener('error', (event) => {
 window.addEventListener('unhandledrejection', (event) => {
     console.error('Unhandled Promise Rejection:', event.reason);
     showError('Internal Error', 'An asynchronous error occurred.');
-}); 
+});
+
+// JSON Validator Functions
+let validationTimeout = null;
+
+// Debounced validation for auto-validate
+function debounceValidation() {
+    if (validationTimeout) {
+        clearTimeout(validationTimeout);
+    }
+    validationTimeout = setTimeout(() => {
+        validateJson();
+    }, 500);
+}
+
+// Main validation function
+function validateJson() {
+    const jsonText = validatorContent || '';
+    
+    if (!jsonText.trim()) {
+        clearValidationResults();
+        return;
+    }
+    
+    try {
+        // Parse JSON
+        const parsed = JSON.parse(jsonText);
+        
+        // Validation successful
+        const formatted = JSON.stringify(parsed, null, 2);
+        validationResult = {
+            valid: true,
+            parsed: parsed,
+            formatted: formatted,
+            errors: []
+        };
+        
+        displayValidationSuccess(parsed, formatted);
+        
+        // Auto-format if option is enabled
+        if (formatOnValidCheckbox.checked) {
+            validatorTextarea.value = formatted;
+            validatorContent = formatted;
+        }
+        
+        updateValidatorUI();
+        
+    } catch (error) {
+        // Validation failed
+        const errorInfo = parseJsonError(error, jsonText);
+        validationResult = {
+            valid: false,
+            parsed: null,
+            formatted: null,
+            errors: [errorInfo]
+        };
+        
+        displayValidationErrors([errorInfo]);
+        updateValidatorUI();
+    }
+}
+
+// Parse JSON error to get detailed information
+function parseJsonError(error, jsonText) {
+    const message = error.message;
+    const lines = jsonText.split('\n');
+    
+    // Try to extract line and column from error message
+    let line = 1;
+    let column = 1;
+    
+    // Common error patterns
+    const patterns = [
+        /at position (\d+)/,
+        /line (\d+)/,
+        /column (\d+)/
+    ];
+    
+    // Extract position if available
+    const positionMatch = message.match(/at position (\d+)/);
+    if (positionMatch) {
+        const position = parseInt(positionMatch[1]);
+        let currentPos = 0;
+        
+        for (let i = 0; i < lines.length; i++) {
+            if (currentPos + lines[i].length >= position) {
+                line = i + 1;
+                column = position - currentPos + 1;
+                break;
+            }
+            currentPos += lines[i].length + 1; // +1 for newline
+        }
+    }
+    
+    return {
+        message: message,
+        line: line,
+        column: column,
+        type: 'Syntax Error'
+    };
+}
+
+// Display validation success
+function displayValidationSuccess(parsed, formatted) {
+    // Hide errors
+    validationErrors.style.display = 'none';
+    
+    // Show success status
+    validationStatus.className = 'validation-status valid';
+    validationStatus.style.display = 'block';
+    
+    // Update status text
+    const statusText = validationStatus.querySelector('.status-text');
+    const statusIcon = validationStatus.querySelector('.status-icon');
+    
+    if (statusText) statusText.textContent = 'JSON Valide';
+    if (statusIcon) {
+        statusIcon.innerHTML = `
+            <path d="M9 12l2 2 4-4"/>
+            <circle cx="12" cy="12" r="10"/>
+        `;
+    }
+    
+    // Update validation info
+    const keys = countJsonElements(parsed);
+    validationInfo.textContent = `${keys.objects} objet(s), ${keys.arrays} tableau(x), ${keys.properties} propriété(s)`;
+    
+    // Display formatted JSON
+    const highlighted = highlightJson(formatted);
+    validatorPreview.innerHTML = highlighted;
+    
+    // Update textarea styling
+    validatorTextarea.classList.remove('invalid');
+    validatorTextarea.classList.add('valid');
+}
+
+// Display validation errors
+function displayValidationErrors(errors) {
+    // Hide success status
+    validationStatus.style.display = 'none';
+    
+    // Show errors
+    validationErrors.style.display = 'block';
+    
+    // Clear previous errors
+    errorList.innerHTML = '';
+    
+    // Add each error
+    errors.forEach(error => {
+        const errorItem = document.createElement('div');
+        errorItem.className = 'error-item';
+        
+        errorItem.innerHTML = `
+            <div class="error-message">${error.message}</div>
+            <div class="error-location">
+                Ligne <span class="error-line">${error.line}</span>, Colonne <span class="error-line">${error.column}</span>
+            </div>
+        `;
+        
+        errorList.appendChild(errorItem);
+    });
+    
+    // Clear preview
+    validatorPreview.innerHTML = `
+        <div class="empty-state">
+            <svg class="empty-icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="15" y1="9" x2="9" y2="15"/>
+                <line x1="9" y1="9" x2="15" y2="15"/>
+            </svg>
+            <h4>JSON Invalide</h4>
+            <p>Corrigez les erreurs pour voir le JSON formaté</p>
+        </div>
+    `;
+    
+    // Update textarea styling
+    validatorTextarea.classList.remove('valid');
+    validatorTextarea.classList.add('invalid');
+}
+
+// Clear validation results
+function clearValidationResults() {
+    validationStatus.style.display = 'none';
+    validationErrors.style.display = 'none';
+    
+    validatorPreview.innerHTML = `
+        <div class="empty-state">
+            <svg class="empty-icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M9 12l2 2 4-4"/>
+                <circle cx="12" cy="12" r="10"/>
+            </svg>
+            <h4>Prêt pour validation</h4>
+            <p>Collez votre JSON et cliquez sur "Valider JSON"</p>
+        </div>
+    `;
+    
+    validatorTextarea.classList.remove('valid', 'invalid');
+    validationResult = null;
+}
+
+// Count JSON elements
+function countJsonElements(obj) {
+    let objects = 0;
+    let arrays = 0;
+    let properties = 0;
+    
+    function count(item) {
+        if (Array.isArray(item)) {
+            arrays++;
+            item.forEach(count);
+        } else if (typeof item === 'object' && item !== null) {
+            objects++;
+            Object.keys(item).forEach(key => {
+                properties++;
+                count(item[key]);
+            });
+        }
+    }
+    
+    count(obj);
+    return { objects, arrays, properties };
+}
+
+// Format validator JSON
+function formatValidatorJson() {
+    if (!validatorContent) return;
+    
+    try {
+        const parsed = JSON.parse(validatorContent);
+        const formatted = JSON.stringify(parsed, null, 2);
+        
+        validatorTextarea.value = formatted;
+        validatorContent = formatted;
+        
+        // Update preview
+        const highlighted = highlightJson(formatted);
+        validatorPreview.innerHTML = highlighted;
+        
+        updateStatus('JSON formaté avec succès');
+    } catch (error) {
+        showError('Format Error', 'Impossible de formater un JSON invalide');
+    }
+}
+
+// Clear validator
+function clearValidator() {
+    validatorTextarea.value = '';
+    validatorContent = null;
+    validatorFilePath = null;
+    validatorFileInput.value = '';
+    
+    clearValidationResults();
+    updateValidatorUI();
+    updateStatus('Validateur réinitialisé');
+}
+
+// Update validator UI
+function updateValidatorUI() {
+    const hasContent = validatorContent && validatorContent.trim();
+    
+    validateBtn.disabled = !hasContent;
+    formatJsonBtn.disabled = !hasContent;
+    clearValidatorBtn.disabled = !hasContent;
+    copyFormattedBtn.disabled = !validationResult?.formatted;
+    
+    // Update main UI as well
+    if (currentMode === 'validator') {
+        updateUI();
+    }
+}
+
+// Update main updateUI function to include validator
+const originalUpdateUI = updateUI;
+updateUI = function() {
+    originalUpdateUI();
+    
+    // Validator mode
+    if (currentMode === 'validator') {
+        updateValidatorUI();
+    }
+}; 
