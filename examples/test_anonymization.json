@@ -1,0 +1,53 @@
+{
+  "user": {
+    "id": 12345,
+    "firstName": "Jean",
+    "lastName": "Dupont",
+    "email": "jean.dupont@email.com",
+    "phone": "0123456789",
+    "address": {
+      "street": "123 rue de la Paix",
+      "city": "Paris",
+      "postalCode": "75001",
+      "country": "France"
+    },
+    "age": 35,
+    "isActive": true,
+    "company": "Entreprise SARL",
+    "website": "https://mon-site.com",
+    "description": "Développeur passionné avec 10 ans d'expérience en développement web"
+  },
+  "employees": [
+    {
+      "firstName": "Marie",
+      "lastName": "Martin",
+      "email": "marie.martin@entreprise.com",
+      "phone": "0987654321",
+      "address": {
+        "street": "456 avenue des Champs",
+        "city": "Lyon",
+        "postalCode": "69000",
+        "country": "France"
+      },
+      "company": "Tech Solutions"
+    },
+    {
+      "firstName": "Pierre",
+      "lastName": "Durand",
+      "email": "pierre.durand@entreprise.com",
+      "phone": "0555666777",
+      "address": {
+        "street": "789 boulevard Saint-Germain",
+        "city": "Marseille",
+        "postalCode": "13000",
+        "country": "France"
+      },
+      "company": "Innovation Corp"
+    }
+  ],
+  "metadata": {
+    "createdAt": "2024-01-15T10:30:00Z",
+    "updatedAt": "2024-01-16T14:45:00Z",
+    "version": "1.0.0"
+  }
+} 

@@ -1,107 +1,331 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" data-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Générateur de Données JSON de Test</title>
+    <title>Genieration - Générateur de données JSON</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <div class="container">
-        <!-- En-tête -->
-        <header class="header">
-            <h1>
-                <span class="icon">🔧</span>
-                Générateur de Données JSON de Test
-            </h1>
-            <p class="subtitle">Générez des données de test à partir d'un squelette JSON et d'un schéma Swagger/OpenAPI</p>
-        </header>
-
-        <!-- Formulaire principal -->
-        <main class="main-content">
-            <div class="form-section">
-                <h2>Configuration</h2>
-                
-                <!-- Fichier squelette -->
-                <div class="input-group">
-                    <label for="skeleton-file">
-                        <span class="label-text">Fichier squelette JSON</span>
-                        <span class="required">*</span>
-                    </label>
-                    <div class="file-input-wrapper">
-                        <input type="text" id="skeleton-file" class="file-path" placeholder="Aucun fichier sélectionné" readonly>
-                        <button type="button" id="browse-skeleton" class="btn btn-secondary">
-                            <span class="icon">📁</span>
-                            Parcourir
-                        </button>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <div class="logo-icon">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+                            <path d="M2 17l10 5 10-5"/>
+                            <path d="M2 12l10 5 10-5"/>
+                        </svg>
                     </div>
-                </div>
-
-                <!-- Fichier Swagger -->
-                <div class="input-group">
-                    <label for="swagger-file">
-                        <span class="label-text">Fichier Swagger/OpenAPI</span>
-                        <span class="optional">(optionnel)</span>
-                    </label>
-                    <div class="file-input-wrapper">
-                        <input type="text" id="swagger-file" class="file-path" placeholder="Aucun fichier sélectionné" readonly>
-                        <button type="button" id="browse-swagger" class="btn btn-secondary">
-                            <span class="icon">📁</span>
-                            Parcourir
-                        </button>
-                    </div>
-                </div>
-
-                <!-- Boutons d'action -->
-                <div class="actions">
-                    <button type="button" id="generate-btn" class="btn btn-primary" disabled>
-                        <span class="icon">⚡</span>
-                        Générer les données
-                    </button>
-                    <button type="button" id="save-btn" class="btn btn-success" disabled>
-                        <span class="icon">💾</span>
-                        Sauvegarder
-                    </button>
+                    <h1 class="logo-text">Genieration</h1>
                 </div>
             </div>
+            
+            <nav class="sidebar-nav">
+                <ul class="nav-menu">
+                    <li class="nav-item">
+                        <button class="nav-link active" data-view="generate">
+                            <svg class="nav-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                            </svg>
+                            <span>Générer des données</span>
+                        </button>
+                    </li>
+                    <li class="nav-item">
+                        <button class="nav-link" data-view="anonymize">
+                            <svg class="nav-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                                <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                                <line x1="12" y1="19" x2="12" y2="23"/>
+                                <line x1="8" y1="23" x2="16" y2="23"/>
+                            </svg>
+                            <span>Anonymiser des données</span>
+                        </button>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
 
-            <!-- Zone de prévisualisation -->
-            <div class="preview-section">
-                <div class="preview-header">
-                    <h2>Prévisualisation</h2>
-                    <div class="preview-actions">
-                        <button type="button" id="copy-btn" class="btn btn-small" disabled>
-                            <span class="icon">📋</span>
-                            Copier
-                        </button>
-                        <button type="button" id="format-btn" class="btn btn-small" disabled>
-                            <span class="icon">🎨</span>
-                            Formater
-                        </button>
+        <!-- Main content -->
+        <main class="main-content">
+            <!-- Top bar -->
+            <header class="top-bar">
+                <div class="top-bar-content">
+                    <h2 class="page-title">Générateur de données JSON</h2>
+                    <div class="top-bar-actions">
+                        <div class="status-indicator">
+                            <span id="status-text">Prêt</span>
+                        </div>
                     </div>
                 </div>
-                <div class="preview-content">
-                    <pre id="json-preview" class="json-preview">
-                        <div class="empty-state">
-                            <span class="icon">📄</span>
-                            <p>Aucune donnée générée</p>
-                            <p class="empty-state-subtitle">Sélectionnez un fichier squelette et cliquez sur "Générer"</p>
+            </header>
+
+            <!-- Content area -->
+            <div class="content-area">
+                <!-- Generate view -->
+                <div class="view active" id="generate-view">
+                    <div class="content-grid">
+                        <!-- Configuration panel -->
+                        <div class="config-panel">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3>Configuration</h3>
+                                </div>
+                                <div class="card-content">
+                                    <!-- JSON Skeleton section -->
+                                    <div class="form-section">
+                                        <div class="form-group">
+                                            <label class="form-label">
+                                                JSON Skeleton
+                                                <span class="required">*</span>
+                                            </label>
+                                            <div class="input-tabs">
+                                                <button type="button" class="tab-btn active" data-tab="skeleton-file">
+                                                    Fichier
+                                                </button>
+                                                <button type="button" class="tab-btn" data-tab="skeleton-content">
+                                                    Contenu
+                                                </button>
+                                            </div>
+                                            
+                                            <div class="tab-content active" id="skeleton-file-content">
+                                                <div class="file-input-group">
+                                                    <input type="text" id="skeleton-file" class="file-input" placeholder="Aucun fichier sélectionné" readonly>
+                                                    <button type="button" id="browse-skeleton" class="btn btn-secondary">
+                                                        Parcourir
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="tab-content" id="skeleton-content-content">
+                                                <textarea id="skeleton-textarea" class="json-textarea" placeholder="Collez votre JSON skeleton ici..."></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Swagger section -->
+                                    <div class="form-section">
+                                        <div class="form-group">
+                                            <label class="form-label">
+                                                Swagger/OpenAPI
+                                                <span class="optional">(optionnel)</span>
+                                            </label>
+                                            <div class="file-input-group">
+                                                <input type="text" id="swagger-file" class="file-input" placeholder="Aucun fichier sélectionné" readonly>
+                                                <button type="button" id="browse-swagger" class="btn btn-secondary">
+                                                    Parcourir
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Actions -->
+                                    <div class="form-actions">
+                                        <button type="button" id="generate-btn" class="btn btn-primary" disabled>
+                                            <svg class="btn-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <path d="M5 12l5 5L20 7"/>
+                                            </svg>
+                                            Générer des données
+                                        </button>
+                                        <button type="button" id="save-btn" class="btn btn-success" disabled>
+                                            <svg class="btn-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+                                                <polyline points="17,21 17,13 7,13 7,21"/>
+                                                <polyline points="7,3 7,8 15,8"/>
+                                            </svg>
+                                            Enregistrer
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                    </pre>
+
+                        <!-- Preview panel -->
+                        <div class="preview-panel">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3>Aperçu des données générées</h3>
+                                    <div class="card-actions">
+                                        <button type="button" id="copy-btn" class="btn btn-ghost" disabled>
+                                            <svg class="btn-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                                            </svg>
+                                            Copier
+                                        </button>
+                                        <button type="button" id="format-btn" class="btn btn-ghost" disabled>
+                                            <svg class="btn-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <path d="M4 7V4a2 2 0 0 1 2-2h8.5L20 7.5V20a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-3"/>
+                                                <path d="M14 2v6h6"/>
+                                                <path d="M10.5 12.5L13 15l-2.5 2.5"/>
+                                                <path d="M7.5 15h5.5"/>
+                                            </svg>
+                                            Formater
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="card-content">
+                                    <div class="json-preview-container">
+                                        <pre id="json-preview" class="json-preview">
+                                            <div class="empty-state">
+                                                <svg class="empty-icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                                                    <polyline points="14,2 14,8 20,8"/>
+                                                    <line x1="16" y1="13" x2="8" y2="13"/>
+                                                    <line x1="16" y1="17" x2="8" y2="17"/>
+                                                    <polyline points="10,9 9,9 8,9"/>
+                                                </svg>
+                                                <h4>Aucune donnée générée</h4>
+                                                <p>Configurez votre skeleton JSON et cliquez sur "Générer des données"</p>
+                                            </div>
+                                        </pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Anonymize view -->
+                <div class="view" id="anonymize-view">
+                    <div class="content-grid">
+                        <!-- Configuration panel -->
+                        <div class="config-panel">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3>Configuration de l'anonymisation</h3>
+                                </div>
+                                <div class="card-content">
+                                    <!-- Data source section -->
+                                    <div class="form-section">
+                                        <div class="form-group">
+                                            <label class="form-label">
+                                                Données à anonymiser
+                                                <span class="required">*</span>
+                                            </label>
+                                            <div class="input-tabs">
+                                                <button type="button" class="tab-btn active" data-tab="anonymize-file">
+                                                    Fichier
+                                                </button>
+                                                <button type="button" class="tab-btn" data-tab="anonymize-content">
+                                                    Contenu
+                                                </button>
+                                            </div>
+                                            
+                                            <div class="tab-content active" id="anonymize-file-content">
+                                                <div class="file-input-group">
+                                                    <input type="text" id="anonymize-file" class="file-input" placeholder="Aucun fichier sélectionné" readonly>
+                                                    <button type="button" id="browse-anonymize" class="btn btn-secondary">
+                                                        Parcourir
+                                                    </button>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="tab-content" id="anonymize-content-content">
+                                                <textarea id="anonymize-textarea" class="json-textarea" placeholder="Collez votre JSON à anonymiser ici..."></textarea>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Options section -->
+                                    <div class="form-section">
+                                        <div class="form-group">
+                                            <label class="form-label">Options</label>
+                                            <div class="checkbox-group">
+                                                <label class="checkbox-label">
+                                                    <input type="checkbox" id="analyze-first" checked>
+                                                    <span class="checkbox-custom"></span>
+                                                    <span>Analyser les champs sensibles d'abord</span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Actions -->
+                                    <div class="form-actions">
+                                        <button type="button" id="analyze-btn" class="btn btn-secondary" disabled>
+                                            <svg class="btn-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <circle cx="11" cy="11" r="8"/>
+                                                <path d="M21 21l-4.35-4.35"/>
+                                            </svg>
+                                            Analyser
+                                        </button>
+                                        <button type="button" id="anonymize-btn" class="btn btn-primary" disabled>
+                                            <svg class="btn-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                                                <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                                            </svg>
+                                            Anonymiser
+                                        </button>
+                                        <button type="button" id="save-anonymized-btn" class="btn btn-success" disabled>
+                                            <svg class="btn-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+                                                <polyline points="17,21 17,13 7,13 7,21"/>
+                                                <polyline points="7,3 7,8 15,8"/>
+                                            </svg>
+                                            Enregistrer
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Preview panel -->
+                        <div class="preview-panel">
+                            <div class="card">
+                                <div class="card-header">
+                                    <h3>Aperçu des données anonymisées</h3>
+                                    <div class="card-actions">
+                                        <button type="button" id="copy-anonymized-btn" class="btn btn-ghost" disabled>
+                                            <svg class="btn-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                                            </svg>
+                                            Copier
+                                        </button>
+                                        <button type="button" id="format-anonymized-btn" class="btn btn-ghost" disabled>
+                                            <svg class="btn-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <path d="M4 7V4a2 2 0 0 1 2-2h8.5L20 7.5V20a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2v-3"/>
+                                                <path d="M14 2v6h6"/>
+                                                <path d="M10.5 12.5L13 15l-2.5 2.5"/>
+                                                <path d="M7.5 15h5.5"/>
+                                            </svg>
+                                            Formater
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="card-content">
+                                    <div class="json-preview-container">
+                                        <pre id="anonymized-preview" class="json-preview">
+                                            <div class="empty-state">
+                                                <svg class="empty-icon" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                                                    <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"/>
+                                                    <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+                                                    <line x1="12" y1="19" x2="12" y2="23"/>
+                                                    <line x1="8" y1="23" x2="16" y2="23"/>
+                                                </svg>
+                                                <h4>Aucune donnée anonymisée</h4>
+                                                <p>Chargez vos données et cliquez sur "Anonymiser"</p>
+                                            </div>
+                                        </pre>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </main>
+    </div>
 
-        <!-- Barre de statut -->
-        <footer class="status-bar">
-            <div class="status-info">
-                <span id="status-text">Prêt</span>
-            </div>
-            <div class="loading-indicator" id="loading" style="display: none;">
-                <span class="spinner"></span>
-                <span>Génération en cours...</span>
-            </div>
-        </footer>
+    <!-- Loading overlay -->
+    <div id="loading-overlay" class="loading-overlay" style="display: none;">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <p id="loading-text">Traitement en cours...</p>
+        </div>
     </div>
 
     <!-- Scripts -->

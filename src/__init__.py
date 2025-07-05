@@ -1,2 +1,2 @@
 # JSON Test Data Generator
-# Application de bureau pour générer des données de test JSON 
+# Desktop application to generate JSON test data 

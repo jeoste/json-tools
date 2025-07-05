@@ -1,6 +1,6 @@
 """
-Module de parsing des fichiers Swagger/OpenAPI.
-Extrait les schémas et contraintes pour la génération de données.
+Module for parsing Swagger/OpenAPI files.
+Extracts schemas and constraints for data generation.
 """
 
 import json
@@ -10,7 +10,7 @@ from pathlib import Path
 
 
 class SwaggerParser:
-    """Parseur de fichiers Swagger/OpenAPI."""
+    """Swagger/OpenAPI file parser."""
     
     def __init__(self):
         self.swagger_spec = None
@@ -18,13 +18,13 @@ class SwaggerParser:
         
     def load_swagger(self, file_path: str) -> Dict[str, Any]:
         """
-        Charge un fichier Swagger/OpenAPI.
+        Load a Swagger/OpenAPI file.
         
         Args:
-            file_path: Chemin vers le fichier Swagger
+            file_path: Path to the Swagger file
             
         Returns:
-            Spécification Swagger parsée
+            Parsed Swagger specification
         """
         file_path_obj = Path(file_path)
         
@@ -35,16 +35,16 @@ class SwaggerParser:
                 else:
                     self.swagger_spec = json.load(f)
             
-            # Extraction des schémas
+            # Extract schemas
             self._extract_schemas()
             
             return self.swagger_spec
             
         except Exception as e:
-            raise ValueError(f"Erreur lors du chargement du fichier Swagger : {str(e)}")
+            raise ValueError(f"Error loading Swagger file: {str(e)}")
     
     def _extract_schemas(self):
-        """Extrait les schémas de la spécification Swagger."""
+        """Extract schemas from the Swagger specification."""
         if not self.swagger_spec:
             return
         
@@ -58,13 +58,13 @@ class SwaggerParser:
     
     def get_schema_for_field(self, field_path: str) -> Optional[Dict[str, Any]]:
         """
-        Récupère le schéma pour un champ donné.
+        Retrieve the schema for a given field.
         
         Args:
-            field_path: Chemin du champ (ex: "User.email")
+            field_path: Field path (ex: "User.email")
             
         Returns:
-            Schéma du champ ou None si non trouvé
+            Field schema or None if not found
         """
         if not self.schemas:
             return None
@@ -88,13 +88,13 @@ class SwaggerParser:
     
     def get_constraints_for_field(self, field_path: str) -> Dict[str, Any]:
         """
-        Récupère les contraintes pour un champ donné.
+        Retrieve constraints for a given field.
         
         Args:
-            field_path: Chemin du champ
+            field_path: Field path
             
         Returns:
-            Dictionnaire des contraintes
+            Dictionary of constraints
         """
         schema = self.get_schema_for_field(field_path)
         
@@ -103,35 +103,35 @@ class SwaggerParser:
         
         constraints = {}
         
-        # Contraintes de type
+        # Type constraints
         if 'type' in schema:
             constraints['type'] = schema['type']
         
-        # Contraintes de format
+        # Format constraints
         if 'format' in schema:
             constraints['format'] = schema['format']
         
-        # Contraintes de longueur
+        # Length constraints
         if 'minLength' in schema:
             constraints['minLength'] = schema['minLength']
         if 'maxLength' in schema:
             constraints['maxLength'] = schema['maxLength']
         
-        # Contraintes numériques
+        # Numeric constraints
         if 'minimum' in schema:
             constraints['minimum'] = schema['minimum']
         if 'maximum' in schema:
             constraints['maximum'] = schema['maximum']
         
-        # Pattern regex
+        # Regex pattern
         if 'pattern' in schema:
             constraints['pattern'] = schema['pattern']
         
-        # Énumération
+        # Enumeration
         if 'enum' in schema:
             constraints['enum'] = schema['enum']
         
-        # Contraintes de tableau
+        # Array constraints
         if 'items' in schema:
             constraints['items'] = schema['items']
         if 'minItems' in schema:
@@ -139,7 +139,7 @@ class SwaggerParser:
         if 'maxItems' in schema:
             constraints['maxItems'] = schema['maxItems']
         
-        # Propriétés d'objet
+        # Object properties
         if 'properties' in schema:
             constraints['properties'] = schema['properties']
         
@@ -147,13 +147,13 @@ class SwaggerParser:
     
     def find_matching_schema(self, json_structure: Dict[str, Any]) -> Optional[str]:
         """
-        Trouve le schéma qui correspond le mieux à une structure JSON.
+        Find the schema that best matches a JSON structure.
         
         Args:
-            json_structure: Structure JSON à analyser
+            json_structure: JSON structure to analyze
             
         Returns:
-            Nom du schéma correspondant ou None
+            Matching schema name or None
         """
         if not self.schemas:
             return None
@@ -173,14 +173,14 @@ class SwaggerParser:
     def _calculate_match_score(self, json_structure: Dict[str, Any], 
                              schema: Dict[str, Any]) -> float:
         """
-        Calcule un score de correspondance entre une structure JSON et un schéma.
+        Calculate a match score between a JSON structure and a schema.
         
         Args:
-            json_structure: Structure JSON
-            schema: Schéma Swagger
+            json_structure: JSON structure
+            schema: Swagger schema
             
         Returns:
-            Score entre 0 et 1
+            Score between 0 and 1
         """
         if 'properties' not in schema:
             return 0.0
@@ -192,13 +192,13 @@ class SwaggerParser:
         if not json_keys or not schema_keys:
             return 0.0
         
-        # Calcul de la correspondance des clés
+        # Calculate key match
         common_keys = json_keys & schema_keys
         total_keys = json_keys | schema_keys
         
         key_score = len(common_keys) / len(total_keys)
         
-        # Calcul de la correspondance des types
+        # Calculate type match
         type_score = 0.0
         if common_keys:
             type_matches = 0
@@ -211,19 +211,19 @@ class SwaggerParser:
             
             type_score = type_matches / len(common_keys)
         
-        # Score final (moyenne pondérée)
+        # Final score (weighted average)
         return (key_score * 0.6) + (type_score * 0.4)
     
     def _types_match(self, value: Any, schema_property: Dict[str, Any]) -> bool:
         """
-        Vérifie si le type d'une valeur correspond au schéma.
+        Check if a value's type matches the schema.
         
         Args:
-            value: Valeur à vérifier
-            schema_property: Propriété du schéma
+            value: Value to check
+            schema_property: Schema property
             
         Returns:
-            True si les types correspondent
+            True if types match
         """
         if 'type' not in schema_property:
             return True
@@ -247,9 +247,9 @@ class SwaggerParser:
     
     def get_all_schemas(self) -> Dict[str, Any]:
         """
-        Retourne tous les schémas disponibles.
+        Return all available schemas.
         
         Returns:
-            Dictionnaire des schémas
+            Dictionary of schemas
         """
         return self.schemas 

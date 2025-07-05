@@ -1,6 +1,6 @@
 """
-Module de génération de données anonymisées cohérentes.
-Utilise la librairie Faker pour générer des données réalistes.
+Module for generating coherent anonymized data.
+Uses the Faker library to generate realistic data.
 """
 
 from faker import Faker
@@ -12,37 +12,37 @@ from typing import Any, Dict, List, Optional
 
 
 class DataGenerator:
-    """Générateur de données anonymisées cohérentes."""
+    """Coherent anonymized data generator."""
     
     def __init__(self, locale: str = 'fr_FR'):
         """
-        Initialise le générateur avec une locale spécifique.
+        Initialize the generator with a specific locale.
         
         Args:
-            locale: Locale pour la génération (par défaut français)
+            locale: Locale for generation (default French)
         """
         self.fake = Faker(locale)
-        Faker.seed(42)  # Pour la reproductibilité
+        Faker.seed(42)  # For reproducibility
         
-        # Cache pour maintenir la cohérence
+        # Cache to maintain consistency
         self._cached_data = {}
         
     def generate_by_type(self, field_type: str, field_name: str = "", 
                         constraints: Optional[Dict] = None) -> Any:
         """
-        Génère une donnée selon le type spécifié.
+        Generate data according to the specified type.
         
         Args:
-            field_type: Type de données à générer
-            field_name: Nom du champ (pour déduire le type)
-            constraints: Contraintes additionnelles
+            field_type: Type of data to generate
+            field_name: Field name (to deduce type)
+            constraints: Additional constraints
             
         Returns:
-            Donnée générée
+            Generated data
         """
         constraints = constraints or {}
         
-        # Génération selon le type
+        # Generation by type
         if field_type == "string":
             return self._generate_string(field_name, constraints)
         elif field_type == "integer":
@@ -59,10 +59,10 @@ class DataGenerator:
             return self._generate_string(field_name, constraints)
     
     def _generate_string(self, field_name: str, constraints: Dict) -> str:
-        """Génère une chaîne de caractères selon le nom du champ."""
+        """Generate a string according to the field name."""
         field_name_lower = field_name.lower()
         
-        # Détection du type selon le nom du champ
+        # Type detection based on field name
         if any(keyword in field_name_lower for keyword in ['email', 'mail', 'e-mail']):
             return self._get_cached_or_generate(f"email_{field_name}", self.fake.email)
         
@@ -104,22 +104,22 @@ class DataGenerator:
             return self._get_cached_or_generate(f"text_{field_name}", 
                                                lambda: self.fake.sentence(nb_words=10))
         
-        # Contraintes de format
+        # Format constraints
         if 'pattern' in constraints:
             return self._generate_pattern_string(constraints['pattern'])
         
-        # Contraintes de longueur
+        # Length constraints
         min_length = constraints.get('minLength', 1)
         max_length = constraints.get('maxLength', 50)
         
         if 'enum' in constraints:
             return random.choice(constraints['enum'])
         
-        # Génération par défaut
+        # Default generation
         return self.fake.lexify('?' * random.randint(min_length, max_length))
     
     def _generate_integer(self, constraints: Dict) -> int:
-        """Génère un entier selon les contraintes."""
+        """Generate an integer according to constraints."""
         minimum = constraints.get('minimum', 0)
         maximum = constraints.get('maximum', 1000)
         
@@ -129,7 +129,7 @@ class DataGenerator:
         return random.randint(minimum, maximum)
     
     def _generate_number(self, constraints: Dict) -> float:
-        """Génère un nombre décimal selon les contraintes."""
+        """Generate a decimal number according to constraints."""
         minimum = constraints.get('minimum', 0.0)
         maximum = constraints.get('maximum', 1000.0)
         
@@ -139,25 +139,25 @@ class DataGenerator:
         return round(random.uniform(minimum, maximum), 2)
     
     def _generate_boolean(self) -> bool:
-        """Génère un booléen."""
+        """Generate a boolean."""
         return random.choice([True, False])
     
     def _generate_array(self, field_name: str, constraints: Dict) -> List[Any]:
-        """Génère un tableau selon les contraintes."""
+        """Generate an array according to constraints."""
         min_items = constraints.get('minItems', 1)
         max_items = constraints.get('maxItems', 5)
         items_schema = constraints.get('items', {})
         
         size = random.randint(min_items, max_items)
         
-        # Type des éléments
+        # Element type
         item_type = items_schema.get('type', 'string')
         
         return [self.generate_by_type(item_type, field_name, items_schema) 
                 for _ in range(size)]
     
     def _generate_object(self, constraints: Dict) -> Dict[str, Any]:
-        """Génère un objet selon les contraintes."""
+        """Generate an object according to constraints."""
         properties = constraints.get('properties', {})
         
         result = {}
@@ -168,8 +168,8 @@ class DataGenerator:
         return result
     
     def _generate_pattern_string(self, pattern: str) -> str:
-        """Génère une chaîne selon un pattern regex."""
-        # Simplification : quelques patterns courants
+        """Generate a string according to a regex pattern."""
+        # Simplification: some common patterns
         if pattern == r'^\d{4}-\d{2}-\d{2}$':
             return self.fake.date().strftime('%Y-%m-%d')
         elif pattern == r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$':
@@ -177,15 +177,15 @@ class DataGenerator:
         elif pattern == r'^\d{10}$':
             return ''.join([str(random.randint(0, 9)) for _ in range(10)])
         else:
-            # Pattern générique
+            # Generic pattern
             return self.fake.lexify(pattern)
     
     def _get_cached_or_generate(self, key: str, generator_func) -> Any:
-        """Récupère une valeur du cache ou la génère."""
+        """Retrieve a value from cache or generate it."""
         if key not in self._cached_data:
             self._cached_data[key] = generator_func()
         return self._cached_data[key]
     
     def reset_cache(self):
-        """Remet à zéro le cache."""
+        """Reset the cache."""
         self._cached_data = {} 
