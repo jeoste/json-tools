@@ -5,7 +5,9 @@ const fs = require('fs-extra');
 const os = require('os');
 
 let mainWindow;
-let isDev = process.env.NODE_ENV === 'development';
+// Détermine si l'application tourne en mode développement
+// On considère que tout lancement non packagé est du développement
+const isDev = !app.isPackaged || process.env.NODE_ENV === 'development';
 let pythonPath = 'python';
 
 // Check if running in packaged mode
@@ -43,13 +45,19 @@ function createWindow() {
       contextIsolation: true,
       preload: path.join(__dirname, 'preload.js')
     },
-    icon: path.join(__dirname, 'assets', 'icon.png'),
+    icon: path.join(__dirname, 'assets', 'logo_bracket.png'),
     show: false,
     titleBarStyle: 'default'
   });
 
   // Load the application
-  mainWindow.loadFile(path.join(__dirname, 'renderer', 'index.html'));
+  if (isDev) {
+    // In development mode, load from Vite dev server
+    mainWindow.loadURL('http://localhost:5173');
+  } else {
+    // In production mode, load from built files
+    mainWindow.loadFile(path.join(__dirname, 'dist', 'index.html'));
+  }
 
   // Show window when ready
   mainWindow.once('ready-to-show', () => {

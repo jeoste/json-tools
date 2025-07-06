@@ -9,7 +9,8 @@
     "build": "cd electron && npm run build",
     "build-win": "cd electron && npm run build-win",
     "dist": "cd electron && npm run dist",
-    "dev": "cd electron && npm run dev"
+    "dev": "cd electron && npm run dev",
+    "electron:dev": "cd electron && npm run electron:dev"
   },
   "repository": {
     "type": "git",
@@ -27,5 +28,12 @@
   "engines": {
     "node": ">=16.0.0",
     "python": ">=3.7.0"
+  },
+  "dependencies": {
+    "@types/react": "^19.1.8",
+    "@types/react-dom": "^19.1.6",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "typescript": "^5.8.3"
   }
-} 
+}
