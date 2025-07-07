@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { CheckCircle, XCircle, Copy, FileText, FilePlus, Save } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast-simple'
+import { useTranslation } from 'react-i18next'
 
 export function ValidatorView() {
   const [jsonInput, setJsonInput] = useState('')
@@ -14,12 +15,13 @@ export function ValidatorView() {
     formatted?: string
   } | null>(null)
   const { toast } = useToast()
+  const { t } = useTranslation()
 
   const importJsonFile = async () => {
     try {
       const filePath = await window.electronAPI.openFileDialog({
         filters: [{ name: 'JSON Files', extensions: ['json'] }],
-        title: 'Sélectionner un fichier JSON',
+        title: t('validator.button.import'),
       })
       if (!filePath) return
       const result = await window.electronAPI.readJsonFile(filePath)
@@ -29,7 +31,7 @@ export function ValidatorView() {
         throw new Error(result.error)
       }
     } catch (error: any) {
-      toast({ title: 'Erreur', description: error.message || 'Import échoué', variant: 'destructive' })
+      toast({ title: t('common.error'), description: error.message || t('common.copyErrorDescription'), variant: 'destructive' })
     }
   }
 
@@ -38,14 +40,14 @@ export function ValidatorView() {
     try {
       const savePath = await window.electronAPI.saveFileDialog({
         filters: [{ name: 'JSON Files', extensions: ['json'] }],
-        title: 'Sauvegarder le JSON formaté',
+        title: t('validator.save'),
         defaultPath: 'formatted.json',
       })
       if (!savePath) return
       await window.electronAPI.saveFile(savePath, validationResult.formatted)
-      toast({ title: 'Sauvegardé', description: 'Fichier JSON enregistré.' })
+      toast({ title: t('validator.save'), description: t('validator.save') + ' OK' })
     } catch (error: any) {
-      toast({ title: 'Erreur', description: error.message || 'Sauvegarde échouée', variant: 'destructive' })
+      toast({ title: t('common.error'), description: error.message || t('common.error'), variant: 'destructive' })
     }
   }
 
@@ -58,8 +60,8 @@ export function ValidatorView() {
         formatted,
       })
       toast({
-        title: "JSON valide",
-        description: "Votre JSON est correctement formaté.",
+        title: t('validator.toastValidTitle'),
+        description: t('validator.toastValidDesc'),
       })
     } catch (error) {
       setValidationResult({
@@ -67,9 +69,9 @@ export function ValidatorView() {
         error: error instanceof Error ? error.message : 'Erreur de validation',
       })
       toast({
-        title: "JSON invalide",
-        description: "Veuillez corriger les erreurs dans votre JSON.",
-        variant: "destructive",
+        title: t('validator.toastInvalidTitle'),
+        description: t('validator.toastInvalidDesc'),
+        variant: 'destructive',
       })
     }
   }
@@ -79,14 +81,14 @@ export function ValidatorView() {
       try {
         await navigator.clipboard.writeText(validationResult.formatted)
         toast({
-          title: "Copié !",
-          description: "JSON formaté copié dans le presse-papiers.",
+          title: t('common.copiedTitle'),
+          description: t('common.copiedDescription', { context: 'JSON' }),
         })
       } catch (error) {
         toast({
-          title: "Erreur",
-          description: "Impossible de copier dans le presse-papiers.",
-          variant: "destructive",
+          title: t('common.error'),
+          description: t('common.copyErrorDescription'),
+          variant: 'destructive',
         })
       }
     }
@@ -100,15 +102,15 @@ export function ValidatorView() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <FileText className="w-5 h-5" />
-              Saisie JSON
+              {t('validator.inputTitle')}
             </CardTitle>
             <CardDescription>
-              Collez votre JSON ici pour le valider et le formater
+              {t('validator.inputDescription')}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <Textarea
-              placeholder="Collez votre JSON ici..."
+              placeholder={t('validator.placeholder')}
               value={jsonInput}
               onChange={(e) => setJsonInput(e.target.value)}
               className="min-h-[400px] font-mono text-sm"
@@ -116,11 +118,11 @@ export function ValidatorView() {
             <div className="flex flex-wrap gap-2">
               <Button onClick={validateJson} disabled={!jsonInput.trim()}>
                 <CheckCircle className="w-4 h-4 mr-2" />
-                Valider JSON
+                {t('validator.button.validate')}
               </Button>
               <Button variant="outline" onClick={importJsonFile}>
                 <FilePlus className="w-4 h-4 mr-2" />
-                Importer fichier
+                {t('validator.button.import')}
               </Button>
               <Button 
                 variant="outline" 
@@ -129,7 +131,7 @@ export function ValidatorView() {
                   setValidationResult(null)
                 }}
               >
-                Effacer
+                {t('common.clear')}
               </Button>
             </div>
           </CardContent>
@@ -142,24 +144,24 @@ export function ValidatorView() {
               {validationResult?.isValid ? (
                 <>
                   <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400" />
-                  Résultat - JSON Valide
+                  {t('validator.result.valid')}
                 </>
               ) : validationResult?.error ? (
                 <>
                   <XCircle className="w-5 h-5 text-destructive" />
-                  Résultat - JSON Invalide
+                  {t('validator.result.invalid')}
                 </>
               ) : (
                 <>
                   <FileText className="w-5 h-5" />
-                  Résultat
+                  {t('validator.result.title')}
                 </>
               )}
             </CardTitle>
             <CardDescription>
-              {validationResult?.isValid && "JSON formaté et validé"}
-              {validationResult?.error && "Erreurs de validation détectées"}
-              {!validationResult && "Le résultat apparaîtra ici après validation"}
+              {validationResult?.isValid && t('validator.description.valid')}
+              {validationResult?.error && t('validator.description.invalid')}
+              {!validationResult && t('validator.description.placeholder')}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -168,16 +170,16 @@ export function ValidatorView() {
                 <div className="flex items-center justify-between">
                   <Badge variant="secondary" className="text-green-600 dark:text-green-400">
                     <CheckCircle className="w-3 h-3 mr-1" />
-                    Valide
+                    {t('validator.badge.valid')}
                   </Badge>
                   <div className="flex gap-2">
                     <Button variant="outline" size="sm" onClick={copyToClipboard}>
                       <Copy className="w-4 h-4 mr-2" />
-                      Copier
+                      {t('common.copy')}
                     </Button>
                     <Button variant="outline" size="sm" onClick={saveFormattedJson}>
                       <Save className="w-4 h-4 mr-2" />
-                      Sauvegarder
+                      {t('validator.save')}
                     </Button>
                   </div>
                 </div>
@@ -191,11 +193,11 @@ export function ValidatorView() {
               <div className="space-y-4">
                 <Badge variant="destructive">
                   <XCircle className="w-3 h-3 mr-1" />
-                  Invalide
+                  {t('validator.badge.invalid')}
                 </Badge>
                 <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4">
                   <p className="text-destructive font-medium mb-2">
-                    Erreur de validation :
+                    {t('validator.toastInvalidTitle')} :
                   </p>
                   <p className="text-destructive/80 text-sm font-mono">
                     {validationResult.error}
@@ -208,8 +210,8 @@ export function ValidatorView() {
               <div className="flex items-center justify-center h-[400px] text-muted-foreground">
                 <div className="text-center">
                   <FileText className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                  <p>Aucun JSON à valider</p>
-                  <p className="text-sm">Collez votre JSON et cliquez sur "Valider"</p>
+                  <p>{t('validator.noJson')}</p>
+                  <p className="text-sm">{t('validator.submitToValidate')}</p>
                 </div>
               </div>
             )}

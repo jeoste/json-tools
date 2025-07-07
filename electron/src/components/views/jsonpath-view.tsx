@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
   Card,
   CardContent,
@@ -19,6 +19,7 @@ export function JsonPathView() {
   const [pathExpr, setPathExpr] = useState('$.')
   const [result, setResult] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
   const { toast } = useToast()
 
   const importJsonFile = async () => {
@@ -44,27 +45,32 @@ export function JsonPathView() {
   }
 
   const evaluatePath = () => {
-    setLoading(true)
     try {
       const json = JSON.parse(jsonInput)
       const extracted = JSONPath({ path: pathExpr, json })
       const formatted = JSON.stringify(extracted, null, 2)
       setResult(formatted)
-      toast({
-        title: 'Extraction réussie',
-        description: 'Les données ont été extraites avec succès.',
-      })
-    } catch (error: any) {
+      setError(null)
+    } catch (err: any) {
       setResult(null)
-      toast({
-        title: 'Erreur',
-        description: error?.message || 'Extraction échouée',
-        variant: 'destructive',
-      })
-    } finally {
-      setLoading(false)
+      setError(err?.message || 'Extraction échouée')
     }
   }
+
+  // Évaluation automatique avec délai pour ne pas surcharger
+  useEffect(() => {
+    if (!jsonInput.trim() || !pathExpr.trim()) {
+      setResult(null)
+      setError(null)
+      return
+    }
+
+    const timer = setTimeout(() => {
+      evaluatePath()
+    }, 500)
+
+    return () => clearTimeout(timer)
+  }, [jsonInput, pathExpr])
 
   const copyToClipboard = async () => {
     if (!result) return
@@ -91,7 +97,7 @@ export function JsonPathView() {
               Données JSON & Expression
             </CardTitle>
             <CardDescription>
-              Collez votre JSON, saisissez une expression JSONPath puis cliquez sur « Extract »
+              Collez votre JSON et saisissez une expression JSONPath : le résultat s'affiche en temps réel.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
@@ -108,13 +114,9 @@ export function JsonPathView() {
               className="font-mono text-sm"
             />
             <div className="flex flex-wrap gap-2">
-              <Button onClick={evaluatePath} disabled={!jsonInput.trim() || !pathExpr.trim() || loading}>
-                {loading ? (
-                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                ) : (
-                  <Search className="w-4 h-4 mr-2" />
-                )}
-                Extract
+              <Button onClick={evaluatePath} variant="secondary" disabled={!jsonInput.trim() || !pathExpr.trim()}>
+                <Search className="w-4 h-4 mr-2" />
+                Extraire
               </Button>
               <Button variant="outline" onClick={importJsonFile} disabled={loading}>
                 <FilePlus className="w-4 h-4 mr-2" />
@@ -142,11 +144,15 @@ export function JsonPathView() {
               Résultat
             </CardTitle>
             <CardDescription>
-              {result ? 'Données extraites' : 'Le résultat apparaîtra ici'}
+              {error ? 'Erreur lors de l\'extraction' : result ? 'Données extraites' : 'Le résultat apparaîtra ici'}
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {result ? (
+            {error ? (
+              <div className="text-destructive">
+                {error}
+              </div>
+            ) : result ? (
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <Badge variant="secondary">JSON</Badge>
@@ -159,7 +165,7 @@ export function JsonPathView() {
                   <code>{result}</code>
                 </pre>
               </div>
-            ) : (
+            ) : !error ? (
               <div className="flex items-center justify-center h-[400px] text-muted-foreground">
                 <div className="text-center">
                   <Search className="w-12 h-12 mx-auto mb-4 opacity-50" />
@@ -167,7 +173,7 @@ export function JsonPathView() {
                   <p className="text-sm">Soumettez un JSON et une expression JSONPath pour lancer l'extraction.</p>
                 </div>
               </div>
-            )}
+            ) : null}
           </CardContent>
         </Card>
       </div>

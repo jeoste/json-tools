@@ -1,6 +1,6 @@
 {
   "name": "jsonnymous",
-  "version": "1.0.0",
+  "version": "0.2.3",
   "description": "JSONnymous - Générateur de données JSON de test - Application Desktop",
   "main": "electron/main.js",
   "scripts": {

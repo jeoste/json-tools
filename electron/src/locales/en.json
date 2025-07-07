@@ -1,0 +1,62 @@
+{
+  "common": {
+    "copy": "Copy",
+    "copiedTitle": "Copied!",
+    "copiedDescription": "{{context}} copied to clipboard.",
+    "error": "Error",
+    "copyErrorDescription": "Unable to copy to clipboard.",
+    "json": "JSON",
+    "clear": "Clear"
+  },
+  "anonymize": {
+    "rawData": "Raw data",
+    "instruction": "Paste your production JSON here then click \"Anonymize\"",
+    "placeholder": "Paste your JSON here...",
+    "button": {
+      "anonymize": "Anonymize",
+      "clear": "Clear"
+    },
+    "resultTitle": "Anonymized result",
+    "resultLabel": "Anonymized JSON",
+    "resultPlaceholder": "The result will appear here",
+    "toast": {
+      "successTitle": "Anonymization successful",
+      "successDesc": "Sensitive data has been anonymized.",
+      "errorTitle": "Error",
+      "errorDesc": "Anonymization failed"
+    },
+    "copyToastDesc": "Anonymized JSON copied to clipboard.",
+    "noDataTitle": "No anonymized data yet.",
+    "noDataDesc": "Submit a JSON to start anonymization."
+  },
+  "validator": {
+    "inputTitle": "JSON Input",
+    "inputDescription": "Paste your JSON here to validate and format it",
+    "placeholder": "Paste your JSON here...",
+    "button": {
+      "validate": "Validate JSON",
+      "import": "Import file"
+    },
+    "toastValidTitle": "Valid JSON",
+    "toastValidDesc": "Your JSON is properly formatted.",
+    "toastInvalidTitle": "Invalid JSON",
+    "toastInvalidDesc": "Please correct the errors in your JSON.",
+    "result": {
+      "valid": "Result - Valid JSON",
+      "invalid": "Result - Invalid JSON",
+      "title": "Result"
+    },
+    "description": {
+      "valid": "Formatted and validated JSON",
+      "invalid": "Validation errors detected",
+      "placeholder": "The result will appear here after validation"
+    },
+    "badge": {
+      "valid": "Valid",
+      "invalid": "Invalid"
+    },
+    "save": "Save",
+    "noJson": "No JSON to validate",
+    "submitToValidate": "Paste your JSON and click \"Validate\""
+  }
+} 

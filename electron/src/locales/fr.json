@@ -1,0 +1,62 @@
+{
+  "common": {
+    "copy": "Copier",
+    "copiedTitle": "Copié !",
+    "copiedDescription": "{{context}} copié dans le presse-papiers.",
+    "error": "Erreur",
+    "copyErrorDescription": "Impossible de copier dans le presse-papiers.",
+    "json": "JSON",
+    "clear": "Effacer"
+  },
+  "anonymize": {
+    "rawData": "Données brutes",
+    "instruction": "Collez ici votre JSON provenant de la production puis cliquez sur \"Anonymize\"",
+    "placeholder": "Collez votre JSON ici...",
+    "button": {
+      "anonymize": "Anonymize",
+      "clear": "Effacer"
+    },
+    "resultTitle": "Résultat anonymisé",
+    "resultLabel": "JSON anonymisé",
+    "resultPlaceholder": "Le résultat apparaîtra ici",
+    "toast": {
+      "successTitle": "Anonymisation réussie",
+      "successDesc": "Les données sensibles ont été anonymisées.",
+      "errorTitle": "Erreur",
+      "errorDesc": "Anonymisation échouée"
+    },
+    "copyToastDesc": "JSON anonymisé copié dans le presse-papiers.",
+    "noDataTitle": "Aucune donnée anonymisée pour le moment.",
+    "noDataDesc": "Soumettez un JSON pour lancer l'anonymisation."
+  },
+  "validator": {
+    "inputTitle": "Saisie JSON",
+    "inputDescription": "Collez votre JSON ici pour le valider et le formater",
+    "placeholder": "Collez votre JSON ici...",
+    "button": {
+      "validate": "Valider JSON",
+      "import": "Importer fichier"
+    },
+    "toastValidTitle": "JSON valide",
+    "toastValidDesc": "Votre JSON est correctement formaté.",
+    "toastInvalidTitle": "JSON invalide",
+    "toastInvalidDesc": "Veuillez corriger les erreurs dans votre JSON.",
+    "result": {
+      "valid": "Résultat - JSON Valide",
+      "invalid": "Résultat - JSON Invalide",
+      "title": "Résultat"
+    },
+    "description": {
+      "valid": "JSON formaté et validé",
+      "invalid": "Erreurs de validation détectées",
+      "placeholder": "Le résultat apparaîtra ici après validation"
+    },
+    "badge": {
+      "valid": "Valide",
+      "invalid": "Invalide"
+    },
+    "save": "Sauvegarder",
+    "noJson": "Aucun JSON à valider",
+    "submitToValidate": "Collez votre JSON et cliquez sur \"Valider\""
+  }
+} 

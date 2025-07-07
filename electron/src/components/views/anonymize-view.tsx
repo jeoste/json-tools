@@ -5,12 +5,14 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Lock, Copy, Loader2, FileText } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast-simple'
+import { useTranslation } from 'react-i18next'
 
 export function AnonymizeView() {
   const [jsonInput, setJsonInput] = useState('')
   const [anonymized, setAnonymized] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const { toast } = useToast()
+  const { t } = useTranslation()
 
   const handleAnonymize = async () => {
     setLoading(true)
@@ -27,16 +29,16 @@ export function AnonymizeView() {
         const formatted = JSON.stringify(response.data, null, 2)
         setAnonymized(formatted)
         toast({
-          title: 'Anonymisation réussie',
-          description: 'Les données sensibles ont été anonymisées.',
+          title: t('anonymize.toast.successTitle'),
+          description: t('anonymize.toast.successDesc'),
         })
       } else {
         throw new Error('Anonymization failed')
       }
     } catch (error: any) {
       toast({
-        title: 'Erreur',
-        description: error?.message || 'Anonymisation échouée',
+        title: t('common.error'),
+        description: error?.message || t('anonymize.toast.errorDesc'),
         variant: 'destructive',
       })
     } finally {
@@ -49,13 +51,13 @@ export function AnonymizeView() {
     try {
       await navigator.clipboard.writeText(anonymized)
       toast({
-        title: 'Copié !',
-        description: 'JSON anonymisé copié dans le presse-papiers.',
+        title: t('common.copiedTitle'),
+        description: t('anonymize.copyToastDesc'),
       })
     } catch {
       toast({
-        title: 'Erreur',
-        description: 'Impossible de copier dans le presse-papiers.',
+        title: t('common.error'),
+        description: t('common.copyErrorDescription'),
         variant: 'destructive',
       })
     }
@@ -69,15 +71,15 @@ export function AnonymizeView() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Lock className="w-5 h-5" />
-              Données brutes
+              {t('anonymize.rawData')}
             </CardTitle>
             <CardDescription>
-              Collez ici votre JSON provenant de la production puis cliquez sur « Anonymize »
+              {t('anonymize.instruction')}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <Textarea
-              placeholder="Collez votre JSON ici..."
+              placeholder={t('anonymize.placeholder')}
               className="min-h-[400px] font-mono text-sm"
               value={jsonInput}
               onChange={(e) => setJsonInput(e.target.value)}
@@ -89,7 +91,7 @@ export function AnonymizeView() {
                 ) : (
                   <Lock className="w-4 h-4 mr-2" />
                 )}
-                Anonymize
+                {t('anonymize.button.anonymize')}
               </Button>
               <Button
                 variant="outline"
@@ -98,7 +100,7 @@ export function AnonymizeView() {
                   setAnonymized(null)
                 }}
               >
-                Effacer
+                {t('common.clear')}
               </Button>
             </div>
           </CardContent>
@@ -109,20 +111,20 @@ export function AnonymizeView() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <FileText className="w-5 h-5" />
-              Résultat anonymisé
+              {t('anonymize.resultTitle')}
             </CardTitle>
             <CardDescription>
-              {anonymized ? 'JSON anonymisé' : 'Le résultat apparaîtra ici'}
+              {anonymized ? t('anonymize.resultLabel') : t('anonymize.resultPlaceholder')}
             </CardDescription>
           </CardHeader>
           <CardContent>
             {anonymized ? (
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <Badge variant="secondary">JSON</Badge>
+                  <Badge variant="secondary">{t('common.json')}</Badge>
                   <Button variant="outline" size="sm" onClick={copyToClipboard}>
                     <Copy className="w-4 h-4 mr-2" />
-                    Copier
+                    {t('common.copy')}
                   </Button>
                 </div>
                 <pre className="bg-muted p-4 rounded-lg overflow-auto max-h-[350px] text-sm">
@@ -133,8 +135,8 @@ export function AnonymizeView() {
               <div className="flex items-center justify-center h-[400px] text-muted-foreground">
                 <div className="text-center">
                   <Lock className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                  <p>Aucune donnée anonymisée pour le moment.</p>
-                  <p className="text-sm">Soumettez un JSON pour lancer l'anonymisation.</p>
+                  <p>{t('anonymize.noDataTitle')}</p>
+                  <p className="text-sm">{t('anonymize.noDataDesc')}</p>
                 </div>
               </div>
             )}
