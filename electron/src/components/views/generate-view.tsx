@@ -5,12 +5,14 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Zap, FilePlus, Copy, Loader2, FileText } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast-simple'
+import { useTranslation } from 'react-i18next'
 
 export function GenerateView() {
   const [skeleton, setSkeleton] = useState('')
   const [generated, setGenerated] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const { toast } = useToast()
+  const { t } = useTranslation()
 
   const handleGenerate = async () => {
     setLoading(true)
@@ -25,12 +27,19 @@ export function GenerateView() {
       if (response?.success) {
         const formatted = JSON.stringify(response.data, null, 2)
         setGenerated(formatted)
-        toast({ title: 'Données générées', description: 'Les données de test ont été créées avec succès.' })
+        toast({ 
+          title: t('generate.toast.successTitle'), 
+          description: t('generate.toast.successDesc') 
+        })
       } else {
         throw new Error('Generation failed')
       }
     } catch (error: any) {
-      toast({ title: 'Erreur', description: error?.message || 'Génération échouée', variant: 'destructive' })
+      toast({ 
+        title: t('common.error'), 
+        description: error?.message || t('generate.toast.errorDesc'), 
+        variant: 'destructive' 
+      })
     } finally {
       setLoading(false)
     }
@@ -40,7 +49,7 @@ export function GenerateView() {
     try {
       const filePath = await window.electronAPI.openFileDialog({
         filters: [{ name: 'JSON Files', extensions: ['json'] }],
-        title: 'Sélectionner un squelette JSON',
+        title: t('generate.importDialog.title'),
       })
       if (!filePath) return
 
@@ -52,10 +61,17 @@ export function GenerateView() {
       if (response?.success) {
         const formatted = JSON.stringify(response.data, null, 2)
         setGenerated(formatted)
-        toast({ title: 'Données générées', description: 'Les données de test ont été créées avec succès.' })
+        toast({ 
+          title: t('generate.toast.successTitle'), 
+          description: t('generate.toast.successDesc') 
+        })
       }
     } catch (error: any) {
-      toast({ title: 'Erreur', description: error?.message || 'Import échoué', variant: 'destructive' })
+      toast({ 
+        title: t('common.error'), 
+        description: error?.message || t('generate.toast.errorDesc'), 
+        variant: 'destructive' 
+      })
     } finally {
       setLoading(false)
     }
@@ -65,9 +81,16 @@ export function GenerateView() {
     if (!generated) return
     try {
       await navigator.clipboard.writeText(generated)
-      toast({ title: 'Copié !', description: 'JSON généré copié dans le presse-papiers.' })
+      toast({ 
+        title: t('common.copiedTitle'), 
+        description: t('generate.copyToastDesc') 
+      })
     } catch {
-      toast({ title: 'Erreur', description: 'Impossible de copier dans le presse-papiers.', variant: 'destructive' })
+      toast({ 
+        title: t('common.error'), 
+        description: t('common.copyErrorDescription'), 
+        variant: 'destructive' 
+      })
     }
   }
 
@@ -79,15 +102,15 @@ export function GenerateView() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <FileText className="w-5 h-5" />
-              Squelette JSON
+              {t('generate.skeletonTitle')}
             </CardTitle>
             <CardDescription>
-              Collez un squelette JSON ou importez un fichier, puis cliquez sur « Generate »
+              {t('generate.instruction')}
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <Textarea
-              placeholder="Collez votre squelette JSON ici..."
+              placeholder={t('generate.placeholder')}
               className="min-h-[400px] font-mono text-sm"
               value={skeleton}
               onChange={(e) => setSkeleton(e.target.value)}
@@ -95,11 +118,11 @@ export function GenerateView() {
             <div className="flex flex-wrap gap-2">
               <Button onClick={handleGenerate} disabled={!skeleton.trim() || loading}>
                 {loading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <Zap className="w-4 h-4 mr-2" />}
-                Generate
+                {t('generate.button.generate')}
               </Button>
               <Button variant="outline" onClick={importSkeletonFile} disabled={loading}>
                 <FilePlus className="w-4 h-4 mr-2" />
-                Importer fichier
+                {t('generate.button.import')}
               </Button>
               <Button
                 variant="outline"
@@ -109,7 +132,7 @@ export function GenerateView() {
                 }}
                 disabled={loading}
               >
-                Effacer
+                {t('common.clear')}
               </Button>
             </div>
           </CardContent>
@@ -120,18 +143,18 @@ export function GenerateView() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Zap className="w-5 h-5" />
-              Données générées
+              {t('generate.resultTitle')}
             </CardTitle>
-            <CardDescription>{generated ? 'JSON généré' : 'Le résultat apparaîtra ici'}</CardDescription>
+            <CardDescription>{generated ? t('generate.resultLabel') : t('generate.resultPlaceholder')}</CardDescription>
           </CardHeader>
           <CardContent>
             {generated ? (
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <Badge variant="secondary">JSON</Badge>
+                  <Badge variant="secondary">{t('common.json')}</Badge>
                   <Button variant="outline" size="sm" onClick={copyToClipboard}>
                     <Copy className="w-4 h-4 mr-2" />
-                    Copier
+                    {t('common.copy')}
                   </Button>
                 </div>
                 <pre className="bg-muted p-4 rounded-lg overflow-auto max-h-[350px] text-sm">
@@ -142,8 +165,8 @@ export function GenerateView() {
               <div className="flex items-center justify-center h-[400px] text-muted-foreground">
                 <div className="text-center">
                   <Zap className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                  <p>Aucune donnée générée pour le moment.</p>
-                  <p className="text-sm">Soumettez un squelette JSON pour lancer la génération.</p>
+                  <p>{t('generate.noDataTitle')}</p>
+                  <p className="text-sm">{t('generate.noDataDesc')}</p>
                 </div>
               </div>
             )}

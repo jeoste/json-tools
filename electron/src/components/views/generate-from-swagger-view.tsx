@@ -5,6 +5,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
 import { FileText, FilePlus, Loader2, Copy, Save } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast-simple'
+import { useTranslation } from 'react-i18next'
 
 // Simple helper to construire un squelette à partir d'un schéma OpenAPI 3.0 (objet uniquement)
 function buildSkeletonFromSchema(schema: any): any {
@@ -45,6 +46,7 @@ export function GenerateFromSwaggerView() {
   const [generatedJson, setGeneratedJson] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const { toast } = useToast()
+  const { t } = useTranslation()
 
   const importSwaggerFile = async () => {
     try {
@@ -53,16 +55,23 @@ export function GenerateFromSwaggerView() {
           { name: 'JSON Files', extensions: ['json'] },
           { name: 'YAML Files', extensions: ['yaml', 'yml'] },
         ],
-        title: 'Sélectionner un fichier Swagger/OpenAPI',
+        title: t('swaggerToJson.importDialog.title'),
       })
       if (!path) return
       const result = await window.electronAPI.readJsonFile(path)
       if (!result.success) throw new Error(result.error)
       setSwaggerPath(path)
       setSwaggerContent(result.content)
-      toast({ title: 'Fichier chargé', description: 'Swagger/OpenAPI importé.' })
+      toast({ 
+        title: t('swaggerToJson.toast.importTitle'), 
+        description: t('swaggerToJson.toast.importDesc') 
+      })
     } catch (error: any) {
-      toast({ title: 'Erreur', description: error.message || 'Import échoué', variant: 'destructive' })
+      toast({ 
+        title: t('common.error'), 
+        description: error.message || t('swaggerToJson.toast.errorDesc'), 
+        variant: 'destructive' 
+      })
     }
   }
 
@@ -72,7 +81,7 @@ export function GenerateFromSwaggerView() {
     try {
       const spec = JSON.parse(swaggerContent)
       if (!spec.components || !spec.components.schemas) {
-        throw new Error('Aucun schéma trouvé dans ce Swagger.')
+        throw new Error(t('swaggerToJson.toast.noSchemaError'))
       }
       const firstSchemaName = Object.keys(spec.components.schemas)[0]
       const firstSchema = spec.components.schemas[firstSchemaName]
@@ -86,12 +95,19 @@ export function GenerateFromSwaggerView() {
       if (response.success) {
         const formatted = JSON.stringify(response.data, null, 2)
         setGeneratedJson(formatted)
-        toast({ title: 'Données générées', description: 'JSON généré à partir du Swagger.' })
+        toast({ 
+          title: t('swaggerToJson.toast.successTitle'), 
+          description: t('swaggerToJson.toast.successDesc') 
+        })
       } else {
         throw new Error('Generation failed')
       }
     } catch (error: any) {
-      toast({ title: 'Erreur', description: error.message || 'Génération échouée', variant: 'destructive' })
+      toast({ 
+        title: t('common.error'), 
+        description: error.message || t('swaggerToJson.toast.errorDesc'), 
+        variant: 'destructive' 
+      })
     } finally {
       setLoading(false)
     }
@@ -101,9 +117,16 @@ export function GenerateFromSwaggerView() {
     if (!generatedJson) return
     try {
       await navigator.clipboard.writeText(generatedJson)
-      toast({ title: 'Copié !', description: 'JSON copié.' })
+      toast({ 
+        title: t('common.copiedTitle'), 
+        description: t('swaggerToJson.copyToastDesc') 
+      })
     } catch {
-      toast({ title: 'Erreur', description: 'Impossible de copier.', variant: 'destructive' })
+      toast({ 
+        title: t('common.error'), 
+        description: t('common.copyErrorDescription'), 
+        variant: 'destructive' 
+      })
     }
   }
 
@@ -112,14 +135,21 @@ export function GenerateFromSwaggerView() {
     try {
       const path = await window.electronAPI.saveFileDialog({
         filters: [{ name: 'JSON Files', extensions: ['json'] }],
-        title: 'Sauvegarder le JSON généré',
-        defaultPath: 'generated.json',
+        title: t('swaggerToJson.saveDialog.title'),
+        defaultPath: t('swaggerToJson.saveDialog.defaultName'),
       })
       if (!path) return
       await window.electronAPI.saveFile(path, generatedJson)
-      toast({ title: 'Sauvegardé', description: 'Fichier JSON enregistré.' })
+      toast({ 
+        title: t('common.success'), 
+        description: t('swaggerToJson.saveToastDesc') 
+      })
     } catch (error: any) {
-      toast({ title: 'Erreur', description: error.message || 'Sauvegarde échouée', variant: 'destructive' })
+      toast({ 
+        title: t('common.error'), 
+        description: error.message || t('swaggerToJson.toast.errorDesc'), 
+        variant: 'destructive' 
+      })
     }
   }
 
@@ -130,13 +160,13 @@ export function GenerateFromSwaggerView() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <FileText className="w-5 h-5" />
-              Swagger / OpenAPI
+              {t('swaggerToJson.inputTitle')}
             </CardTitle>
-            <CardDescription>Importez un fichier Swagger/OpenAPI puis générez des exemples JSON</CardDescription>
+            <CardDescription>{t('swaggerToJson.instruction')}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <Textarea
-              placeholder="Contenu Swagger chargé..."
+              placeholder={t('swaggerToJson.placeholder')}
               value={swaggerContent}
               onChange={(e) => setSwaggerContent(e.target.value)}
               className="min-h-[400px] font-mono text-sm"
@@ -144,14 +174,14 @@ export function GenerateFromSwaggerView() {
             <div className="flex flex-wrap gap-2">
               <Button variant="outline" onClick={importSwaggerFile}>
                 <FilePlus className="w-4 h-4 mr-2" />
-                Importer fichier
+                {t('swaggerToJson.button.import')}
               </Button>
               <Button onClick={handleGenerate} disabled={!swaggerContent || loading}>
                 {loading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <FileText className="w-4 h-4 mr-2" />}
-                Generate JSON
+                {t('swaggerToJson.button.generate')}
               </Button>
               <Button variant="outline" onClick={() => { setSwaggerContent(''); setGeneratedJson(null); setSwaggerPath(null) }}>
-                Effacer
+                {t('common.clear')}
               </Button>
             </div>
           </CardContent>
@@ -161,23 +191,23 @@ export function GenerateFromSwaggerView() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <FileText className="w-5 h-5" />
-              JSON généré
+              {t('swaggerToJson.resultTitle')}
             </CardTitle>
-            <CardDescription>{generatedJson ? 'Résultat' : 'Le résultat apparaîtra ici'}</CardDescription>
+            <CardDescription>{generatedJson ? t('swaggerToJson.resultLabel') : t('swaggerToJson.resultPlaceholder')}</CardDescription>
           </CardHeader>
           <CardContent>
             {generatedJson ? (
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <Badge variant="secondary">JSON</Badge>
+                  <Badge variant="secondary">{t('common.json')}</Badge>
                   <div className="flex gap-2">
                     <Button variant="outline" size="sm" onClick={copyToClipboard}>
                       <Copy className="w-4 h-4 mr-2" />
-                      Copier
+                      {t('common.copy')}
                     </Button>
                     <Button variant="outline" size="sm" onClick={saveJson}>
                       <Save className="w-4 h-4 mr-2" />
-                      Sauvegarder
+                      {t('common.save')}
                     </Button>
                   </div>
                 </div>
@@ -189,7 +219,7 @@ export function GenerateFromSwaggerView() {
               <div className="flex items-center justify-center h-[400px] text-muted-foreground">
                 <div className="text-center">
                   <FileText className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                  <p>Aucun JSON généré pour le moment.</p>
+                  <p>{t('swaggerToJson.noDataTitle')}</p>
                 </div>
               </div>
             )}

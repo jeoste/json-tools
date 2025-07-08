@@ -17,6 +17,12 @@ declare global {
       skeleton_content?: string
       swagger_path?: string
     }) => Promise<{ success: boolean; data: any }>
+    
+    // Update management
+    checkForUpdates: () => Promise<void>
+    getAppVersion: () => Promise<string>
+    onUpdateStatus: (callback: (event: any, status: string) => void) => void
+    removeUpdateStatusListener: (callback: (event: any, status: string) => void) => void
   }
 
   interface Window {

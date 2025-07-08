@@ -3,8 +3,10 @@ const path = require('path');
 const { spawn } = require('child_process');
 const fs = require('fs-extra');
 const os = require('os');
+const UpdateManager = require('./updater');
 
 let mainWindow;
+let updateManager;
 // Détermine si l'application tourne en mode développement
 // On considère que tout lancement non packagé est du développement
 const isDev = !app.isPackaged || process.env.NODE_ENV === 'development';
@@ -62,6 +64,9 @@ function createWindow() {
   // Show window when ready
   mainWindow.once('ready-to-show', () => {
     mainWindow.show();
+    
+    // Initialize update manager
+    updateManager = new UpdateManager(mainWindow);
     
     // Check Python and dependencies
     checkPythonAndDependencies();
@@ -628,6 +633,17 @@ ipcMain.handle('set-window-bounds', async (event, bounds) => {
   } catch (error) {
     return { success: false, error: error.message };
   }
+});
+
+// Update handlers
+ipcMain.handle('check-for-updates', () => {
+  if (updateManager) {
+    updateManager.checkForUpdates();
+  }
+});
+
+ipcMain.handle('get-app-version', () => {
+  return app.getVersion();
 });
 
 // New unified handlers for the updated interface

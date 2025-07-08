@@ -6,7 +6,50 @@
     "error": "Erreur",
     "copyErrorDescription": "Impossible de copier dans le presse-papiers.",
     "json": "JSON",
-    "clear": "Effacer"
+    "clear": "Effacer",
+    "save": "Sauvegarder",
+    "import": "Importer",
+    "generate": "Générer",
+    "loading": "Chargement...",
+    "success": "Succès",
+    "failed": "Échec"
+  },
+  "layout": {
+    "appName": "JSONnymous",
+    "navigation": {
+      "anonymize": "Anonymize",
+      "generate": "Generate", 
+      "swagger": "Swagger Spec",
+      "swaggerToJson": "Swagger JSON",
+      "validator": "Validate",
+      "jsonpath": "JSONPath"
+    },
+    "descriptions": {
+      "anonymize": "Anonymisez les données JSON en masquant ou remplaçant les champs sensibles pour protéger la confidentialité.",
+      "generate": "Générez des données JSON synthétiques basées sur votre schéma ou exemple pour les tests et le développement.",
+      "swagger": "Générez une spécification Swagger (OpenAPI) à partir d'un échantillon de charge utile JSON.",
+      "swaggerToJson": "Générez des exemples de charges utiles JSON directement à partir d'une spécification Swagger/OpenAPI.",
+      "validator": "Validez les documents JSON contre un schéma spécifié pour assurer la justesse.",
+      "jsonpath": "Extrayez des données de JSON en utilisant des expressions JSONPath."
+    },
+    "account": {
+      "title": "Compte",
+      "description": "Gérez votre profil et synchronisez les paramètres entre web et bureau (bientôt disponible).",
+      "featureInDevelopment": "Fonctionnalité en cours de développement."
+    },
+    "about": {
+      "title": "À propos de JSONnymous",
+      "version": "Version {{version}}",
+      "contact": "Vous pouvez nous contacter à",
+      "checkUpdates": "Vérifier les mises à jour",
+      "checkingUpdates": "Vérification en cours..."
+    }
+  },
+  "theme": {
+    "light": "Clair",
+    "dark": "Sombre",
+    "system": "Système",
+    "tooltip": "Changer le thème"
   },
   "anonymize": {
     "rawData": "Données brutes",
@@ -28,6 +71,115 @@
     "copyToastDesc": "JSON anonymisé copié dans le presse-papiers.",
     "noDataTitle": "Aucune donnée anonymisée pour le moment.",
     "noDataDesc": "Soumettez un JSON pour lancer l'anonymisation."
+  },
+  "generate": {
+    "skeletonTitle": "Squelette JSON",
+    "instruction": "Collez un squelette JSON ou importez un fichier, puis cliquez sur « Generate »",
+    "placeholder": "Collez votre squelette JSON ici...",
+    "button": {
+      "generate": "Generate",
+      "import": "Importer fichier",
+      "clear": "Effacer"
+    },
+    "resultTitle": "Données générées", 
+    "resultLabel": "JSON généré",
+    "resultPlaceholder": "Le résultat apparaîtra ici",
+    "toast": {
+      "successTitle": "Données générées",
+      "successDesc": "Les données de test ont été créées avec succès.",
+      "errorTitle": "Erreur",
+      "errorDesc": "Génération échouée"
+    },
+    "copyToastDesc": "JSON généré copié dans le presse-papiers.",
+    "noDataTitle": "Aucune donnée générée pour le moment.",
+    "noDataDesc": "Soumettez un squelette JSON pour lancer la génération.",
+    "importDialog": {
+      "title": "Sélectionner un squelette JSON"
+    }
+  },
+  "swagger": {
+    "inputTitle": "Exemple JSON",
+    "instruction": "Collez un exemple JSON pour générer une spécification OpenAPI 3.0",
+    "placeholder": "Collez votre JSON ici...",
+    "button": {
+      "generate": "Generate",
+      "clear": "Effacer"
+    },
+    "resultTitle": "Spécification OpenAPI",
+    "resultLabel": "Résultat",
+    "resultPlaceholder": "Le résultat apparaîtra ici",
+    "toast": {
+      "successTitle": "Spécification générée",
+      "successDesc": "OpenAPI généré avec succès.",
+      "errorTitle": "Erreur", 
+      "errorDesc": "Génération échouée"
+    },
+    "copyToastDesc": "Spécification OpenAPI copiée.",
+    "saveToastDesc": "Fichier enregistré.",
+    "noDataTitle": "Aucune spécification générée pour le moment.",
+    "noDataDesc": "Soumettez un JSON pour lancer la génération.",
+    "saveDialog": {
+      "title": "Sauvegarder la spécification",
+      "defaultName": "openapi.json"
+    }
+  },
+  "swaggerToJson": {
+    "inputTitle": "Swagger / OpenAPI",
+    "instruction": "Importez un fichier Swagger/OpenAPI puis générez des exemples JSON",
+    "placeholder": "Contenu Swagger chargé...",
+    "button": {
+      "import": "Importer fichier",
+      "generate": "Generate JSON",
+      "clear": "Effacer"
+    },
+    "resultTitle": "JSON généré",
+    "resultLabel": "Résultat",
+    "resultPlaceholder": "Le résultat apparaîtra ici",
+    "toast": {
+      "importTitle": "Fichier chargé",
+      "importDesc": "Swagger/OpenAPI importé.",
+      "successTitle": "Données générées",
+      "successDesc": "JSON généré à partir du Swagger.",
+      "errorTitle": "Erreur",
+      "errorDesc": "Génération échouée",
+      "noSchemaError": "Aucun schéma trouvé dans ce Swagger."
+    },
+    "copyToastDesc": "JSON copié.",
+    "saveToastDesc": "Fichier JSON enregistré.",
+    "noDataTitle": "Aucun JSON généré pour le moment.",
+    "importDialog": {
+      "title": "Sélectionner un fichier Swagger/OpenAPI"
+    },
+    "saveDialog": {
+      "title": "Sauvegarder le JSON généré",
+      "defaultName": "generated.json"
+    }
+  },
+  "jsonpath": {
+    "inputTitle": "Données JSON & Expression",
+    "instruction": "Collez votre JSON et saisissez une expression JSONPath : le résultat s'affiche en temps réel.",
+    "placeholder": "Collez votre JSON ici...",
+    "pathPlaceholder": "Expression JSONPath, ex: $.body",
+    "button": {
+      "extract": "Extraire",
+      "import": "Importer fichier",
+      "clear": "Effacer"
+    },
+    "resultTitle": "Résultat",
+    "resultLabel": "Données extraites",
+    "resultPlaceholder": "Le résultat apparaîtra ici",
+    "errorLabel": "Erreur lors de l'extraction",
+    "toast": {
+      "errorTitle": "Erreur",
+      "errorDesc": "Import échoué",
+      "extractionError": "Extraction échouée"
+    },
+    "copyToastDesc": "Résultat copié dans le presse-papiers.",
+    "noDataTitle": "Aucun résultat pour le moment.",
+    "noDataDesc": "Soumettez un JSON et une expression JSONPath pour lancer l'extraction.",
+    "importDialog": {
+      "title": "Sélectionner un fichier JSON"
+    }
   },
   "validator": {
     "inputTitle": "Saisie JSON",

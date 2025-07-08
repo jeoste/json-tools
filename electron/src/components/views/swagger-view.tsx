@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { FileText, Copy, Loader2, Save, Code } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast-simple'
+import { useTranslation } from 'react-i18next'
 
 function inferSchema(value: any): any {
   if (Array.isArray(value)) {
@@ -73,6 +74,7 @@ export function SwaggerView() {
   const [openapiSpec, setOpenapiSpec] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const { toast } = useToast()
+  const { t } = useTranslation()
 
   const handleGenerate = () => {
     setLoading(true)
@@ -80,9 +82,16 @@ export function SwaggerView() {
       const obj = JSON.parse(jsonInput)
       const spec = generateOpenApi(obj)
       setOpenapiSpec(spec)
-      toast({ title: 'Spécification générée', description: 'OpenAPI généré avec succès.' })
+      toast({ 
+        title: t('swagger.toast.successTitle'), 
+        description: t('swagger.toast.successDesc') 
+      })
     } catch (error: any) {
-      toast({ title: 'Erreur', description: error.message || 'Génération échouée', variant: 'destructive' })
+      toast({ 
+        title: t('common.error'), 
+        description: error.message || t('swagger.toast.errorDesc'), 
+        variant: 'destructive' 
+      })
     } finally {
       setLoading(false)
     }
@@ -92,9 +101,16 @@ export function SwaggerView() {
     if (!openapiSpec) return
     try {
       await navigator.clipboard.writeText(openapiSpec)
-      toast({ title: 'Copié !', description: 'Spécification OpenAPI copiée.' })
+      toast({ 
+        title: t('common.copiedTitle'), 
+        description: t('swagger.copyToastDesc') 
+      })
     } catch {
-      toast({ title: 'Erreur', description: 'Impossible de copier.', variant: 'destructive' })
+      toast({ 
+        title: t('common.error'), 
+        description: t('common.copyErrorDescription'), 
+        variant: 'destructive' 
+      })
     }
   }
 
@@ -106,14 +122,21 @@ export function SwaggerView() {
           { name: 'JSON Files', extensions: ['json'] },
           { name: 'YAML Files', extensions: ['yaml', 'yml'] },
         ],
-        title: 'Sauvegarder la spécification',
-        defaultPath: 'openapi.json',
+        title: t('swagger.saveDialog.title'),
+        defaultPath: t('swagger.saveDialog.defaultName'),
       })
       if (!path) return
       await window.electronAPI.saveFile(path, openapiSpec)
-      toast({ title: 'Sauvegardé', description: 'Fichier enregistré.' })
+      toast({ 
+        title: t('common.success'), 
+        description: t('swagger.saveToastDesc') 
+      })
     } catch (error: any) {
-      toast({ title: 'Erreur', description: error.message || 'Sauvegarde échouée', variant: 'destructive' })
+      toast({ 
+        title: t('common.error'), 
+        description: error.message || t('swagger.toast.errorDesc'), 
+        variant: 'destructive' 
+      })
     }
   }
 
@@ -125,13 +148,13 @@ export function SwaggerView() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Code className="w-5 h-5" />
-              Exemple JSON
+              {t('swagger.inputTitle')}
             </CardTitle>
-            <CardDescription>Collez un exemple JSON pour générer une spécification OpenAPI 3.0</CardDescription>
+            <CardDescription>{t('swagger.instruction')}</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <Textarea
-              placeholder="Collez votre JSON ici..."
+              placeholder={t('swagger.placeholder')}
               className="min-h-[400px] font-mono text-sm"
               value={jsonInput}
               onChange={(e) => setJsonInput(e.target.value)}
@@ -139,7 +162,7 @@ export function SwaggerView() {
             <div className="flex gap-2 flex-wrap">
               <Button onClick={handleGenerate} disabled={!jsonInput.trim() || loading}>
                 {loading ? <Loader2 className="w-4 h-4 mr-2 animate-spin" /> : <FileText className="w-4 h-4 mr-2" />}
-                Generate
+                {t('swagger.button.generate')}
               </Button>
               <Button
                 variant="outline"
@@ -148,7 +171,7 @@ export function SwaggerView() {
                   setOpenapiSpec(null)
                 }}
               >
-                Effacer
+                {t('common.clear')}
               </Button>
             </div>
           </CardContent>
@@ -159,23 +182,23 @@ export function SwaggerView() {
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <FileText className="w-5 h-5" />
-              Spécification OpenAPI
+              {t('swagger.resultTitle')}
             </CardTitle>
-            <CardDescription>{openapiSpec ? 'Résultat' : 'Le résultat apparaîtra ici'}</CardDescription>
+            <CardDescription>{openapiSpec ? t('swagger.resultLabel') : t('swagger.resultPlaceholder')}</CardDescription>
           </CardHeader>
           <CardContent>
             {openapiSpec ? (
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
-                  <Badge variant="secondary">JSON</Badge>
+                  <Badge variant="secondary">{t('common.json')}</Badge>
                   <div className="flex gap-2">
                     <Button variant="outline" size="sm" onClick={copyToClipboard}>
                       <Copy className="w-4 h-4 mr-2" />
-                      Copier
+                      {t('common.copy')}
                     </Button>
                     <Button variant="outline" size="sm" onClick={saveSpec}>
                       <Save className="w-4 h-4 mr-2" />
-                      Sauvegarder
+                      {t('common.save')}
                     </Button>
                   </div>
                 </div>
@@ -187,8 +210,8 @@ export function SwaggerView() {
               <div className="flex items-center justify-center h-[400px] text-muted-foreground">
                 <div className="text-center">
                   <FileText className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                  <p>Aucune spécification générée pour le moment.</p>
-                  <p className="text-sm">Soumettez un JSON pour lancer la génération.</p>
+                  <p>{t('swagger.noDataTitle')}</p>
+                  <p className="text-sm">{t('swagger.noDataDesc')}</p>
                 </div>
               </div>
             )}

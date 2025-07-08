@@ -27,5 +27,13 @@ contextBridge.exposeInMainWorld('electronAPI', {
   
   // Messages and notifications
   showError: (title, message) => ipcRenderer.invoke('show-error', { title, message }),
-  showInfo: (title, message) => ipcRenderer.invoke('show-info', { title, message })
+  showInfo: (title, message) => ipcRenderer.invoke('show-info', { title, message }),
+  
+  // Update management
+  checkForUpdates: () => ipcRenderer.invoke('check-for-updates'),
+  getAppVersion: () => ipcRenderer.invoke('get-app-version'),
+  
+  // Update event listeners
+  onUpdateStatus: (callback) => ipcRenderer.on('update-status', callback),
+  removeUpdateStatusListener: (callback) => ipcRenderer.removeListener('update-status', callback)
 }); 

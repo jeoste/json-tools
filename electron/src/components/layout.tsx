@@ -1,4 +1,4 @@
-import { Lock, Zap, FileText, CheckCircle, Search, Info, User } from 'lucide-react'
+import { Lock, Zap, FileText, CheckCircle, Search, Info, User, Download } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ViewType } from '@/App'
 import logoPng from '../../assets/logo_bracket.png'
@@ -12,6 +12,9 @@ import {
   SheetDescription,
 } from '@/components/ui/sheet'
 import { LanguageSelector } from '@/components/language-selector'
+import { ThemeSelector } from '@/components/theme-selector'
+import { useTranslation } from 'react-i18next'
+import { useUpdater } from '@/hooks/use-updater'
 
 interface LayoutProps {
   children: React.ReactNode
@@ -19,55 +22,56 @@ interface LayoutProps {
   onViewChange: (view: ViewType) => void
 }
 
-const navigationItems = [
-  {
-    key: 'anonymize' as ViewType,
-    label: 'Anonymize',
-    icon: Lock,
-  },
-  {
-    key: 'generate' as ViewType,
-    label: 'Generate',
-    icon: Zap,
-  },
-  {
-    key: 'swagger' as ViewType,
-    label: 'Swagger Spec',
-    icon: FileText,
-  },
-  {
-    key: 'swaggerToJson' as ViewType,
-    label: 'Swagger JSON',
-    icon: FileText,
-  },
-  {
-    key: 'validator' as ViewType,
-    label: 'Validate',
-    icon: CheckCircle,
-  },
-  {
-    key: 'jsonpath' as ViewType,
-    label: 'JSONPath',
-    icon: Search,
-  },
-]
-
-const viewDescriptions: Record<ViewType, string> = {
-  anonymize: 'Anonymize JSON data, masking or replacing sensitive fields to protect privacy.',
-  generate: 'Generate synthetic JSON data based on your schema or example for testing and development.',
-  swagger: 'Generate a Swagger (OpenAPI) specification from a sample JSON payload.',
-  swaggerToJson: 'Generate example JSON payloads directly from a Swagger/OpenAPI specification.',
-  validator: 'Validate JSON documents against a specified schema to ensure correctness.',
-  jsonpath: 'Extract data from JSON using JSONPath expressions.',
-}
-
 export function Layout({ children, currentView, onViewChange }: LayoutProps) {
-  const getViewTitle = (view: ViewType) => {
-    const item = navigationItems.find(item => item.key === view)
-    return item?.label || 'JSONnymous'
+  const { t } = useTranslation()
+  const { isCheckingForUpdates, updateStatus, appVersion, checkForUpdates } = useUpdater()
+  
+  const navigationItems = [
+    {
+      key: 'anonymize' as ViewType,
+      label: t('layout.navigation.anonymize'),
+      icon: Lock,
+    },
+    {
+      key: 'generate' as ViewType,
+      label: t('layout.navigation.generate'),
+      icon: Zap,
+    },
+    {
+      key: 'swagger' as ViewType,
+      label: t('layout.navigation.swagger'),
+      icon: FileText,
+    },
+    {
+      key: 'swaggerToJson' as ViewType,
+      label: t('layout.navigation.swaggerToJson'),
+      icon: FileText,
+    },
+    {
+      key: 'validator' as ViewType,
+      label: t('layout.navigation.validator'),
+      icon: CheckCircle,
+    },
+    {
+      key: 'jsonpath' as ViewType,
+      label: t('layout.navigation.jsonpath'),
+      icon: Search,
+    },
+  ]
+
+  const viewDescriptions: Record<ViewType, string> = {
+    anonymize: t('layout.descriptions.anonymize'),
+    generate: t('layout.descriptions.generate'),
+    swagger: t('layout.descriptions.swagger'),
+    swaggerToJson: t('layout.descriptions.swaggerToJson'),
+    validator: t('layout.descriptions.validator'),
+    jsonpath: t('layout.descriptions.jsonpath'),
   }
 
-  const appVersion = '0.1.0' // TODO: dynamically load from package.json or env
+  const getViewTitle = (view: ViewType) => {
+    const item = navigationItems.find(item => item.key === view)
+    return item?.label || t('layout.appName')
+  }
 
   return (
     <div className="flex h-screen bg-background">
@@ -80,7 +84,7 @@ export function Layout({ children, currentView, onViewChange }: LayoutProps) {
               alt="JSONnymous logo"
               className="w-8 h-8 rounded-md object-cover"
             />
-            <h1 className="text-xl font-medium">JSONnymous</h1>
+            <h1 className="text-xl font-medium">{t('layout.appName')}</h1>
           </div>
           
           <nav className="space-y-2">
@@ -105,9 +109,10 @@ export function Layout({ children, currentView, onViewChange }: LayoutProps) {
             })}
           </nav>
 
-          {/* Sélecteur de langue */}
-          <div className="mt-6">
+          {/* Sélecteurs de langue et thème */}
+          <div className="mt-6 space-y-2">
             <LanguageSelector />
+            <ThemeSelector />
           </div>
         </div>
 
@@ -116,18 +121,18 @@ export function Layout({ children, currentView, onViewChange }: LayoutProps) {
           <SheetTrigger asChild>
             <button className="flex items-center gap-2 p-6 border-t border-border text-muted-foreground hover:text-foreground hover:bg-accent/40">
               <User className="w-4 h-4" />
-              Account
+              {t('layout.account.title')}
             </button>
           </SheetTrigger>
           <SheetContent side="bottom" className="sm:max-w-lg">
             <SheetHeader>
-              <SheetTitle>Account</SheetTitle>
+              <SheetTitle>{t('layout.account.title')}</SheetTitle>
               <SheetDescription>
-                Manage your profile and synchronize settings between web & desktop (coming soon).
+                {t('layout.account.description')}
               </SheetDescription>
             </SheetHeader>
             <div className="mt-4 space-y-4">
-              <p>Feature under development.</p>
+              <p>{t('layout.account.featureInDevelopment')}</p>
             </div>
           </SheetContent>
         </Sheet>
@@ -137,20 +142,28 @@ export function Layout({ children, currentView, onViewChange }: LayoutProps) {
           <SheetTrigger asChild>
             <button className="flex items-center gap-2 p-6 border-t border-border text-muted-foreground hover:text-foreground hover:bg-accent/40">
               <Info className="w-4 h-4" />
-              About
+              {t('layout.about.title')}
             </button>
           </SheetTrigger>
           <SheetContent side="bottom" className="sm:max-w-lg">
             <SheetHeader>
-              <SheetTitle>About JSONnymous</SheetTitle>
+              <SheetTitle>{t('layout.about.title')}</SheetTitle>
               <SheetDescription>
-                Version {appVersion}
+                {t('layout.about.version', { version: appVersion })}
               </SheetDescription>
             </SheetHeader>
             <div className="mt-4 space-y-4">
-              <p>You can reach us at <a href="mailto:contact@neungbo.com" className="underline text-primary">contact@neungbo.com</a>.</p>
-              <Button onClick={() => {/* TODO: implement updater */}}>
-                Check for updates
+              <p>{t('layout.about.contact')} <a href="mailto:contact@neungbo.com" className="underline text-primary">contact@neungbo.com</a>.</p>
+              {updateStatus && (
+                <p className="text-sm text-muted-foreground">{updateStatus}</p>
+              )}
+              <Button 
+                onClick={checkForUpdates}
+                disabled={isCheckingForUpdates}
+                className="w-full"
+              >
+                <Download className="w-4 h-4 mr-2" />
+                {isCheckingForUpdates ? t('layout.about.checkingUpdates') : t('layout.about.checkUpdates')}
               </Button>
             </div>
           </SheetContent>

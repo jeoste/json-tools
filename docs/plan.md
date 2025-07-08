@@ -2,7 +2,7 @@
 
 ## Fonctionnalités à venir
 
-### 1. Gestion du compte (Desktop & Web)
+### 1. Gestion du compte (Desktop & Web) 🎯 **PRIORITÉ SUIVANTE**
 - [ ] Ajouter une authentification unifiée (JWT OAuth2) pour l'application web et de bureau.
 - [ ] Implémenter la synchronisation des préférences/utilisateurs via une API (inspiration Solidtime.io).
 - [ ] UI : Formulaire de connexion/inscription et affichage du profil dans le panneau "Account".
@@ -43,18 +43,22 @@
 - [ ] Tests end-to-end pour la synchronisation.
 - [ ] Scénarios de mise à jour automatique.
 
-### 6. Internationalisation (i18n)
-- [ ] Langue par défaut : anglais.
-- [ ] Ajouter la prise en charge du français (UI, documentation).
-- [ ] Ajouter la prise en charge du coréen (UI, documentation).
-- [ ] Détecter automatiquement la langue du système et prévoir un sélecteur manuel dans l'application.
+### 6. Internationalisation (i18n) ✅ **TERMINÉ**
+- [x] Langue par défaut : anglais.
+- [x] Ajouter la prise en charge du français (UI, documentation).
+- [x] Ajouter la prise en charge du coréen (UI, documentation).
+- [x] Détecter automatiquement la langue du système et prévoir un sélecteur manuel dans l'application.
+- [x] Implémenter la persistance du choix de langue entre les sessions.
+- [x] Traduire toutes les vues et composants de l'interface utilisateur.
 
-### 7. Thème (Clair / Sombre / Système)
-- [ ] Implémenter un sélecteur de thème avec trois options : Clair, Sombre, Système.
-- [ ] Utiliser `prefers-color-scheme` pour détecter la préférence de l'OS quand « Système » est sélectionné.
-- [ ] Persister le choix de l'utilisateur (localStorage / store).
-- [ ] Mettre à jour dynamiquement les variables CSS à partir de `globals.css`.
-- [ ] Vérifier l'accessibilité (contraste suffisant) pour chaque thème.
+### 7. Thème (Clair / Sombre / Système) ✅ **TERMINÉ**
+- [x] Implémenter un sélecteur de thème avec trois options : Clair, Sombre, Système.
+- [x] Utiliser `prefers-color-scheme` pour détecter la préférence de l'OS quand « Système » est sélectionné.
+- [x] Persister le choix de l'utilisateur (localStorage / store).
+- [x] Mettre à jour dynamiquement les variables CSS à partir de `globals.css`.
+- [x] Vérifier l'accessibilité (contraste suffisant) pour chaque thème.
+- [x] Intégrer le sélecteur dans la sidebar avec icônes appropriées.
+- [x] Traduire les labels de thème dans toutes les langues supportées.
 
 ---
-_Màj : {{DATE}}_ 
+_Màj : 2024-12-19_ 

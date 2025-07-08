@@ -34,7 +34,7 @@ function App() {
   }
 
   return (
-    <ThemeProvider defaultTheme="dark" storageKey="jsonnymous-ui-theme">
+    <ThemeProvider defaultTheme="system" storageKey="jsonnymous-ui-theme">
       <Layout currentView={currentView} onViewChange={setCurrentView}>
         {renderView()}
       </Layout>
