@@ -116,16 +116,16 @@ export function ValidatorView() {
               className="min-h-[400px] font-mono text-sm"
             />
             <div className="flex flex-wrap gap-2">
-              <Button onClick={validateJson} disabled={!jsonInput.trim()}>
+              <Button variant="success" onClick={validateJson} disabled={!jsonInput.trim()}>
                 <CheckCircle className="w-4 h-4 mr-2" />
                 {t('validator.button.validate')}
               </Button>
-              <Button variant="outline" onClick={importJsonFile}>
+              <Button variant="info" onClick={importJsonFile}>
                 <FilePlus className="w-4 h-4 mr-2" />
                 {t('validator.button.import')}
               </Button>
               <Button 
-                variant="outline" 
+                variant="warning" 
                 onClick={() => {
                   setJsonInput('')
                   setValidationResult(null)
@@ -196,10 +196,10 @@ export function ValidatorView() {
                   {t('validator.badge.invalid')}
                 </Badge>
                 <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4">
-                  <p className="text-destructive font-medium mb-2">
+                  <p className="text-white font-medium mb-2">
                     {t('validator.toastInvalidTitle')} :
                   </p>
-                  <p className="text-destructive/80 text-sm font-mono">
+                  <p className="text-white/90 text-sm font-mono">
                     {validationResult.error}
                   </p>
                 </div>

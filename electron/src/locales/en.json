@@ -15,7 +15,7 @@
     "failed": "Failed"
   },
   "layout": {
-    "appName": "JSONnymous",
+    "appName": "JSON Tools",
     "navigation": {
       "anonymize": "Anonymize",
       "generate": "Generate", 
@@ -38,7 +38,7 @@
       "featureInDevelopment": "Feature under development."
     },
     "about": {
-      "title": "About JSONnymous",
+      "title": "About JSON Tools",
       "version": "Version {{version}}",
       "contact": "You can reach us at",
       "checkUpdates": "Check for updates",
@@ -48,7 +48,6 @@
   "theme": {
     "light": "Light",
     "dark": "Dark",
-    "system": "System",
     "tooltip": "Change theme"
   },
   "anonymize": {
@@ -169,6 +168,67 @@
     "resultLabel": "Extracted data",
     "resultPlaceholder": "The result will appear here",
     "errorLabel": "Error during extraction",
+    "instructions": {
+      "title": "JSONPath Guide",
+      "description": "Expressions and syntax to extract JSON data",
+      "basic": {
+        "title": "Basic expressions",
+        "root": "Root of JSON document",
+        "current": "Current object/element",
+        "child": "Access child property",
+        "bracket": "Access property with brackets",
+        "wildcard": "All direct elements",
+        "recursive": "Recursive search (all levels)"
+      },
+      "arrays": {
+        "title": "Arrays",
+        "all": "All array elements",
+        "index": "Element at index n",
+        "slice": "Elements from index 1 to 3",
+        "last": "Last element",
+        "condition": "Elements where price > 10"
+      },
+      "filters": {
+        "title": "Conditional filters",
+        "exists": "Elements having 'name' property",
+        "equals": "Elements where name = 'John'",
+        "regex": "Elements where name contains 'test'",
+        "multiple": "Multiple conditions with AND"
+      },
+      "examples": {
+        "title": "Practical examples",
+        "users": "All users",
+        "names": "All user names",
+        "adults": "Users over 18",
+        "emails": "All emails",
+        "first": "First active user"
+      },
+      "syntax": {
+        "title": "Reference syntax",
+        "table": {
+          "expression": "Expression",
+          "usage": "Usage"
+        },
+        "operators": {
+          "root": "the root object/element",
+          "current": "the current object/element",
+          "child": "child operator",
+          "recursive": "recursive descent. JSONPath borrows this syntax from E4X.",
+          "wildcard": "wildcard. All objects/elements regardless their names.",
+          "subscript": "subscript operator. XPath uses it to iterate over element collections and for predicates. In Javascript and JSON it is the native array operator.",
+          "filter": "applies a filter (script) expression.",
+          "script": "script expression, using the underlying script engine."
+        }
+      },
+      "testCases": {
+        "title": "JSONPath test cases",
+        "case1": "Select the document node",
+        "case2": "Select the 'employees' element",
+        "case3": "Select all 'employee' elements that are direct children of 'employees'",
+        "case4": "Select all 'id' elements regardless of their positions",
+        "case5": "Select the 'id' attribute of the first 'employee'"
+      }
+    },
     "toast": {
       "errorTitle": "Error",
       "errorDesc": "Import failed",

@@ -1,7 +1,7 @@
 {
-  "name": "jsonnymous",
+  "name": "json-tools",
   "version": "0.2.3",
-  "description": "JSONnymous - Générateur de données JSON de test - Application Desktop",
+  "description": "JSON Tools - All-in-one tools for JSON",
   "main": "electron/main.js",
   "scripts": {
     "start": "cd electron && npm start",
@@ -14,7 +14,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/votre-username/jsonnymous.git"
+    "url": "git+https://github.com/jeoste/json-tools.git"
   },
   "keywords": [
     "json",
@@ -23,7 +23,7 @@
     "electron",
     "desktop-app"
   ],
-  "author": "JSONnymous Team",
+  "author": "jeoste",
   "license": "MIT",
   "engines": {
     "node": ">=16.0.0",

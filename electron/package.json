@@ -1,7 +1,7 @@
 {
-  "name": "jsonnymous-electron",
+  "name": "json-tools-electron",
   "version": "1.0.0",
-  "description": "JSONnymous - Générateur de données JSON de test moderne - Interface Electron",
+  "description": "JSON Tools - All-in-one tools for JSON powered by Electron",
   "main": "main.js",
   "scripts": {
     "dev": "vite",
@@ -14,7 +14,7 @@
     "electron:pack": "npm run build && electron-builder --dir"
   },
   "author": {
-    "name": "JSONnymous Team",
+    "name": "jeoste",
     "email": "jeoffrey039@gmail.com"
   },
   "license": "MIT",
@@ -59,14 +59,14 @@
     "tailwindcss-animate": "^1.0.0"
   },
   "build": {
-    "appId": "com.jsonnymous.json-generator",
-    "productName": "JSONnymous JSON Generator",
-    "copyright": "Copyright © 2025 JSONnymous Team",
+    "appId": "com.json-tools.json-generator",
+    "productName": "JSON Tools",
+    "copyright": "Copyright © 2025 jeoste",
     "icon": "assets/icon.ico",
     "publish": {
       "provider": "github",
-      "owner": "votre-username",
-      "repo": "JSONymous"
+      "owner": "jeoste",
+      "repo": "json-tools"
     },
     "directories": {
       "output": "dist-electron",
@@ -116,8 +116,8 @@
           ]
         }
       ],
-      "artifactName": "JSONnymous-Setup-${version}.${ext}",
-      "publisherName": "JSONnymous Team",
+      "artifactName": "JSON-Tools-Setup-${version}.${ext}",
+      "publisherName": "jeoste",
       "verifyUpdateCodeSignature": false,
       "requestedExecutionLevel": "asInvoker"
     },
@@ -127,8 +127,8 @@
       "allowElevation": true,
       "createDesktopShortcut": true,
       "createStartMenuShortcut": true,
-      "shortcutName": "JSONnymous JSON Generator",
-      "artifactName": "JSONnymous-Setup-${version}.${ext}",
+      "shortcutName": "JSON Tools",
+      "artifactName": "JSON-Tools-Setup-${version}.${ext}",
       "deleteAppDataOnUninstall": false
     }
   }

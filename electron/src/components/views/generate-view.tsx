@@ -29,7 +29,8 @@ export function GenerateView() {
         setGenerated(formatted)
         toast({ 
           title: t('generate.toast.successTitle'), 
-          description: t('generate.toast.successDesc') 
+          description: t('generate.toast.successDesc'),
+          variant: 'success'
         })
       } else {
         throw new Error('Generation failed')
@@ -63,7 +64,8 @@ export function GenerateView() {
         setGenerated(formatted)
         toast({ 
           title: t('generate.toast.successTitle'), 
-          description: t('generate.toast.successDesc') 
+          description: t('generate.toast.successDesc'),
+          variant: 'success'
         })
       }
     } catch (error: any) {
@@ -83,7 +85,8 @@ export function GenerateView() {
       await navigator.clipboard.writeText(generated)
       toast({ 
         title: t('common.copiedTitle'), 
-        description: t('generate.copyToastDesc') 
+        description: t('generate.copyToastDesc'),
+        variant: 'info'
       })
     } catch {
       toast({ 

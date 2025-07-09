@@ -24,6 +24,8 @@ module.exports = {
   			ring: 'hsl(var(--ring))',
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
+  			
+  			// Couleurs principales
   			primary: {
   				DEFAULT: 'hsl(var(--primary))',
   				foreground: 'hsl(var(--primary-foreground))'
@@ -32,6 +34,26 @@ module.exports = {
   				DEFAULT: 'hsl(var(--secondary))',
   				foreground: 'hsl(var(--secondary-foreground))'
   			},
+  			
+  			// Couleurs sémantiques personnalisées
+  			danger: {
+  				DEFAULT: 'var(--danger)',
+  				foreground: 'hsl(var(--foreground))'
+  			},
+  			warning: {
+  				DEFAULT: 'var(--warning)',
+  				foreground: 'hsl(var(--foreground))'
+  			},
+  			success: {
+  				DEFAULT: 'var(--success)',
+  				foreground: 'hsl(var(--foreground))'
+  			},
+  			info: {
+  				DEFAULT: 'var(--info)',
+  				foreground: 'hsl(var(--foreground))'
+  			},
+  			
+  			// Couleur destructive (alias pour danger)
   			destructive: {
   				DEFAULT: 'hsl(var(--destructive))',
   				foreground: 'hsl(var(--destructive-foreground))'

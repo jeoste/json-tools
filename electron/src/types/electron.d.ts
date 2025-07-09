@@ -1,5 +1,15 @@
 export {}
 
+interface UpdateStatus {
+  status: 'idle' | 'checking' | 'available' | 'not-available' | 'downloading' | 'downloaded' | 'error';
+  message: string;
+  timestamp?: string;
+  percent?: number;
+  transferred?: number;
+  total?: number;
+  bytesPerSecond?: number;
+}
+
 declare global {
   interface ElectronAPI {
     anonymizeData: (request: {
@@ -20,9 +30,11 @@ declare global {
     
     // Update management
     checkForUpdates: () => Promise<void>
+    checkForUpdatesAndNotify: () => Promise<void>
+    quitAndInstall: () => Promise<void>
     getAppVersion: () => Promise<string>
-    onUpdateStatus: (callback: (event: any, status: string) => void) => void
-    removeUpdateStatusListener: (callback: (event: any, status: string) => void) => void
+    onUpdateStatus: (callback: (event: any, status: UpdateStatus) => void) => void
+    removeUpdateStatusListener: (callback: (event: any, status: UpdateStatus) => void) => void
   }
 
   interface Window {

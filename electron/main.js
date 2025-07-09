@@ -68,6 +68,17 @@ function createWindow() {
     // Initialize update manager
     updateManager = new UpdateManager(mainWindow);
     
+    // Check for updates automatically on startup (after 3 seconds delay)
+    setTimeout(async () => {
+      if (updateManager) {
+        try {
+          await updateManager.checkForUpdatesAndNotify();
+        } catch (error) {
+          console.error('❌ Erreur lors de la vérification automatique des mises à jour:', error);
+        }
+      }
+    }, 3000);
+    
     // Check Python and dependencies
     checkPythonAndDependencies();
   });
@@ -513,10 +524,7 @@ ipcMain.handle('delete-path', async (event, targetPath) => {
   }
 });
 
-// Get app version
-ipcMain.handle('get-app-version', async () => {
-  return { success: true, version: app.getVersion() };
-});
+// Get app version (moved to update handlers section)
 
 // Get system info
 ipcMain.handle('get-system-info', async () => {
@@ -636,9 +644,21 @@ ipcMain.handle('set-window-bounds', async (event, bounds) => {
 });
 
 // Update handlers
-ipcMain.handle('check-for-updates', () => {
+ipcMain.handle('check-for-updates', async () => {
   if (updateManager) {
-    updateManager.checkForUpdates();
+    await updateManager.checkForUpdates(true); // Avec dialogue "pas de mise à jour"
+  }
+});
+
+ipcMain.handle('check-for-updates-and-notify', async () => {
+  if (updateManager) {
+    await updateManager.checkForUpdatesAndNotify(); // Silencieux
+  }
+});
+
+ipcMain.handle('quit-and-install', async () => {
+  if (updateManager) {
+    updateManager.quitAndInstall();
   }
 });
 

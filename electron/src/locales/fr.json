@@ -15,7 +15,7 @@
     "failed": "Échec"
   },
   "layout": {
-    "appName": "JSONnymous",
+    "appName": "JSON Tools",
     "navigation": {
       "anonymize": "Anonymize",
       "generate": "Generate", 
@@ -25,12 +25,13 @@
       "jsonpath": "JSONPath"
     },
     "descriptions": {
-      "anonymize": "Anonymisez les données JSON en masquant ou remplaçant les champs sensibles pour protéger la confidentialité.",
-      "generate": "Générez des données JSON synthétiques basées sur votre schéma ou exemple pour les tests et le développement.",
-      "swagger": "Générez une spécification Swagger (OpenAPI) à partir d'un échantillon de charge utile JSON.",
-      "swaggerToJson": "Générez des exemples de charges utiles JSON directement à partir d'une spécification Swagger/OpenAPI.",
-      "validator": "Validez les documents JSON contre un schéma spécifié pour assurer la justesse.",
-      "jsonpath": "Extrayez des données de JSON en utilisant des expressions JSONPath."
+      "anonymize": "Anonymisez les données d'un JSON venant de l'environnement de production en masquant ou remplaçant tous les champs sensibles et protéger vos données.",
+      "generate": "Générez des \"vraies fausses\" données JSON basées sur votre schéma ou un exemple afin de tester vos API en développement.",
+      "swagger": "Générez une spécification OAS (OpenAPI) à partir d'un schéma JSON valide.",
+      "swaggerToJson": "Générez des \" vraies fausses\" données d'exemple à partir d'une spécification OAS (OpenAPI).",
+      "validator": "Validez votre structure JSON.",
+      "jsonpath": "Chemin d'extraction de données de votre JSON en utilisant des expressions JSONPath.",
+      "jsonpathDesc": "JSONPath est un langage de requête pour JSON. Il permet d'extraire des données de JSON en utilisant des expressions."
     },
     "account": {
       "title": "Compte",
@@ -38,7 +39,7 @@
       "featureInDevelopment": "Fonctionnalité en cours de développement."
     },
     "about": {
-      "title": "À propos de JSONnymous",
+      "title": "À propos de JSON Tools",
       "version": "Version {{version}}",
       "contact": "Vous pouvez nous contacter à",
       "checkUpdates": "Vérifier les mises à jour",
@@ -48,7 +49,6 @@
   "theme": {
     "light": "Clair",
     "dark": "Sombre",
-    "system": "Système",
     "tooltip": "Changer le thème"
   },
   "anonymize": {
@@ -169,6 +169,67 @@
     "resultLabel": "Données extraites",
     "resultPlaceholder": "Le résultat apparaîtra ici",
     "errorLabel": "Erreur lors de l'extraction",
+    "instructions": {
+      "title": "Guide JSONPath",
+      "description": "Expressions et syntaxe pour extraire des données JSON",
+      "basic": {
+        "title": "Expressions de base",
+        "root": "Racine du document JSON",
+        "current": "Objet/élément actuel",
+        "child": "Accéder à une propriété enfant",
+        "bracket": "Accéder à une propriété avec crochets",
+        "wildcard": "Tous les éléments directs",
+        "recursive": "Recherche récursive (tous niveaux)"
+      },
+      "arrays": {
+        "title": "Tableaux",
+        "all": "Tous les éléments du tableau",
+        "index": "Élément à l'index n",
+        "slice": "Éléments de l'index 1 à 3",
+        "last": "Dernier élément",
+        "condition": "Éléments où price > 10"
+      },
+      "filters": {
+        "title": "Filtres conditionnels",
+        "exists": "Éléments ayant la propriété 'name'",
+        "equals": "Éléments où name = 'John'",
+        "regex": "Éléments où name contient 'test'",
+        "multiple": "Conditions multiples avec ET"
+      },
+      "examples": {
+        "title": "Exemples pratiques",
+        "users": "Tous les utilisateurs",
+        "names": "Tous les noms d'utilisateurs",
+        "adults": "Utilisateurs de plus de 18 ans",
+        "emails": "Tous les emails",
+        "first": "Premier utilisateur actif"
+      },
+      "syntax": {
+        "title": "Syntaxe de référence",
+        "table": {
+          "expression": "Expression",
+          "usage": "Utilisation"
+        },
+        "operators": {
+          "root": "l'objet/élément racine",
+          "current": "l'objet/élément actuel",
+          "child": "opérateur enfant",
+          "recursive": "descente récursive. JSONPath emprunte cette syntaxe à E4X.",
+          "wildcard": "joker. Tous les objets/éléments quel que soit leur nom.",
+          "subscript": "opérateur d'indice. XPath l'utilise pour itérer sur les collections d'éléments et pour les prédicats. En Javascript et JSON, c'est l'opérateur de tableau natif.",
+          "filter": "applique une expression de filtre (script).",
+          "script": "expression de script, utilisant le moteur de script sous-jacent."
+        }
+      },
+      "testCases": {
+        "title": "Cas de test JSONPath",
+        "case1": "Sélectionner le nœud document",
+        "case2": "Sélectionner l'élément 'employees'",
+        "case3": "Sélectionner tous les éléments 'employee' enfants directs de 'employees'",
+        "case4": "Sélectionner tous les éléments 'id' quelle que soit leur position",
+        "case5": "Sélectionner l'attribut 'id' du premier 'employee'"
+      }
+    },
     "toast": {
       "errorTitle": "Erreur",
       "errorDesc": "Import échoué",

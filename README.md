@@ -1,4 +1,4 @@
-# 🚀 JSONnymous - JSON Data Generator & Anonymizer
+# 🚀 JSON Tools - JSON Data Generator & Anonymizer
 
 > A modern desktop application for generating realistic test data and anonymizing sensitive information in JSON format.
 

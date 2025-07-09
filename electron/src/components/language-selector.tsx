@@ -1,4 +1,4 @@
-import { Globe } from 'lucide-react'
+
 import { Button } from '@/components/ui/button'
 import {
   DropdownMenu,
@@ -31,7 +31,7 @@ export function LanguageSelector() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="w-full justify-start font-normal text-muted-foreground hover:text-foreground">
-          <Globe className="w-4 h-4 mr-2" />
+          <span className="text-lg mr-2">{currentLang.flag}</span>
           {currentLang.label}
         </Button>
       </DropdownMenuTrigger>
@@ -39,7 +39,7 @@ export function LanguageSelector() {
         <DropdownMenuRadioGroup value={current} onValueChange={handleChange}>
           {languages.map(lang => (
             <DropdownMenuRadioItem key={lang.code} value={lang.code}>
-              <span className="mr-2">{lang.flag}</span>
+              <span className="text-lg mr-2">{lang.flag}</span>
               {lang.label}
             </DropdownMenuRadioItem>
           ))}

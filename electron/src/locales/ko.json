@@ -15,7 +15,7 @@
     "failed": "실패"
   },
   "layout": {
-    "appName": "JSONnymous",
+    "appName": "JSON Tools",
     "navigation": {
       "anonymize": "익명화",
       "generate": "생성", 
@@ -38,7 +38,7 @@
       "featureInDevelopment": "기능 개발 중입니다."
     },
     "about": {
-      "title": "JSONnymous 정보",
+      "title": "JSON Tools 정보",
       "version": "버전 {{version}}",
       "contact": "연락처:",
       "checkUpdates": "업데이트 확인",
@@ -48,7 +48,6 @@
   "theme": {
     "light": "라이트",
     "dark": "다크",
-    "system": "시스템",
     "tooltip": "테마 변경"
   },
   "anonymize": {
@@ -169,6 +168,67 @@
     "resultLabel": "추출된 데이터",
     "resultPlaceholder": "결과가 여기에 표시됩니다",
     "errorLabel": "추출 중 오류",
+    "instructions": {
+      "title": "JSONPath 가이드",
+      "description": "JSON 데이터를 추출하는 표현식과 문법",
+      "basic": {
+        "title": "기본 표현식",
+        "root": "JSON 문서의 루트",
+        "current": "현재 객체/요소",
+        "child": "자식 속성에 접근",
+        "bracket": "대괄호로 속성에 접근",
+        "wildcard": "모든 직접 요소",
+        "recursive": "재귀 검색 (모든 레벨)"
+      },
+      "arrays": {
+        "title": "배열",
+        "all": "배열의 모든 요소",
+        "index": "인덱스 n의 요소",
+        "slice": "인덱스 1부터 3까지의 요소",
+        "last": "마지막 요소",
+        "condition": "price > 10인 요소"
+      },
+      "filters": {
+        "title": "조건부 필터",
+        "exists": "'name' 속성을 가진 요소",
+        "equals": "name = 'John'인 요소",
+        "regex": "name에 'test'가 포함된 요소",
+        "multiple": "AND로 연결된 여러 조건"
+      },
+      "examples": {
+        "title": "실용적인 예제",
+        "users": "모든 사용자",
+        "names": "모든 사용자 이름",
+        "adults": "18세 이상 사용자",
+        "emails": "모든 이메일",
+        "first": "첫 번째 활성 사용자"
+      },
+      "syntax": {
+        "title": "참조 문법",
+        "table": {
+          "expression": "표현식",
+          "usage": "사용법"
+        },
+        "operators": {
+          "root": "루트 객체/요소",
+          "current": "현재 객체/요소",
+          "child": "자식 연산자",
+          "recursive": "재귀 하강. JSONPath는 이 문법을 E4X에서 가져왔습니다.",
+          "wildcard": "와일드카드. 이름에 관계없이 모든 객체/요소.",
+          "subscript": "첨자 연산자. XPath는 요소 컬렉션을 반복하고 조건자에 사용합니다. Javascript와 JSON에서는 네이티브 배열 연산자입니다.",
+          "filter": "필터 (스크립트) 표현식을 적용합니다.",
+          "script": "기본 스크립트 엔진을 사용하는 스크립트 표현식."
+        }
+      },
+      "testCases": {
+        "title": "JSONPath 테스트 케이스",
+        "case1": "문서 노드 선택",
+        "case2": "'employees' 요소 선택",
+        "case3": "'employees'의 직접 자식인 모든 'employee' 요소 선택",
+        "case4": "위치에 관계없이 모든 'id' 요소 선택",
+        "case5": "첫 번째 'employee'의 'id' 속성 선택"
+      }
+    },
     "toast": {
       "errorTitle": "오류",
       "errorDesc": "가져오기 실패",
