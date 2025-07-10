@@ -161,6 +161,7 @@ generated/
 *.generated.json 
 
 # Build files
+dist-electron/
 dist/
 out/
 release/
