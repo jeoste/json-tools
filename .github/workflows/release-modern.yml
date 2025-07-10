@@ -45,7 +45,7 @@ jobs:
         
     - name: Build Electron application
       working-directory: electron
-      run: npm run build-win
+      run: npm run electron:build-win
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
@@ -69,7 +69,7 @@ jobs:
         echo "Contenu du dossier dist:"
         Get-ChildItem -Path "electron/dist" -Recurse | Select-Object FullName
         
-        $setupFile = "electron/dist/JSONnymous-Setup-${{ steps.version.outputs.version_clean }}.exe"
+        $setupFile = "electron/dist/JSON-Tools-Setup-${{ steps.version.outputs.version_clean }}.exe"
         if (Test-Path $setupFile) {
           echo "✅ Fichier setup trouvé: $setupFile"
           $fileSize = (Get-Item $setupFile).Length
@@ -88,10 +88,10 @@ jobs:
         tag_name: ${{ steps.version.outputs.version }}
         name: Release ${{ steps.version.outputs.version }}
         body: |
-          ## 🚀 JSONnymous JSON Generator ${{ steps.version.outputs.version }}
+          ## 🚀 JSON Tools ${{ steps.version.outputs.version }}
           
           ### 📦 Installation
-          1. Téléchargez le fichier `JSONnymous-Setup-${{ steps.version.outputs.version_clean }}.exe`
+          1. Téléchargez le fichier `JSON-Tools-Setup-${{ steps.version.outputs.version_clean }}.exe`
           2. Exécutez le fichier téléchargé
           3. Suivez les instructions d'installation
           
@@ -116,11 +116,11 @@ jobs:
           - [Documentation](https://github.com/${{ github.repository }}/blob/main/README.md)
           - [Rapporter un bug](https://github.com/${{ github.repository }}/issues)
           
-          **💡 Astuce:** Pour une installation silencieuse, utilisez `JSONnymous-Setup-${{ steps.version.outputs.version_clean }}.exe /S`
+          **💡 Astuce:** Pour une installation silencieuse, utilisez `JSON-Tools-Setup-${{ steps.version.outputs.version_clean }}.exe /S`
         draft: false
         prerelease: false
         files: |
-          electron/dist/JSONnymous-Setup-${{ steps.version.outputs.version_clean }}.exe
+          electron/dist/JSON-Tools-Setup-${{ steps.version.outputs.version_clean }}.exe
         fail_on_unmatched_files: true
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} 

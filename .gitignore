@@ -159,3 +159,11 @@ Thumbs.db
 output/
 generated/
 *.generated.json 
+
+# Build files
+dist/
+out/
+release/
+*.exe
+*.dmg
+*.AppImage

@@ -44,7 +44,7 @@ jobs:
     - name: Build Electron app
       run: |
         cd electron
-        npm run build-win
+        npm run electron:build-win
       env:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
@@ -69,10 +69,10 @@ jobs:
         tag_name: ${{ steps.get_version.outputs.version }}
         release_name: Release ${{ steps.get_version.outputs.version }}
         body: |
-          ## 🚀 Nouvelle version de JSONnymous JSON Generator
+          ## 🚀 Nouvelle version de JSON Tools
           
           ### 📦 Installation
-          Téléchargez le fichier `JSONnymous-Setup-${{ steps.get_version.outputs.version_clean }}.exe` ci-dessous et exécutez-le pour installer l'application.
+          Téléchargez le fichier `JSON-Tools-Setup-${{ steps.get_version.outputs.version_clean }}.exe` ci-dessous et exécutez-le pour installer l'application.
           
           ### 🔧 Configuration requise
           - Windows 10 ou supérieur
@@ -93,6 +93,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./electron/dist/JSONnymous-Setup-${{ steps.get_version.outputs.version_clean }}.exe
-        asset_name: JSONnymous-Setup-${{ steps.get_version.outputs.version_clean }}.exe
+        asset_path: ./electron/dist/JSON-Tools-Setup-${{ steps.get_version.outputs.version_clean }}.exe
+        asset_name: JSON-Tools-Setup-${{ steps.get_version.outputs.version_clean }}.exe
         asset_content_type: application/octet-stream 
