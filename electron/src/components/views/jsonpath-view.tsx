@@ -10,7 +10,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Search, FileText, Copy, FilePlus, Loader2, BookOpen, ChevronDown, ChevronUp } from 'lucide-react'
+import { Search, FileText, Copy, FilePlus, BookOpen, ChevronDown, ChevronUp } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast-simple'
 import { JSONPath } from 'jsonpath-plus'
 import { useTranslation } from 'react-i18next'
@@ -19,7 +19,7 @@ export function JsonPathView() {
   const [jsonInput, setJsonInput] = useState('')
   const [pathExpr, setPathExpr] = useState('$.')
   const [result, setResult] = useState<string | null>(null)
-  const [loading, setLoading] = useState(false)
+  const [loading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [showInstructions, setShowInstructions] = useState(false)
   const { toast } = useToast()

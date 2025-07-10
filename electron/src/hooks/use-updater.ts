@@ -34,7 +34,7 @@ export function useUpdater() {
     getAppVersion();
 
     // Écouter les événements de mise à jour
-    const handleUpdateStatus = (event: any, statusData: UpdateStatus) => {
+    const handleUpdateStatus = (_event: any, statusData: UpdateStatus) => {
       console.log('📦 Update status received:', statusData);
       setUpdateStatus(statusData);
       

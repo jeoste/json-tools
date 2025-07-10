@@ -2,7 +2,6 @@
 
 // Inspired by react-hot-toast library
 import * as React from "react"
-import { toast as sonnerToast } from 'sonner'
 
 import type {
   ToastActionElement,
@@ -17,6 +16,8 @@ type ToasterToast = ToastProps & {
   title?: React.ReactNode
   description?: React.ReactNode
   action?: ToastActionElement
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
 }
 
 const actionTypes = {
@@ -190,28 +191,6 @@ function useToast() {
     toast,
     dismiss: (toastId?: string) => dispatch({ type: "DISMISS_TOAST", toastId }),
   }
-}
-
-type ToastProps = {
-  title?: string
-  description?: string
-  variant?: 'default' | 'destructive'
-}
-
-export const useToast = () => {
-  const toast = ({ title, description, variant = 'default' }: ToastProps) => {
-    if (variant === 'destructive') {
-      sonnerToast.error(title, {
-        description,
-      })
-    } else {
-      sonnerToast.success(title, {
-        description,
-      })
-    }
-  }
-
-  return { toast }
 }
 
 export { useToast, toast }
