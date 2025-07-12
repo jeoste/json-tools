@@ -3,7 +3,14 @@ const path = require('path');
 const { spawn } = require('child_process');
 const fs = require('fs-extra');
 const os = require('os');
-const UpdateManager = require('./updater');
+// === Mise à jour désactivée temporairement ===
+const updatesEnabled = false; // Mettre à true pour réactiver l'auto-update
+
+let UpdateManager;
+if (updatesEnabled) {
+  // On ne charge la logique de mise à jour que si elle est activée
+  UpdateManager = require('./updater');
+}
 
 let mainWindow;
 let updateManager;
@@ -65,19 +72,22 @@ function createWindow() {
   mainWindow.once('ready-to-show', () => {
     mainWindow.show();
     
-    // Initialize update manager
-    updateManager = new UpdateManager(mainWindow);
-    
-    // Check for updates automatically on startup (after 3 seconds delay)
-    setTimeout(async () => {
-      if (updateManager) {
-        try {
-          await updateManager.checkForUpdatesAndNotify();
-        } catch (error) {
-          console.error('❌ Erreur lors de la vérification automatique des mises à jour:', error);
+    // Mise à jour : désactivée lorsque updatesEnabled === false
+    if (updatesEnabled) {
+      // Initialize update manager
+      updateManager = new UpdateManager(mainWindow);
+
+      // Check for updates automatically on startup (after 3 seconds delay)
+      setTimeout(async () => {
+        if (updateManager) {
+          try {
+            await updateManager.checkForUpdatesAndNotify();
+          } catch (error) {
+            console.error('❌ Erreur lors de la vérification automatique des mises à jour:', error);
+          }
         }
-      }
-    }, 3000);
+      }, 3000);
+    }
     
     // Check Python and dependencies
     checkPythonAndDependencies();
