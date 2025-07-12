@@ -5,11 +5,12 @@ import path from 'path'
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
-  resolve: {
-    alias: {
-      '@': path.resolve(__dirname, './src'),
-    },
-  },
+resolve: {
+  alias: [
+    { find: '@', replacement: path.resolve(__dirname, 'src') },
+    { find: '@libs', replacement: path.resolve(__dirname, 'src/lib') }
+  ]
+},
   build: {
     outDir: 'dist',
   },

@@ -8,7 +8,12 @@
     "strict": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": [
+        "src/*"
+      ],
+      "@libs/*": [
+        "src/lib/*"
+      ]
     }
   },
   "include": ["vite.config.ts"]
