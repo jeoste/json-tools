@@ -3,96 +3,54 @@ name: Release
 on:
   push:
     tags:
-      - 'v*'
+      - 'v*.*.*'
   workflow_dispatch:
-    inputs:
-      version:
-        description: 'Version à publier (ex: v1.0.0)'
-        required: true
-        default: 'v1.0.0'
+
+env:
+  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
-  release:
-    runs-on: windows-latest
-    
+  build:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [windows-latest, macos-latest, ubuntu-latest]
+
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-      
-    - name: Setup Node.js
-      uses: actions/setup-node@v4
-      with:
-        node-version: '18'
-        cache: 'npm'
-        cache-dependency-path: electron/package-lock.json
-        
-    - name: Setup Python
-      uses: actions/setup-python@v4
-      with:
-        python-version: '3.11'
-        
-    - name: Install Python dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-        
-    - name: Install Node.js dependencies
-      run: |
-        cd electron
-        npm ci
-        
-    - name: Build Electron app
-      run: |
-        cd electron
-        npm run electron:build-win
-      env:
-        GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        
-    - name: Get version from tag or input
-      id: get_version
-      run: |
-        if ("${{ github.event_name }}" -eq "workflow_dispatch") {
-          $version = "${{ github.event.inputs.version }}"
-        } else {
-          $version = "${{ github.ref_name }}"
-        }
-        echo "version=$version" >> $env:GITHUB_OUTPUT
-        echo "version_clean=$($version -replace '^v', '')" >> $env:GITHUB_OUTPUT
-      shell: powershell
-      
-    - name: Create Release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: ${{ steps.get_version.outputs.version }}
-        release_name: Release ${{ steps.get_version.outputs.version }}
-        body: |
-          ## 🚀 Nouvelle version de JSON Tools
-          
-          ### 📦 Installation
-          Téléchargez le fichier `JSON-Tools-Setup-${{ steps.get_version.outputs.version_clean }}.exe` ci-dessous et exécutez-le pour installer l'application.
-          
-          ### 🔧 Configuration requise
-          - Windows 10 ou supérieur
-          - Python 3.7+ (installé automatiquement si nécessaire)
-          
-          ### 📋 Changements
-          - Veuillez consulter les commits pour les détails des changements
-          
-          ---
-          
-          **Installation automatique :** Double-cliquez sur le fichier .exe et suivez les instructions à l'écran.
-        draft: false
-        prerelease: false
-        
-    - name: Upload Release Asset
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./electron/dist/JSON-Tools-Setup-${{ steps.get_version.outputs.version_clean }}.exe
-        asset_name: JSON-Tools-Setup-${{ steps.get_version.outputs.version_clean }}.exe
-        asset_content_type: application/octet-stream 
+      - uses: actions/checkout@v3
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm ci
+        working-directory: electron
+
+      - name: Build application
+        run: npm run electron:dist
+        working-directory: electron
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: ${{ runner.os }}-build
+          path: electron/dist-electron/**
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v3
+        with:
+          path: ./artifacts
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ github.ref_name }}
+          name: ${{ github.ref_name }}
+          files: |
+            artifacts/**/*.exe
+            artifacts/**/*.dmg
+            artifacts/**/*.AppImage 

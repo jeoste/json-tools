@@ -3,7 +3,7 @@ description:
 globs: 
 alwaysApply: true
 ---
-# rule-project-jsonymous
+# rule-project-json-tools
 
 - This startup is about creating a Data Platform focus on Observability
 - Design is inspired from acreom App (https://github.com/Acreom/app). This branch is the copy of the master branch of the project
