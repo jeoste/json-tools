@@ -22,7 +22,11 @@
     "noFallthroughCasesInSwitch": true,
 
     /* Path mapping */
-    "baseUrl": ".", "paths": { "@/*": ["./src/*"],"@libs/*": ["./src/lib/*"] }
+    "baseUrl": "src",
+    "paths": {
+      "@/*": ["./*"],
+      "@libs/*": ["./lib/*"]
+    }
   },
   "include": ["src/**/*.ts", "src/**/*.tsx", "src/components/ui/sonner.tsx", "src/lib/utils.ts"]
 } 
