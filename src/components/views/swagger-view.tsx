@@ -23,12 +23,13 @@ function inferSchema(value: any): any {
       return { type: Number.isInteger(value) ? 'integer' : 'number' }
     case 'boolean':
       return { type: 'boolean' }
-    case 'object':
+    case 'object': {
       const properties: Record<string, any> = {}
       for (const [k, v] of Object.entries(value)) {
         properties[k] = inferSchema(v)
       }
       return { type: 'object', properties }
+    }
     default:
       return { type: 'string' }
   }

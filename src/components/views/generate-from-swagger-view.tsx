@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button'
 import { Textarea } from '@/components/ui/textarea'
 import { Badge } from '@/components/ui/badge'
-import { FileText, FilePlus, Loader2, Copy, Save } from 'lucide-react'
+import { FileText, Loader2, Copy, Save } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast-simple'
 import { useTranslation } from 'react-i18next'
 import { apiClient } from '@/lib/api-client'

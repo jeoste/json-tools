@@ -1,298 +1,86 @@
 # My Data Toolbox
 
-> A modern web application to generate realistic JSON test data, anonymize sensitive fields, validate and query JSON, and work with Swagger/OpenAPI.
+> Web app to generate realistic JSON/XML test data, anonymize sensitive fields, validate and query JSON/XML, and work with Swagger/OpenAPI.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Node.js](https://img.shields.io/badge/Node.js-18.0%2B-green.svg)](https://nodejs.org)
+[![Node.js](https://img.shields.io/badge/Node.js-20.0%2B-green.svg)](https://nodejs.org)
 [![Python](https://img.shields.io/badge/Python-3.9%2B-blue.svg)](https://python.org)
 [![Vercel](https://img.shields.io/badge/Vercel-Deployed-black.svg)](https://vercel.com)
 
-## 📸 Screenshots
+## Features
 
-> Place screenshots in `screenshots/` as described in `screenshots/README.md`.
-
-- Main Interface — sidebar + content
-- Data Generation — skeleton to generated JSON
-- Data Anonymization — before/after preview
-- Configuration — dialogs and options
-- Preview — formatted output
-
-## ✨ Features
-
-- Generate realistic data from JSON skeletons (Python engine, Faker)
+- Generate realistic data from JSON skeletons (Python + Faker)
+- Random JSON / XML generators
 - Optional Swagger/OpenAPI constraints during generation
-- JSON anonymization (preserve structure/relationships)
+- JSON anonymization (preserve structure)
 - JSON validation and pretty-print
-- JSONPath querying with live evaluation
-- Convert JSON example → OpenAPI schema (helper)
-- Build skeletons from OpenAPI schemas (helper)
-- Modern UI: dark/light themes, i18n (EN/FR/KO)
+- JSONPath querying (client-side)
+- XML validate / XPath (lxml) / generate from skeleton
+- Convert JSON example → OpenAPI schema
+- Build skeletons from OpenAPI schemas
+- Dark/light themes, i18n (EN/FR/KO)
 
-## 🧱 Tech Stack
+## Tech Stack
 
-**Frontend:**
-- React 18 + TypeScript, Vite 5, Tailwind CSS, shadcn/ui
-- i18next (internationalisation), Lucide React (icônes), JSONPath-Plus
+**Frontend:** React 18 + TypeScript, Vite 6, Tailwind CSS, shadcn/ui, i18next, Lucide, JSONPath-Plus
 
-**Backend:**
-- Python 3.9+ serverless functions on Vercel
-- Flask handlers for API endpoints
-- Python modules: `faker`, `pyyaml`, `jsonschema`, `openapi-spec-validator`
+**Backend:** Python 3.9+ Vercel serverless (`BaseHTTPRequestHandler`), shared modules in `lib/` (`faker`, `pyyaml`, `jsonschema`, `openapi-spec-validator`, `lxml`)
 
-**Infrastructure:**
-- Vercel (hosting + serverless functions)
-- GitHub (CI/CD)
+**Infra:** Vercel + GitHub Actions. Legacy Electron desktop app lives under `electron/` (see `electron/README.md`).
 
-## 🗂️ Project Structure
+## Project Structure
 
 ```
 my-data-toolbox/
-├─ api/                     # Vercel serverless functions (Python)
-│  ├─ generate.py          # POST /api/generate
-│  ├─ anonymize.py         # POST /api/anonymize
-│  └─ analyze.py           # POST /api/analyze
-├─ src/                     # Frontend React (Web)
-│  ├─ components/
-│  │  ├─ views/            # Generate / Anonymize / Swagger / Validator / JSONPath
-│  │  └─ ui/               # shadcn/ui components
-│  ├─ hooks/
-│  ├─ locales/             # i18n resources (en, fr, ko)
-│  ├─ lib/                  # API client, utilities
-│  ├─ globals.css
-│  └─ main.tsx
-├─ lib/                     # Python modules (shared)
-│  ├─ data_generator.py
-│  ├─ data_anonymizer.py
-│  ├─ json_processor.py
-│  └─ swagger_parser.py
-├─ examples/                # Sample skeletons and swagger specs
-├─ docs/                    # Plan & release notes
-└─ screenshots/             # Marketing screenshots
+├─ api/                     # Vercel Python functions
+│  ├─ generate.py / anonymize.py / analyze.py
+│  ├─ xml-validate.py / xml-path.py / generate-xml.py
+│  └─ random-json.py / random-xml.py
+├─ lib/                     # Canonical Python business logic + http_handler
+├─ src/                     # React SPA (views are code-split)
+├─ electron/                # Legacy desktop packaging
+├─ tests/                   # pytest smoke tests
+├─ examples/
+└─ public/fonts/            # Self-hosted Inter
 ```
 
-## 🔧 Prerequisites
+## Prerequisites
 
-- Node.js 18.0+ (required by Vite 5)
-- Python 3.9+ (for local development)
-- npm or yarn
+- Node.js 20+
+- Python 3.9+
+- npm
 
-## 🚀 Quick Start (Development)
+## Quick Start
 
-### Local Development
-
-1. Install dependencies:
 ```bash
 npm install
-```
-
-2. Install Python dependencies (for local testing):
-```bash
 pip install -r requirements.txt
+npm run dev          # UI only → http://localhost:5173
+# or full stack:
+npx vercel dev
 ```
 
-3. UI-only mode (Vite dev server):
+## Scripts
+
 ```bash
 npm run dev
-```
-
-The React application will be available at `http://localhost:5173`.
-In this mode, only the **frontend** is running. Calls to `/api/*` are
-expected to fail locally (404) unless they target a deployed Vercel
-environment.
-
-4. Full‑stack mode (frontend + Python serverless APIs):
-
-To test the Python serverless functions locally, use Vercel CLI:
-
-```bash
-npm install -g vercel
-vercel dev
-```
-
-This will start a local server (usually `http://localhost:3000`) that
-simulates the full Vercel environment: the React app and all `/api/*.py`
-endpoints (`/api/generate`, `/api/anonymize`, etc.).
-
-## 📦 Build & Distribution
-
-### Build for Production
-
-```bash
 npm run build
+npm run preview
+npm run lint
+npm run test         # Vitest
+npm run test:python  # pytest
 ```
 
-This creates an optimized production build in the `dist/` directory.
-
-### Deploy to Vercel
-
-Il existe deux méthodes pour déployer automatiquement sur Vercel :
-
-#### Méthode 1 : Intégration native Vercel (Recommandée)
-
-1. **Connecter votre dépôt GitHub:**
-   - Allez sur [Vercel](https://vercel.com)
-   - Importez votre dépôt GitHub
-   - Vercel détectera automatiquement les paramètres du projet
-
-2. **Configurer les variables d'environnement (si nécessaire):**
-   - Allez dans les paramètres du projet sur Vercel
-   - Ajoutez les variables d'environnement requises
-
-3. **Déploiement automatique:**
-   - Vercel déploiera automatiquement à chaque push sur la branche `main`
-   - Des déploiements de preview sont créés pour les pull requests
-
-L'application sera disponible à `https://your-project.vercel.app`
-
-#### Méthode 2 : GitHub Actions (Alternative)
-
-Si vous préférez utiliser GitHub Actions pour le déploiement, configurez les secrets suivants dans votre dépôt GitHub :
-
-1. **Obtenir les identifiants Vercel:**
-   - Allez sur [Vercel Settings > Tokens](https://vercel.com/account/tokens)
-   - Créez un nouveau token et copiez-le
-   - Allez dans les paramètres de votre projet Vercel pour obtenir `ORG_ID` et `PROJECT_ID`
-
-2. **Configurer les secrets GitHub:**
-   - Allez dans `Settings > Secrets and variables > Actions` de votre dépôt GitHub
-   - Ajoutez les secrets suivants :
-     - `VERCEL_TOKEN` : votre token Vercel
-     - `VERCEL_ORG_ID` : l'ID de votre organisation Vercel
-     - `VERCEL_PROJECT_ID` : l'ID de votre projet Vercel
-
-3. **Déploiement automatique:**
-   - Le workflow `.github/workflows/vercel-deploy.yml` se déclenchera automatiquement à chaque push sur `main`
-   - Le déploiement en production sera effectué automatiquement
-
-### Manual Deployment
+## Build & Deploy
 
 ```bash
-npm install -g vercel
-vercel
+npm run build   # → dist/
 ```
 
-## 🧪 Available NPM Scripts
+Deploy via Vercel Git integration (recommended) or `.github/workflows/vercel-deploy.yml` (Node 20) with secrets `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`.
 
-```bash
-npm run dev      # Start development server (Vite)
-npm run build    # Build for production
-npm run preview  # Preview production build locally
-npm run lint     # Run ESLint
-```
+Optional env for APIs: `MAX_BODY_BYTES`, `ALLOWED_ORIGINS`, `DEBUG=1` (exposes error details).
 
-## 🌐 API Endpoints
+## License
 
-The application exposes the following REST API endpoints:
-
-### POST /api/generate
-
-Generate JSON data from a skeleton.
-
-**Request:**
-```json
-{
-  "skeleton": { ... },
-  "swagger": { ... },  // optional
-  "options": {
-    "count": 5,
-    "seed": 42,
-    "locale": "en_US"
-  }
-}
-```
-
-**Response:**
-```json
-{
-  "success": true,
-  "data": { ... },
-  "metadata": {
-    "generatedAt": "2025-11-25T10:30:00Z",
-    "itemCount": 5
-  }
-}
-```
-
-### POST /api/anonymize
-
-Anonymize sensitive data in JSON.
-
-**Request:**
-```json
-{
-  "data": { ... },
-  "options": {
-    "locale": "en_US"
-  }
-}
-```
-
-**Response:**
-```json
-{
-  "success": true,
-  "data": { ... },
-  "metadata": {
-    "anonymizedFields": 12,
-    "processedAt": "2025-11-25T10:30:00Z"
-  }
-}
-```
-
-### POST /api/analyze
-
-Analyze sensitive fields in JSON data.
-
-**Request:**
-```json
-{
-  "data": { ... }
-}
-```
-
-**Response:**
-```json
-{
-  "success": true,
-  "sensitiveFields": ["user.email", "user.phone"],
-  "totalFields": 2
-}
-```
-
-## 🗺️ Roadmap
-
-See `docs/plan.md` for the current roadmap (accounts, sync, updates, tests, etc.).
-
-## 🛠️ Troubleshooting
-
-- **\"npm command not found\"**: Install Node.js from `https://nodejs.org`, then verify with `node --version`.
-- **Build fails**: Ensure Node.js 18+ is installed and all dependencies are installed with `npm install`.
-- **API errors in production**: Check browser console for error messages. Ensure the serverless functions are properly deployed on Vercel.
-- **API `/api/*` returning 404 in local dev**: This is expected when using `npm run dev` (frontend only). Use `vercel dev` to run the full stack locally (frontend + Python APIs), or point the app to a deployed Vercel instance.
-- **Local development issues**: Make sure Vite dev server is running on port 5173. Check for port conflicts.
-
-## 🔄 Migration from Electron Version
-
-If you were using the Electron desktop version:
-
-- **File operations**: Now handled via browser File API (drag-and-drop or file picker)
-- **No local file system access**: Files must be imported/exported through the browser
-- **Same functionality**: All features are preserved, just accessed through a web interface
-- **Better accessibility**: Works on any device with a modern browser
-
-## 🙌 Acknowledgments
-
-- UI design inspired by Acreom
-- shadcn/ui, Radix UI, Lucide Icons
-- Electron, Vite, Tailwind CSS
-- Faker, JSONPath-Plus
-
-## 📄 License
-
-MIT — see `LICENSE`.
-
-## 💬 Support
-
-- Issues: `https://github.com/jeoste/my-data-toolbox/issues`
-- Discussions: `https://github.com/jeoste/my-data-toolbox/discussions`
-- Contact: jeoffrey.stephan.pro@gmail.com 
+MIT — see [LICENSE](LICENSE).

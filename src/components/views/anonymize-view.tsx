@@ -27,7 +27,7 @@ export function AnonymizeView() {
       let data
       try {
         data = JSON.parse(jsonInput)
-      } catch (parseError) {
+      } catch (_parseError) {
         throw new Error('Invalid JSON format')
       }
 
@@ -73,7 +73,7 @@ export function AnonymizeView() {
       let data
       try {
         data = JSON.parse(content)
-      } catch (parseError) {
+      } catch (_parseError) {
         throw new SyntaxError('Invalid JSON file')
       }
       

@@ -66,7 +66,7 @@ export function ValidatorView() {
           title: t('common.copiedTitle'),
           description: t('common.copiedDescription', { context: 'JSON' }),
         })
-      } catch (error) {
+      } catch (_error) {
         toast({
           title: t('common.error'),
           description: t('common.copyErrorDescription'),

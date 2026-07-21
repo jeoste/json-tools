@@ -4,7 +4,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Zap, FilePlus, Copy, Loader2, FileText, Download } from 'lucide-react'
+import { Zap, Copy, Loader2, FileText, Download } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast-simple'
 import { useTranslation } from 'react-i18next'
 import { apiClient } from '@/lib/api-client'
@@ -30,7 +30,7 @@ export function GenerateView() {
       let skeletonData
       try {
         skeletonData = JSON.parse(skeleton)
-      } catch (parseError) {
+      } catch (_parseError) {
         throw new Error('Invalid JSON format')
       }
 
@@ -83,7 +83,7 @@ export function GenerateView() {
       let skeletonData
       try {
         skeletonData = JSON.parse(content)
-      } catch (parseError) {
+      } catch (_parseError) {
         throw new SyntaxError('Invalid JSON file')
       }
       

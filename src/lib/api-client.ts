@@ -46,8 +46,11 @@ export interface ValidateXmlOptions {
   format?: boolean
 }
 
-export interface ValidateXmlResponse extends APIResponse {
+export interface ValidateXmlResponse {
+  success: boolean
   isValid: boolean
+  data?: unknown
+  details?: string
   formatted?: string
   structure?: {
     rootTag: string
@@ -56,13 +59,15 @@ export interface ValidateXmlResponse extends APIResponse {
     hasText: boolean
     childTags: Record<string, number>
   }
-  error?: {
-    code?: number
-    message: string
-    line?: number
-    column?: number
-    position?: number
-  }
+  error?:
+    | string
+    | {
+        code?: number
+        message: string
+        line?: number
+        column?: number
+        position?: number
+      }
   metadata?: {
     validatedAt: string
   }
@@ -130,7 +135,7 @@ export interface RandomXmlResponse extends APIResponse {
   }
 }
 
-class APIError extends Error {
+export class APIError extends Error {
   constructor(
     message: string,
     public statusCode: number,
@@ -352,7 +357,7 @@ export class APIClient {
       let data
       try {
         data = JSON.parse(text)
-      } catch (parseError) {
+      } catch {
         // If we can't parse JSON but got text, include it in the error
         throw new APIError(
           `Invalid JSON response from server: ${response.status} ${response.statusText}`,

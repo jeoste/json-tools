@@ -3,7 +3,7 @@
  */
 
 import { useState, useCallback } from 'react'
-import { apiClient, APIError } from '@/lib/api-client'
+import { APIError } from '@/lib/api-client'
 
 export function useAPI<T>() {
   const [loading, setLoading] = useState(false)

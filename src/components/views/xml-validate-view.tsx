@@ -68,9 +68,13 @@ export function XmlValidateView() {
           description: t('xmlValidate.toastValidDesc'),
         })
       } else {
+        const err =
+          typeof response.error === 'string'
+            ? { message: response.error }
+            : response.error
         setValidationResult({
           isValid: false,
-          error: response.error,
+          error: err,
         })
         toast({
           title: t('xmlValidate.toastInvalidTitle'),
@@ -103,7 +107,7 @@ export function XmlValidateView() {
           title: t('common.copiedTitle'),
           description: t('common.copiedDescription', { context: 'XML' }),
         })
-      } catch (error) {
+      } catch (_error) {
         toast({
           title: t('common.error'),
           description: t('common.copyErrorDescription'),
