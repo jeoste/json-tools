@@ -175,3 +175,5 @@ electron/node_modules/
 # Frontend TypeScript libs (must be tracked for Vercel build)
 !src/lib/
 !src/lib/**
+.vercel
+.env*

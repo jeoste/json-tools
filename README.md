@@ -2,6 +2,8 @@
 
 > Web app to generate realistic JSON/XML test data, anonymize sensitive fields, validate and query JSON/XML, and work with Swagger/OpenAPI.
 
+**Live:** [https://my-data-toolbox.jeoste.com](https://my-data-toolbox.jeoste.com)
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Node.js](https://img.shields.io/badge/Node.js-20.0%2B-green.svg)](https://nodejs.org)
 [![Python](https://img.shields.io/badge/Python-3.9%2B-blue.svg)](https://python.org)
@@ -77,9 +79,9 @@ npm run test:python  # pytest
 npm run build   # → dist/
 ```
 
-Deploy via Vercel Git integration (recommended) or `.github/workflows/vercel-deploy.yml` (Node 20) with secrets `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`.
+Production is [my-data-toolbox.jeoste.com](https://my-data-toolbox.jeoste.com). Deploys go through the Vercel Git integration on `master`. Manual production deploys: `.github/workflows/vercel-deploy.yml` (`workflow_dispatch`) with secrets `VERCEL_TOKEN`, `VERCEL_ORG_ID`, `VERCEL_PROJECT_ID`.
 
-Optional env for APIs: `MAX_BODY_BYTES`, `ALLOWED_ORIGINS`, `DEBUG=1` (exposes error details).
+Optional env for APIs: `MAX_BODY_BYTES`, `ALLOWED_ORIGINS` (production is set to the live origin), `DEBUG=1` (exposes error details).
 
 ## License
 
