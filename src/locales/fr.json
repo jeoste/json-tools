@@ -15,7 +15,10 @@
     "failed": "Échec",
     "exported": "Exporté",
     "export": "Exporter",
-    "exportSuccess": "Fichier téléchargé avec succès"
+    "exportSuccess": "Fichier téléchargé avec succès",
+    "dropFile": "Déposez un fichier, ou cliquez pour choisir",
+    "fileTooLarge": "Fichier au-delà de {{max}} Mo",
+    "fileProcessError": "Impossible de traiter ce fichier"
   },
   "layout": {
     "appName": "My Data Toolbox",

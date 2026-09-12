@@ -2,9 +2,10 @@
  * File upload component with drag-and-drop support
  */
 
-import { useRef, useState, DragEvent, ChangeEvent } from 'react'
+import { useRef, useState, DragEvent, ChangeEvent, KeyboardEvent } from 'react'
 import { Upload, X } from 'lucide-react'
-import { Button } from '@/components/ui/button'
+import { useTranslation } from 'react-i18next'
+import { cn } from '@/lib/utils'
 
 interface FileUploadProps {
   accept?: string
@@ -21,17 +22,23 @@ export function FileUpload({
   disabled = false,
   className = '',
 }: FileUploadProps) {
+  const { t } = useTranslation()
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [isDragging, setIsDragging] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
+  const openPicker = () => {
+    if (!disabled) {
+      fileInputRef.current?.click()
+    }
+  }
+
   const validateFile = (file: File): boolean => {
     setError(null)
 
-    // Check file size
     const fileSizeMB = file.size / (1024 * 1024)
     if (fileSizeMB > maxSize) {
-      setError(`File size exceeds ${maxSize} MB limit`)
+      setError(t('common.fileTooLarge', { max: maxSize }))
       return false
     }
 
@@ -46,7 +53,7 @@ export function FileUpload({
     try {
       await onFileSelect(file)
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to process file')
+      setError(err instanceof Error ? err.message : t('common.fileProcessError'))
     }
   }
 
@@ -55,7 +62,6 @@ export function FileUpload({
     if (file) {
       handleFile(file)
     }
-    // Reset input
     if (fileInputRef.current) {
       fileInputRef.current.value = ''
     }
@@ -85,17 +91,30 @@ export function FileUpload({
     }
   }
 
+  const handleKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault()
+      openPicker()
+    }
+  }
+
   return (
-    <div className={className}>
+    <div className={cn('min-w-0 w-full', className)}>
       <div
+        role="button"
+        tabIndex={disabled ? -1 : 0}
+        onClick={openPicker}
+        onKeyDown={handleKeyDown}
         onDragOver={handleDragOver}
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
-        className={`
-          flex items-center gap-3 rounded-lg border border-dashed px-3 py-2.5 text-left transition-colors
-          ${isDragging ? 'border-primary bg-primary/5' : 'border-border'}
-          ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:border-primary/40'}
-        `}
+        aria-disabled={disabled}
+        className={cn(
+          'flex min-w-0 w-full items-center gap-3 rounded-lg border border-dashed px-3 py-2.5 text-left transition-colors',
+          'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+          isDragging ? 'border-primary bg-primary/5' : 'border-border',
+          disabled ? 'cursor-not-allowed opacity-50' : 'cursor-pointer hover:border-primary/40'
+        )}
       >
         <input
           ref={fileInputRef}
@@ -107,26 +126,16 @@ export function FileUpload({
         />
         <Upload className="h-4 w-4 shrink-0 text-muted-foreground" />
         <div className="min-w-0 flex-1">
-          <p className="text-xs text-muted-foreground">
-            Drop a file here, or choose one
+          <p className="truncate text-xs text-muted-foreground">
+            {t('common.dropFile')}
           </p>
           {error && (
             <p className="mt-1 flex items-center gap-1 text-xs text-destructive">
-              <X className="h-3 w-3" />
-              {error}
+              <X className="h-3 w-3 shrink-0" />
+              <span className="min-w-0 break-words">{error}</span>
             </p>
           )}
         </div>
-        <Button
-          type="button"
-          variant="outline"
-          size="sm"
-          className="h-7 shrink-0"
-          onClick={() => fileInputRef.current?.click()}
-          disabled={disabled}
-        >
-          Select
-        </Button>
       </div>
     </div>
   )
@@ -162,4 +171,3 @@ export function downloadFile(content: string, filename: string, mimeType: string
   document.body.removeChild(link)
   URL.revokeObjectURL(url)
 }
-

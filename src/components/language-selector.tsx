@@ -38,7 +38,7 @@ export function LanguageSelector({ compact = false }: LanguageSelectorProps) {
           size={compact ? 'sm' : 'default'}
           className={cn(
             'font-normal text-muted-foreground hover:text-foreground',
-            compact ? 'h-8 flex-1 px-2' : 'w-full justify-start'
+            compact ? 'h-8 w-auto px-2' : 'w-full justify-start'
           )}
         >
           <span className="text-[11px] font-medium tracking-wide">{currentLang.short}</span>

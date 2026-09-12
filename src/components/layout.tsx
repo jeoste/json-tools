@@ -138,20 +138,6 @@ export function Layout({ children, currentView, onViewChange }: LayoutProps) {
     },
   ]
 
-  const viewDescriptions: Record<ViewType, string> = {
-    anonymize: t('layout.descriptions.anonymize'),
-    generate: t('layout.descriptions.generate'),
-    swagger: t('layout.descriptions.swagger'),
-    swaggerToJson: t('layout.descriptions.swaggerToJson'),
-    validator: t('layout.descriptions.validator'),
-    jsonpath: t('layout.descriptions.jsonpath'),
-    xmlValidate: t('layout.descriptions.xmlValidate'),
-    xmlPath: t('layout.descriptions.xmlPath'),
-    generateXml: t('layout.descriptions.generateXml'),
-    randomJson: t('layout.descriptions.randomJson'),
-    randomXml: t('layout.descriptions.randomXml'),
-  }
-
   const handleNavigate = (view: ViewType) => {
     onViewChange(view)
     setMobileOpen(false)
@@ -179,7 +165,8 @@ export function Layout({ children, currentView, onViewChange }: LayoutProps) {
       <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
         <SheetContent
           side="left"
-          className="w-56 gap-0 bg-sidebar p-0 text-sidebar-foreground duration-200"
+          hideClose
+          className="w-56 gap-0 bg-sidebar p-0 text-sidebar-foreground"
         >
           <SheetTitle className="sr-only">{t('layout.appName')}</SheetTitle>
           {sidebar}
@@ -187,7 +174,7 @@ export function Layout({ children, currentView, onViewChange }: LayoutProps) {
       </Sheet>
 
       <main className="flex min-w-0 flex-1 flex-col">
-        <header className="flex items-center gap-3 border-b border-border px-4 py-2.5 md:items-start md:px-5 md:py-3">
+        <header className="flex h-11 shrink-0 items-center gap-3 border-b border-border px-4 md:px-5">
           {isMobile && (
             <Button
               type="button"
@@ -200,14 +187,9 @@ export function Layout({ children, currentView, onViewChange }: LayoutProps) {
               <Menu className="h-4 w-4" />
             </Button>
           )}
-          <div className="min-w-0">
-            <h2 className="text-[15px] font-medium leading-tight">
-              {allTools[currentView]?.label || t('layout.appName')}
-            </h2>
-            <p className="mt-1 hidden max-w-3xl text-xs leading-relaxed text-muted-foreground md:block">
-              {viewDescriptions[currentView]}
-            </p>
-          </div>
+          <h2 className="min-w-0 truncate text-[15px] font-medium leading-none">
+            {allTools[currentView]?.label || t('layout.appName')}
+          </h2>
         </header>
         <div className="min-h-0 flex-1 overflow-hidden">{children}</div>
       </main>
@@ -254,7 +236,7 @@ function SidebarPanel({
               <CollapsibleTrigger asChild>
                 <button
                   type="button"
-                  className="flex h-8 w-full items-center justify-between rounded-md px-2 text-[11px] font-medium uppercase tracking-wide text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                  className="flex h-8 w-full items-center justify-between rounded-md px-2 text-[11px] font-medium uppercase tracking-[0.06em] text-muted-foreground outline-none hover:bg-sidebar-accent hover:text-sidebar-accent-foreground focus-visible:ring-2 focus-visible:ring-sidebar-ring"
                 >
                   <span className="flex items-center gap-2">
                     <CategoryIcon className="h-3.5 w-3.5" />
@@ -276,7 +258,7 @@ function SidebarPanel({
                       key={tool.key}
                       type="button"
                       className={cn(
-                        'flex h-8 w-full items-center rounded-md px-2 text-[13px]',
+                        'flex h-8 w-full items-center rounded-md px-2 text-[13px] outline-none focus-visible:ring-2 focus-visible:ring-sidebar-ring',
                         active
                           ? 'bg-sidebar-accent font-medium text-sidebar-accent-foreground'
                           : 'text-muted-foreground hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground'

@@ -6,52 +6,32 @@ type ToastProps = {
   variant?: 'default' | 'destructive' | 'success' | 'warning' | 'info'
 }
 
+const quiet = {
+  background: 'hsl(var(--card))',
+  color: 'hsl(var(--foreground))',
+  border: '1px solid hsl(var(--border))',
+} as const
+
 export const useToast = () => {
   const toast = ({ title, description, variant = 'success' }: ToastProps) => {
+    const options = { description, style: quiet }
+
     switch (variant) {
       case 'destructive':
-        sonnerToast.error(title, {
-          description,
-          style: {
-            background: 'var(--danger)',
-            color: 'white',
-            border: '1px solid var(--danger)',
-          },
-        })
+        sonnerToast.error(title, options)
         break
       case 'warning':
-        sonnerToast.warning(title, {
-          description,
-          style: {
-            background: 'var(--warning)',
-            color: 'white',
-            border: '1px solid var(--warning)',
-          },
-        })
+        sonnerToast.warning(title, options)
         break
       case 'info':
-        sonnerToast.info(title, {
-          description,
-          style: {
-            background: 'var(--info)',
-            color: 'white',
-            border: '1px solid var(--info)',
-          },
-        })
+        sonnerToast.info(title, options)
         break
       case 'success':
       default:
-        sonnerToast.success(title, {
-          description,
-          style: {
-            background: 'var(--success)',
-            color: 'white',
-            border: '1px solid var(--success)',
-          },
-        })
+        sonnerToast.success(title, options)
         break
     }
   }
 
   return { toast }
-} 
+}

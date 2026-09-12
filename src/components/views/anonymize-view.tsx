@@ -197,9 +197,9 @@ export function AnonymizeView() {
               <FileText className="h-4 w-4" />
               {t('anonymize.resultTitle')}
             </CardTitle>
-            <CardDescription>
-              {anonymized ? t('anonymize.resultLabel') : t('anonymize.resultPlaceholder')}
-            </CardDescription>
+            {anonymized ? (
+              <CardDescription>{t('anonymize.resultLabel')}</CardDescription>
+            ) : null}
           </CardHeader>
           <CardContent className="flex min-h-0 flex-1 flex-col">
             {anonymized ? (
@@ -222,11 +222,11 @@ export function AnonymizeView() {
                 </pre>
               </div>
             ) : (
-              <div className="flex min-h-[10rem] flex-1 items-center justify-center text-muted-foreground">
-                <div className="text-center">
+              <div className="flex min-h-[10rem] flex-1 items-center justify-center px-4 text-muted-foreground">
+                <div className="max-w-[16rem] text-center">
                   <Lock className="mx-auto mb-2 h-5 w-5 opacity-50" />
-                  <p>{t('anonymize.noDataTitle')}</p>
-                  <p className="text-sm">{t('anonymize.noDataDesc')}</p>
+                  <p className="text-sm">{t('anonymize.noDataTitle')}</p>
+                  <p className="mt-1 text-xs leading-relaxed">{t('anonymize.noDataDesc')}</p>
                 </div>
               </div>
             )}

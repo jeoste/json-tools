@@ -15,7 +15,10 @@
     "failed": "Failed",
     "exported": "Exported",
     "export": "Export",
-    "exportSuccess": "File downloaded successfully"
+    "exportSuccess": "File downloaded successfully",
+    "dropFile": "Drop a file here, or click to choose",
+    "fileTooLarge": "File exceeds {{max}} MB",
+    "fileProcessError": "Could not process that file"
   },
   "layout": {
     "appName": "My Data Toolbox",

@@ -228,7 +228,9 @@ export function GenerateView() {
               <Zap className="h-4 w-4" />
               {t('generate.resultTitle')}
             </CardTitle>
-            <CardDescription>{generated ? t('generate.resultLabel') : t('generate.resultPlaceholder')}</CardDescription>
+            {generated ? (
+              <CardDescription>{t('generate.resultLabel')}</CardDescription>
+            ) : null}
           </CardHeader>
           <CardContent className="flex-1 flex flex-col min-h-0">
             {generated ? (
@@ -251,11 +253,11 @@ export function GenerateView() {
                 </pre>
               </div>
             ) : (
-              <div className="flex min-h-[10rem] flex-1 items-center justify-center text-muted-foreground">
-                <div className="text-center">
+              <div className="flex min-h-[10rem] flex-1 items-center justify-center px-4 text-muted-foreground">
+                <div className="max-w-[16rem] text-center">
                   <Zap className="mx-auto mb-2 h-5 w-5 opacity-50" />
-                  <p>{t('generate.noDataTitle')}</p>
-                  <p className="text-sm">{t('generate.noDataDesc')}</p>
+                  <p className="text-sm">{t('generate.noDataTitle')}</p>
+                  <p className="mt-1 text-xs leading-relaxed">{t('generate.noDataDesc')}</p>
                 </div>
               </div>
             )}

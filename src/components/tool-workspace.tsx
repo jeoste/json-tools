@@ -14,8 +14,7 @@ export function ToolWorkspace({
   return (
     <div
       className={cn(
-        'flex h-full min-h-0 flex-col p-4 lg:p-5',
-        'overflow-auto',
+        'flex h-full min-h-0 flex-col overflow-x-hidden overflow-y-auto p-4 lg:p-5',
         columns === 2 && 'lg:overflow-hidden',
         className
       )}

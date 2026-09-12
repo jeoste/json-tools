@@ -12,7 +12,10 @@
     "generate": "생성",
     "loading": "로딩 중...",
     "success": "성공",
-    "failed": "실패"
+    "failed": "실패",
+    "dropFile": "파일을 놓거나 클릭해서 선택",
+    "fileTooLarge": "파일이 {{max}} MB를 초과합니다",
+    "fileProcessError": "파일을 처리할 수 없습니다"
   },
   "layout": {
     "appName": "My Data Toolbox",
