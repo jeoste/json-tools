@@ -16,6 +16,7 @@
   },
   "layout": {
     "appName": "My Data Toolbox",
+    "openMenu": "메뉴 열기",
     "navigation": {
       "anonymize": "익명화",
       "generate": "생성", 

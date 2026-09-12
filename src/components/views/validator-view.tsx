@@ -7,6 +7,7 @@ import { CheckCircle, XCircle, Copy, FileText, Save } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast-simple'
 import { useTranslation } from 'react-i18next'
 import { FileUpload, readFileAsText, downloadFile } from '@/components/file-upload'
+import { ToolWorkspace } from '@/components/tool-workspace'
 
 export function ValidatorView() {
   const [jsonInput, setJsonInput] = useState('')
@@ -77,13 +78,12 @@ export function ValidatorView() {
   }
 
   return (
-    <div className="container mx-auto p-4 sm:p-6 max-w-[1600px]">
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6">
+    <ToolWorkspace>
         {/* Input Panel */}
-        <Card className="h-full flex flex-col">
+        <Card className="flex min-h-0 flex-col lg:h-full">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <FileText className="w-5 h-5" />
+              <FileText className="h-4 w-4" />
               {t('validator.inputTitle')}
             </CardTitle>
             <CardDescription>
@@ -95,7 +95,7 @@ export function ValidatorView() {
               placeholder={t('validator.placeholder')}
               value={jsonInput}
               onChange={(e) => setJsonInput(e.target.value)}
-              className="min-h-[400px] font-mono text-sm flex-1"
+              className="min-h-[12rem] flex-1 font-mono text-sm"
             />
             <FileUpload
               accept=".json"
@@ -121,22 +121,22 @@ export function ValidatorView() {
         </Card>
 
         {/* Result Panel */}
-        <Card className="h-full flex flex-col">
+        <Card className="flex min-h-0 flex-col lg:h-full">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               {validationResult?.isValid ? (
                 <>
-                  <CheckCircle className="w-5 h-5 text-green-600 dark:text-green-400" />
+                  <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
                   {t('validator.result.valid')}
                 </>
               ) : validationResult?.error ? (
                 <>
-                  <XCircle className="w-5 h-5 text-destructive" />
+                  <XCircle className="h-4 w-4 text-destructive" />
                   {t('validator.result.invalid')}
                 </>
               ) : (
                 <>
-                  <FileText className="w-5 h-5" />
+                  <FileText className="h-4 w-4" />
                   {t('validator.result.title')}
                 </>
               )}
@@ -166,7 +166,7 @@ export function ValidatorView() {
                     </Button>
                   </div>
                 </div>
-                <pre className="bg-muted p-4 rounded-lg overflow-auto flex-1 text-sm min-h-[600px]">
+                <pre className="min-h-[10rem] flex-1 overflow-auto rounded-lg bg-muted/40 p-3 text-sm">
                   <code>{validationResult.formatted}</code>
                 </pre>
               </div>
@@ -190,9 +190,9 @@ export function ValidatorView() {
             )}
             
             {!validationResult && (
-              <div className="flex items-center justify-center min-h-[600px] text-muted-foreground">
+              <div className="flex min-h-[10rem] flex-1 items-center justify-center text-muted-foreground">
                 <div className="text-center">
-                  <FileText className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                  <FileText className="mx-auto mb-2 h-5 w-5 opacity-50" />
                   <p>{t('validator.noJson')}</p>
                   <p className="text-sm">{t('validator.submitToValidate')}</p>
                 </div>
@@ -200,7 +200,6 @@ export function ValidatorView() {
             )}
           </CardContent>
         </Card>
-      </div>
-    </div>
+    </ToolWorkspace>
   )
 } 

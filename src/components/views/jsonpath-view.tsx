@@ -15,6 +15,7 @@ import { Search, FileText, Copy, BookOpen, ChevronDown, ChevronUp } from 'lucide
 import { useToast } from '@/hooks/use-toast-simple'
 import { JSONPath } from 'jsonpath-plus'
 import { useTranslation } from 'react-i18next'
+import { ToolWorkspace } from '@/components/tool-workspace'
 
 export function JsonPathView() {
   const [jsonInput, setJsonInput] = useState('')
@@ -143,14 +144,13 @@ export function JsonPathView() {
 }`
 
   return (
-    <div className="container mx-auto p-6 max-w-7xl">
-      <div className="space-y-6">
+    <ToolWorkspace columns={1}>
         {/* Instructions Panel - Collapsible at top */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <BookOpen className="w-5 h-5" />
+                <BookOpen className="h-4 w-4" />
                 {t('jsonpath.instructions.title')}
               </div>
               <Button
@@ -403,7 +403,7 @@ export function JsonPathView() {
           <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Search className="w-5 h-5" />
+              <Search className="h-4 w-4" />
               {t('jsonpath.inputTitle')}
             </CardTitle>
             <CardDescription>
@@ -466,7 +466,7 @@ export function JsonPathView() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <FileText className="w-5 h-5" />
+                <FileText className="h-4 w-4" />
                 {t('jsonpath.resultTitle')}
               </CardTitle>
               <CardDescription>
@@ -487,14 +487,14 @@ export function JsonPathView() {
                       {t('common.copy')}
                     </Button>
                   </div>
-                  <pre className="bg-muted p-4 rounded-lg overflow-auto max-h-[350px] text-sm">
+                  <pre className="min-h-[10rem] max-h-[28rem] flex-1 overflow-auto rounded-lg bg-muted/40 p-3 text-sm">
                     <code>{result}</code>
                   </pre>
                 </div>
               ) : !error ? (
-                <div className="flex items-center justify-center h-[400px] text-muted-foreground">
+                <div className="flex min-h-[10rem] flex-1 items-center justify-center text-muted-foreground">
                   <div className="text-center">
-                    <Search className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                    <Search className="mx-auto mb-2 h-5 w-5 opacity-50" />
                     <p>{t('jsonpath.noDataTitle')}</p>
                     <p className="text-sm">{t('jsonpath.noDataDesc')}</p>
                   </div>
@@ -503,7 +503,6 @@ export function JsonPathView() {
             </CardContent>
           </Card>
         </div>
-      </div>
-    </div>
+    </ToolWorkspace>
   )
 } 

@@ -8,55 +8,49 @@
    * ===================================== */
   
   :root {
-    /* --- Couleurs de base (Mode Clair) --- */
-    --bg-dark: hsl(212 34% 90%);
-    --bg: hsl(212 73% 95%);
-    --bg-light: hsl(212 100% 100%);
-    --text: hsl(214 77% 5%);
-    --text-muted: hsl(211 19% 29%);
-    --highlight: hsl(212 100% 100%);
-    --border: 0 0% 89.8%;
-    --border-muted: hsl(212 17% 63%);
+    --bg-dark: hsl(212 24% 90%);
+    --bg: hsl(212 32% 96%);
+    --bg-light: hsl(212 40% 99%);
+    --text: hsl(214 28% 12%);
+    --text-muted: hsl(211 12% 38%);
+    --highlight: hsl(212 40% 99%);
+    --border-muted: hsl(212 12% 78%);
 
-    /* --- Couleurs sémantiques --- */
-    --primary: 0 0% 9%;
-    --secondary: 0 0% 96.1%;
-    --danger:  hsl(  0  85% 65%);
-    --warning: hsl( 45 100% 60%);
-    --success: hsl(145  65% 55%);
-    --info:    hsl(210  95% 60%);
-    
-    /* --- Variables Shadcn/UI (Mode Clair) --- */
-    --background: 0 0% 100%;
-    --foreground: 0 0% 3.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 3.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 3.9%;
-    --primary: 209 71% 28%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 212 73% 90%;
-    --secondary-foreground: 0 0% 9%;
-    --muted: 0 0% 96.1%;
-    --muted-foreground: 0 0% 45.1%;
-    --accent: 0 0% 96.1%;
-    --accent-foreground: 0 0% 9%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 212 12% 51%;
-    --input: 0 0% 89.8%;
-    --ring: 0 0% 3.9%;
-    --radius: 0.5rem;
+    --danger: hsl(0 72% 48%);
+    --warning: hsl(38 88% 46%);
+    --success: hsl(152 42% 36%);
+    --info: hsl(209 62% 42%);
+
+    --background: 212 32% 96%;
+    --foreground: 214 28% 12%;
+    --card: 212 40% 99%;
+    --card-foreground: 214 28% 12%;
+    --popover: 212 40% 99%;
+    --popover-foreground: 214 28% 12%;
+    --primary: 209 58% 32%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 212 18% 91%;
+    --secondary-foreground: 214 28% 12%;
+    --muted: 212 18% 92%;
+    --muted-foreground: 211 10% 40%;
+    --accent: 212 18% 91%;
+    --accent-foreground: 214 28% 12%;
+    --destructive: 0 72% 48%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 212 14% 84%;
+    --input: 212 14% 84%;
+    --ring: 209 58% 32%;
+    --radius: 0.625rem;
 
     /* --- Sidebar (Mode Clair) --- */
-    --sidebar-background: 212 73% 98%;
-    --sidebar-foreground: 214 77% 10%;
-    --sidebar-primary: 209 71% 28%;
-    --sidebar-primary-foreground: 212 100% 100%;
-    --sidebar-accent: 212 73% 92%;
-    --sidebar-accent-foreground: 214 77% 10%;
-    --sidebar-border: 212 12% 75%;
-    --sidebar-ring: 209 71% 28%;
+    --sidebar-background: 212 28% 94%;
+    --sidebar-foreground: 214 22% 18%;
+    --sidebar-primary: 209 58% 32%;
+    --sidebar-primary-foreground: 210 40% 98%;
+    --sidebar-accent: 212 22% 90%;
+    --sidebar-accent-foreground: 214 22% 14%;
+    --sidebar-border: 212 14% 86%;
+    --sidebar-ring: 209 58% 32%;
     --chart-1: 12 76% 61%;
     --chart-2: 173 58% 39%;
     --chart-3: 197 37% 24%;
@@ -69,54 +63,48 @@
    * ===================================== */
   
   .light {
-    /* --- Couleurs de base (Mode Clair) --- */
-    --bg-dark: hsl(212 34% 90%);
-    --bg: hsl(212 73% 95%);
-    --bg-light: hsl(212 100% 100%);
-    --text: hsl(214 77% 5%);
-    --text-muted: hsl(211 19% 29%);
-    --highlight: hsl(212 100% 100%);
-    --border: hsl(212 12% 51%);
-    --border-muted: hsl(212 17% 63%);
+    --bg-dark: hsl(212 24% 90%);
+    --bg: hsl(212 32% 96%);
+    --bg-light: hsl(212 40% 99%);
+    --text: hsl(214 28% 12%);
+    --text-muted: hsl(211 12% 38%);
+    --highlight: hsl(212 40% 99%);
+    --border-muted: hsl(212 12% 78%);
 
-    /* --- Couleurs sémantiques --- */
-    --primary: hsl(209 71% 28%);
-    --secondary: hsl(38 100% 17%);
-    --danger:  hsl(  0  80% 55%);
-    --warning: hsl( 45  95% 54%);
-    --success: hsl(145  60% 45%);
-    --info:    hsl(210  90% 50%);
-    
-    /* --- Variables Shadcn/UI --- */
-    --background: 212 73% 95%;
-    --foreground: 214 77% 5%;
-    --card: 212 100% 100%;
-    --card-foreground: 214 77% 5%;
-    --popover: 212 100% 100%;
-    --popover-foreground: 214 77% 5%;
-    --primary: 209 71% 28%;
-    --primary-foreground: 212 100% 100%;
-    --secondary: 212 73% 90%;
-    --secondary-foreground: 214 77% 5%;
-    --muted: 212 73% 90%;
-    --muted-foreground: 211 19% 29%;
-    --accent: 212 73% 88%;
-    --accent-foreground: 214 77% 5%;
-    --destructive: 0 72% 51%;
+    --danger: hsl(0 72% 48%);
+    --warning: hsl(38 88% 46%);
+    --success: hsl(152 42% 36%);
+    --info: hsl(209 62% 42%);
+
+    --background: 212 32% 96%;
+    --foreground: 214 28% 12%;
+    --card: 212 40% 99%;
+    --card-foreground: 214 28% 12%;
+    --popover: 212 40% 99%;
+    --popover-foreground: 214 28% 12%;
+    --primary: 209 58% 32%;
+    --primary-foreground: 210 40% 98%;
+    --secondary: 212 18% 91%;
+    --secondary-foreground: 214 28% 12%;
+    --muted: 212 18% 92%;
+    --muted-foreground: 211 10% 40%;
+    --accent: 212 18% 91%;
+    --accent-foreground: 214 28% 12%;
+    --destructive: 0 72% 48%;
     --destructive-foreground: 0 0% 100%;
-    --border: 212 12% 51%;
-    --input: 212 73% 90%;
-    --ring: 209 71% 28%;
+    --border: 212 14% 84%;
+    --input: 212 14% 84%;
+    --ring: 209 58% 32%;
 
     /* --- Sidebar --- */
-    --sidebar-background: 212 73% 98%;
-    --sidebar-foreground: 214 77% 10%;
-    --sidebar-primary: 209 71% 28%;
-    --sidebar-primary-foreground: 212 100% 100%;
-    --sidebar-accent: 212 73% 92%;
-    --sidebar-accent-foreground: 214 77% 10%;
-    --sidebar-border: 212 12% 75%;
-    --sidebar-ring: 209 71% 28%;
+    --sidebar-background: 212 28% 94%;
+    --sidebar-foreground: 214 22% 18%;
+    --sidebar-primary: 209 58% 32%;
+    --sidebar-primary-foreground: 210 40% 98%;
+    --sidebar-accent: 212 22% 90%;
+    --sidebar-accent-foreground: 214 22% 14%;
+    --sidebar-border: 212 14% 86%;
+    --sidebar-ring: 209 58% 32%;
   }
 
   /* =====================================
@@ -124,54 +112,47 @@
    * ===================================== */
   
   .dark {
-    /* --- Couleurs de base (Mode Sombre) --- */
-    --bg-dark: hsl(212 34% 10%);
-    --bg: hsl(212 73% 8%);
-    --bg-light: hsl(212 50% 15%);
-    --text: hsl(214 77% 95%);
-    --text-muted: hsl(211 19% 71%);
-    --highlight: hsl(212 100% 20%);
-    --border: 0 0% 14.9%;
-    --border-muted: hsl(212 17% 37%);
+    --bg-dark: hsl(212 22% 6%);
+    --bg: hsl(212 24% 8%);
+    --bg-light: hsl(212 18% 13%);
+    --text: hsl(210 20% 94%);
+    --text-muted: hsl(212 10% 68%);
+    --highlight: hsl(212 18% 16%);
+    --border-muted: hsl(212 12% 22%);
 
-    /* --- Couleurs sémantiques --- */
-    --primary: 0 0% 98%;
-    --secondary: 0 0% 14.9%;
-    --danger: hsl(0 80% 55%);
-    --warning: hsl(45 95% 54%);
-    --success: hsl(145 60% 45%);
-    --info: hsl(210 90% 50%);
-    
-    /* --- Variables Shadcn/UI --- */
-    --background: 0 0% 3.9%;
-    --foreground: 0 0% 98%;
-    --card: 0 0% 3.9%;
-    --card-foreground: 0 0% 98%;
-    --popover: 0 0% 3.9%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 209 71% 72%;
-    --primary-foreground: 0 0% 9%;
-    --secondary: 212 50% 20%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 14.9%;
-    --muted-foreground: 0 0% 63.9%;
-    --accent: 0 0% 14.9%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
+    --danger: hsl(0 62% 58%);
+    --warning: hsl(38 78% 58%);
+    --success: hsl(152 38% 48%);
+    --info: hsl(209 62% 62%);
+
+    --background: 212 24% 8%;
+    --foreground: 210 20% 94%;
+    --card: 212 20% 10%;
+    --card-foreground: 210 20% 94%;
+    --popover: 212 20% 11%;
+    --popover-foreground: 210 20% 94%;
+    --primary: 209 52% 68%;
+    --primary-foreground: 212 28% 10%;
+    --secondary: 212 16% 16%;
+    --secondary-foreground: 210 20% 94%;
+    --muted: 212 16% 14%;
+    --muted-foreground: 212 10% 64%;
+    --accent: 212 16% 16%;
+    --accent-foreground: 210 20% 94%;
+    --destructive: 0 55% 42%;
     --destructive-foreground: 0 0% 98%;
-    --border: 212 12% 49%;
-    --input: 0 0% 14.9%;
-    --ring: 0 0% 83.1%;
+    --border: 212 12% 18%;
+    --input: 212 12% 18%;
+    --ring: 209 52% 68%;
 
-    /* --- Sidebar --- */
-    --sidebar-background: 212 73% 5%;
-    --sidebar-foreground: 214 77% 90%;
-    --sidebar-primary: 209 71% 72%;
-    --sidebar-primary-foreground: 212 73% 8%;
-    --sidebar-accent: 212 50% 18%;
-    --sidebar-accent-foreground: 214 77% 90%;
-    --sidebar-border: 212 12% 35%;
-    --sidebar-ring: 209 71% 72%;
+    --sidebar-background: 212 26% 7%;
+    --sidebar-foreground: 210 16% 88%;
+    --sidebar-primary: 209 52% 68%;
+    --sidebar-primary-foreground: 212 28% 10%;
+    --sidebar-accent: 212 18% 14%;
+    --sidebar-accent-foreground: 210 20% 94%;
+    --sidebar-border: 212 12% 14%;
+    --sidebar-ring: 209 52% 68%;
     --chart-1: 220 70% 50%;
     --chart-2: 160 60% 45%;
     --chart-3: 30 80% 55%;
@@ -190,8 +171,18 @@
   }
   
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground antialiased;
     font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-feature-settings: 'ss01' on, 'cv11' on;
+  }
+
+  ::selection {
+    background: hsl(var(--primary) / 0.22);
+    color: hsl(var(--foreground));
+  }
+
+  :focus-visible {
+    outline-color: hsl(var(--ring));
   }
 }
 
@@ -200,18 +191,20 @@
  * ===================================== */
 
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 10px;
+  height: 10px;
 }
 
 ::-webkit-scrollbar-track {
-  @apply bg-muted;
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-border rounded-sm;
+  background: hsl(var(--border));
+  border: 2px solid hsl(var(--background));
+  border-radius: 999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  @apply bg-muted-foreground;
+  background: hsl(var(--muted-foreground) / 0.45);
 } 

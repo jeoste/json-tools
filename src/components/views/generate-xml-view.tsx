@@ -9,6 +9,7 @@ import { useToast } from '@/hooks/use-toast-simple'
 import { useTranslation } from 'react-i18next'
 import { apiClient } from '@/lib/api-client'
 import { FileUpload, readFileAsText, downloadFile } from '@/components/file-upload'
+import { ToolWorkspace } from '@/components/tool-workspace'
 
 export function GenerateXmlView() {
   const [skeleton, setSkeleton] = useState('')
@@ -136,13 +137,12 @@ export function GenerateXmlView() {
   }
 
   return (
-    <div className="container mx-auto p-4 sm:p-6 max-w-[1600px]">
-      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4 sm:gap-6">
+    <ToolWorkspace>
         {/* Input Panel */}
-        <Card className="h-full flex flex-col">
+        <Card className="flex min-h-0 flex-col lg:h-full">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <FileText className="w-5 h-5" />
+              <FileText className="h-4 w-4" />
               {t('generateXml.skeletonTitle')}
             </CardTitle>
             <CardDescription>
@@ -152,7 +152,7 @@ export function GenerateXmlView() {
           <CardContent className="space-y-4 flex-1 flex flex-col">
             <Textarea
               placeholder={t('generateXml.placeholder')}
-              className="min-h-[400px] font-mono text-sm flex-1"
+              className="min-h-[12rem] flex-1 font-mono text-sm"
               value={skeleton}
               onChange={(e) => setSkeleton(e.target.value)}
             />
@@ -198,10 +198,10 @@ export function GenerateXmlView() {
         </Card>
 
         {/* Result Panel */}
-        <Card className="h-full flex flex-col">
+        <Card className="flex min-h-0 flex-col lg:h-full">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Zap className="w-5 h-5" />
+              <Zap className="h-4 w-4" />
               {t('generateXml.resultTitle')}
             </CardTitle>
             <CardDescription>{generated ? t('generateXml.resultLabel') : t('generateXml.resultPlaceholder')}</CardDescription>
@@ -222,14 +222,14 @@ export function GenerateXmlView() {
                     </Button>
                   </div>
                 </div>
-                <pre className="bg-muted p-4 rounded-lg overflow-auto flex-1 text-sm min-h-[600px]">
+                <pre className="min-h-[10rem] flex-1 overflow-auto rounded-lg bg-muted/40 p-3 text-sm">
                   <code>{generated}</code>
                 </pre>
               </div>
             ) : (
-              <div className="flex items-center justify-center min-h-[600px] text-muted-foreground">
+              <div className="flex min-h-[10rem] flex-1 items-center justify-center text-muted-foreground">
                 <div className="text-center">
-                  <Zap className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                  <Zap className="mx-auto mb-2 h-5 w-5 opacity-50" />
                   <p>{t('generateXml.noDataTitle')}</p>
                   <p className="text-sm">{t('generateXml.noDataDesc')}</p>
                 </div>
@@ -237,8 +237,7 @@ export function GenerateXmlView() {
             )}
           </CardContent>
         </Card>
-      </div>
-    </div>
+    </ToolWorkspace>
   )
 }
 

@@ -92,9 +92,9 @@ export function FileUpload({
         onDragLeave={handleDragLeave}
         onDrop={handleDrop}
         className={`
-          border-2 border-dashed rounded-lg p-6 text-center transition-colors
-          ${isDragging ? 'border-primary bg-primary/5' : 'border-muted-foreground/25'}
-          ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:border-primary/50'}
+          flex items-center gap-3 rounded-lg border border-dashed px-3 py-2.5 text-left transition-colors
+          ${isDragging ? 'border-primary bg-primary/5' : 'border-border'}
+          ${disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer hover:border-primary/40'}
         `}
       >
         <input
@@ -105,25 +105,28 @@ export function FileUpload({
           disabled={disabled}
           className="hidden"
         />
-        <Upload className="w-8 h-8 mx-auto mb-2 opacity-50" />
-        <p className="text-sm text-muted-foreground mb-2">
-          Drag and drop a file here, or click to select
-        </p>
+        <Upload className="h-4 w-4 shrink-0 text-muted-foreground" />
+        <div className="min-w-0 flex-1">
+          <p className="text-xs text-muted-foreground">
+            Drop a file here, or choose one
+          </p>
+          {error && (
+            <p className="mt-1 flex items-center gap-1 text-xs text-destructive">
+              <X className="h-3 w-3" />
+              {error}
+            </p>
+          )}
+        </div>
         <Button
           type="button"
           variant="outline"
           size="sm"
+          className="h-7 shrink-0"
           onClick={() => fileInputRef.current?.click()}
           disabled={disabled}
         >
-          Select File
+          Select
         </Button>
-        {error && (
-          <div className="mt-2 text-sm text-destructive flex items-center justify-center gap-2">
-            <X className="w-4 h-4" />
-            {error}
-          </div>
-        )}
       </div>
     </div>
   )

@@ -1,4 +1,16 @@
-import { Lock, Zap, FileText, CheckCircle, Search, ChevronDown, ChevronRight, Code2, FileCode, Shuffle } from 'lucide-react'
+import {
+  Lock,
+  Zap,
+  FileText,
+  CheckCircle,
+  Search,
+  ChevronDown,
+  ChevronRight,
+  Code2,
+  FileCode,
+  Shuffle,
+  Menu,
+} from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { ViewType } from '@/App'
 import logoPng from '@/assets/logo.png'
@@ -11,6 +23,8 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from '@/components/ui/collapsible'
+import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet'
+import { useIsMobile } from '@/hooks/use-mobile'
 import { useState } from 'react'
 
 interface LayoutProps {
@@ -33,6 +47,8 @@ interface NavigationCategory {
 
 export function Layout({ children, currentView, onViewChange }: LayoutProps) {
   const { t } = useTranslation()
+  const isMobile = useIsMobile()
+  const [mobileOpen, setMobileOpen] = useState(false)
   const [openCategories, setOpenCategories] = useState<Record<string, boolean>>({
     JSON: true,
     XML: true,
@@ -40,57 +56,57 @@ export function Layout({ children, currentView, onViewChange }: LayoutProps) {
 
   const allTools: Record<ViewType, NavigationItem> = {
     anonymize: {
-      key: 'anonymize' as ViewType,
+      key: 'anonymize',
       label: t('layout.navigation.anonymize'),
       icon: Lock,
     },
     generate: {
-      key: 'generate' as ViewType,
+      key: 'generate',
       label: t('layout.navigation.generate'),
       icon: Zap,
     },
     swagger: {
-      key: 'swagger' as ViewType,
+      key: 'swagger',
       label: t('layout.navigation.swagger'),
       icon: FileText,
     },
     swaggerToJson: {
-      key: 'swaggerToJson' as ViewType,
+      key: 'swaggerToJson',
       label: t('layout.navigation.swaggerToJson'),
       icon: FileText,
     },
     validator: {
-      key: 'validator' as ViewType,
+      key: 'validator',
       label: t('layout.navigation.validator'),
       icon: CheckCircle,
     },
     jsonpath: {
-      key: 'jsonpath' as ViewType,
+      key: 'jsonpath',
       label: t('layout.navigation.jsonpath'),
       icon: Search,
     },
     xmlValidate: {
-      key: 'xmlValidate' as ViewType,
+      key: 'xmlValidate',
       label: t('layout.navigation.xmlValidate'),
       icon: CheckCircle,
     },
     xmlPath: {
-      key: 'xmlPath' as ViewType,
+      key: 'xmlPath',
       label: t('layout.navigation.xmlPath'),
       icon: Search,
     },
     generateXml: {
-      key: 'generateXml' as ViewType,
+      key: 'generateXml',
       label: t('layout.navigation.generateXml'),
       icon: Zap,
     },
     randomJson: {
-      key: 'randomJson' as ViewType,
+      key: 'randomJson',
       label: t('layout.navigation.randomJson'),
       icon: Shuffle,
     },
     randomXml: {
-      key: 'randomXml' as ViewType,
+      key: 'randomXml',
       label: t('layout.navigation.randomXml'),
       icon: Shuffle,
     },
@@ -136,110 +152,152 @@ export function Layout({ children, currentView, onViewChange }: LayoutProps) {
     randomXml: t('layout.descriptions.randomXml'),
   }
 
-  const getViewTitle = (view: ViewType) => {
-    return allTools[view]?.label || t('layout.appName')
+  const handleNavigate = (view: ViewType) => {
+    onViewChange(view)
+    setMobileOpen(false)
   }
 
-  const toggleCategory = (category: string) => {
-    setOpenCategories(prev => ({
-      ...prev,
-      [category]: !prev[category],
-    }))
-  }
+  const sidebar = (
+    <SidebarPanel
+      appName={t('layout.appName')}
+      categories={navigationCategories}
+      currentView={currentView}
+      openCategories={openCategories}
+      onToggleCategory={(category) =>
+        setOpenCategories((prev) => ({ ...prev, [category]: !prev[category] }))
+      }
+      onNavigate={handleNavigate}
+    />
+  )
 
   return (
-    <div className="flex h-screen bg-background">
-      {/* Sidebar */}
-      <aside className="w-64 bg-card border-r border-border flex flex-col">
-        <div className="p-6 flex-1 flex flex-col">
-          <div className="flex items-center gap-2 mb-8">
-            <img
-              src={logoPng}
-              alt="JSON Tools logo"
-              className="w-8 h-8 rounded-md object-cover"
-            />
-            <h1 className="text-xl font-medium">{t('layout.appName')}</h1>
-          </div>
-          
-          <nav className="space-y-1">
-            {navigationCategories.map((category) => {
-              const CategoryIcon = category.icon
-              const isOpen = openCategories[category.category]
-              return (
-                <Collapsible
-                  key={category.category}
-                  open={isOpen}
-                  onOpenChange={() => toggleCategory(category.category)}
-                >
-                  <CollapsibleTrigger asChild>
-                    <Button
-                      variant="ghost"
-                      className="w-full justify-between font-semibold text-sm text-foreground hover:bg-accent"
-                    >
-                      <div className="flex items-center">
-                        <CategoryIcon className="w-4 h-4 mr-2" />
-                        {category.category}
-                      </div>
-                      {isOpen ? (
-                        <ChevronDown className="w-4 h-4" />
-                      ) : (
-                        <ChevronRight className="w-4 h-4" />
-                      )}
-                    </Button>
-                  </CollapsibleTrigger>
-                  <CollapsibleContent className="space-y-1 pl-4">
-                    {category.tools.map((tool) => {
-                      const ToolIcon = tool.icon
-                      return (
-                        <Button
-                          key={tool.key}
-                          variant="ghost"
-                          className={cn(
-                            "w-full justify-start font-normal",
-                            currentView === tool.key
-                              ? "border-l-4 border-primary bg-primary/10 text-primary"
-                              : "text-muted-foreground"
-                          )}
-                          onClick={() => onViewChange(tool.key)}
-                        >
-                          <ToolIcon className="w-4 h-4 mr-2" />
-                          {tool.label}
-                        </Button>
-                      )
-                    })}
-                  </CollapsibleContent>
-                </Collapsible>
-              )
-            })}
-          </nav>
-
-          {/* Sélecteurs de langue et thème */}
-          <div className="mt-6 space-y-2">
-            <LanguageSelector />
-            <ThemeSelector />
-          </div>
-        </div>
+    <div className="flex h-dvh bg-background">
+      <aside className="hidden w-56 shrink-0 flex-col border-r border-sidebar-border bg-sidebar text-sidebar-foreground md:flex">
+        {sidebar}
       </aside>
 
-      {/* Main Content */}
-      <main className="flex-1 flex flex-col">
-        {/* Header */}
-        <header className="border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-          <div className="flex flex-col gap-1 px-6 py-3">
-            <h2 className="text-lg font-medium">
-              {getViewTitle(currentView)}
+      <Sheet open={mobileOpen} onOpenChange={setMobileOpen}>
+        <SheetContent
+          side="left"
+          className="w-56 gap-0 bg-sidebar p-0 text-sidebar-foreground duration-200"
+        >
+          <SheetTitle className="sr-only">{t('layout.appName')}</SheetTitle>
+          {sidebar}
+        </SheetContent>
+      </Sheet>
+
+      <main className="flex min-w-0 flex-1 flex-col">
+        <header className="flex items-center gap-3 border-b border-border px-4 py-2.5 md:items-start md:px-5 md:py-3">
+          {isMobile && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="icon"
+              className="h-8 w-8 shrink-0"
+              onClick={() => setMobileOpen(true)}
+              aria-label={t('layout.openMenu')}
+            >
+              <Menu className="h-4 w-4" />
+            </Button>
+          )}
+          <div className="min-w-0">
+            <h2 className="text-[15px] font-medium leading-tight">
+              {allTools[currentView]?.label || t('layout.appName')}
             </h2>
-            <p className="text-sm leading-relaxed text-foreground/80">
+            <p className="mt-1 hidden max-w-3xl text-xs leading-relaxed text-muted-foreground md:block">
               {viewDescriptions[currentView]}
             </p>
           </div>
         </header>
-
-        {/* Content */}
-        <div className="flex-1 overflow-auto">
-          {children}
-        </div>
+        <div className="min-h-0 flex-1 overflow-hidden">{children}</div>
       </main>
     </div>
   )
-} 
+}
+
+function SidebarPanel({
+  appName,
+  categories,
+  currentView,
+  openCategories,
+  onToggleCategory,
+  onNavigate,
+}: {
+  appName: string
+  categories: NavigationCategory[]
+  currentView: ViewType
+  openCategories: Record<string, boolean>
+  onToggleCategory: (category: string) => void
+  onNavigate: (view: ViewType) => void
+}) {
+  return (
+    <div className="flex h-full min-h-0 flex-col">
+      <div className="flex items-center gap-2 px-3 py-3">
+        <img
+          src={logoPng}
+          alt=""
+          className="h-7 w-7 rounded-md object-cover"
+        />
+        <p className="text-sm font-medium tracking-tight">{appName}</p>
+      </div>
+
+      <nav className="min-h-0 flex-1 overflow-y-auto px-2 pb-2">
+        {categories.map((category) => {
+          const CategoryIcon = category.icon
+          const isOpen = openCategories[category.category]
+          return (
+            <Collapsible
+              key={category.category}
+              open={isOpen}
+              onOpenChange={() => onToggleCategory(category.category)}
+            >
+              <CollapsibleTrigger asChild>
+                <button
+                  type="button"
+                  className="flex h-8 w-full items-center justify-between rounded-md px-2 text-[11px] font-medium uppercase tracking-wide text-muted-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+                >
+                  <span className="flex items-center gap-2">
+                    <CategoryIcon className="h-3.5 w-3.5" />
+                    {category.category}
+                  </span>
+                  {isOpen ? (
+                    <ChevronDown className="h-3.5 w-3.5" />
+                  ) : (
+                    <ChevronRight className="h-3.5 w-3.5" />
+                  )}
+                </button>
+              </CollapsibleTrigger>
+              <CollapsibleContent className="mb-2 mt-0.5 space-y-0.5">
+                {category.tools.map((tool) => {
+                  const ToolIcon = tool.icon
+                  const active = currentView === tool.key
+                  return (
+                    <button
+                      key={tool.key}
+                      type="button"
+                      className={cn(
+                        'flex h-8 w-full items-center rounded-md px-2 text-[13px]',
+                        active
+                          ? 'bg-sidebar-accent font-medium text-sidebar-accent-foreground'
+                          : 'text-muted-foreground hover:bg-sidebar-accent/60 hover:text-sidebar-accent-foreground'
+                      )}
+                      onClick={() => onNavigate(tool.key)}
+                    >
+                      <ToolIcon className="mr-2 h-3.5 w-3.5 shrink-0" />
+                      <span className="truncate">{tool.label}</span>
+                    </button>
+                  )
+                })}
+              </CollapsibleContent>
+            </Collapsible>
+          )
+        })}
+      </nav>
+
+      <div className="mt-auto flex items-center gap-1 border-t border-sidebar-border p-2">
+        <LanguageSelector compact />
+        <ThemeSelector compact />
+      </div>
+    </div>
+  )
+}

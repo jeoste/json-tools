@@ -1,0 +1,341 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-12T13:14:00.000Z",
+  "title": "Design System: My Data Toolbox",
+  "extensions": {
+    "colorMeta": {
+      "harbor-steel": {
+        "role": "primary",
+        "displayName": "Harbor Steel",
+        "canonical": "hsl(209 52% 68%)",
+        "tonalRamp": [
+          "hsl(209 40% 18%)",
+          "hsl(209 44% 28%)",
+          "hsl(209 48% 38%)",
+          "hsl(209 52% 48%)",
+          "hsl(209 52% 58%)",
+          "hsl(209 52% 68%)",
+          "hsl(209 45% 80%)",
+          "hsl(209 35% 92%)"
+        ]
+      },
+      "harbor-steel-ink": {
+        "role": "primary",
+        "displayName": "Harbor Steel Ink",
+        "canonical": "hsl(209 58% 32%)",
+        "tonalRamp": [
+          "hsl(209 50% 14%)",
+          "hsl(209 54% 20%)",
+          "hsl(209 58% 26%)",
+          "hsl(209 58% 32%)",
+          "hsl(209 52% 44%)",
+          "hsl(209 48% 58%)",
+          "hsl(209 40% 74%)",
+          "hsl(209 30% 90%)"
+        ]
+      },
+      "inkwell": {
+        "role": "neutral",
+        "displayName": "Inkwell",
+        "canonical": "hsl(212 24% 8%)",
+        "tonalRamp": [
+          "hsl(212 24% 6%)",
+          "hsl(212 24% 8%)",
+          "hsl(212 22% 12%)",
+          "hsl(212 20% 18%)",
+          "hsl(212 16% 32%)",
+          "hsl(212 14% 52%)",
+          "hsl(212 18% 78%)",
+          "hsl(212 28% 96%)"
+        ]
+      },
+      "night-paper": {
+        "role": "neutral",
+        "displayName": "Night Paper",
+        "canonical": "hsl(212 20% 10%)",
+        "tonalRamp": [
+          "hsl(212 22% 7%)",
+          "hsl(212 20% 10%)",
+          "hsl(212 18% 14%)",
+          "hsl(212 16% 22%)",
+          "hsl(212 14% 36%)",
+          "hsl(212 12% 54%)",
+          "hsl(212 16% 80%)",
+          "hsl(212 32% 97%)"
+        ]
+      },
+      "sidebar-well": {
+        "role": "neutral",
+        "displayName": "Sidebar Well",
+        "canonical": "hsl(212 26% 7%)",
+        "tonalRamp": [
+          "hsl(212 28% 5%)",
+          "hsl(212 26% 7%)",
+          "hsl(212 22% 11%)",
+          "hsl(212 18% 16%)",
+          "hsl(212 14% 28%)",
+          "hsl(212 12% 48%)",
+          "hsl(212 16% 76%)",
+          "hsl(212 26% 94%)"
+        ]
+      },
+      "ink-text": {
+        "role": "neutral",
+        "displayName": "Ink Text",
+        "canonical": "hsl(210 20% 94%)",
+        "tonalRamp": [
+          "hsl(210 16% 18%)",
+          "hsl(210 14% 32%)",
+          "hsl(210 12% 48%)",
+          "hsl(210 12% 64%)",
+          "hsl(210 16% 78%)",
+          "hsl(210 20% 88%)",
+          "hsl(210 20% 94%)",
+          "hsl(210 24% 98%)"
+        ]
+      },
+      "muted-ink": {
+        "role": "neutral",
+        "displayName": "Muted Ink",
+        "canonical": "hsl(212 10% 64%)",
+        "tonalRamp": [
+          "hsl(212 10% 22%)",
+          "hsl(212 10% 34%)",
+          "hsl(212 10% 46%)",
+          "hsl(212 10% 56%)",
+          "hsl(212 10% 64%)",
+          "hsl(212 10% 74%)",
+          "hsl(212 12% 84%)",
+          "hsl(212 14% 93%)"
+        ]
+      },
+      "bench-edge": {
+        "role": "neutral",
+        "displayName": "Bench Edge",
+        "canonical": "hsl(212 12% 18%)",
+        "tonalRamp": [
+          "hsl(212 12% 10%)",
+          "hsl(212 12% 14%)",
+          "hsl(212 12% 18%)",
+          "hsl(212 12% 28%)",
+          "hsl(212 12% 48%)",
+          "hsl(212 12% 68%)",
+          "hsl(212 14% 84%)",
+          "hsl(212 16% 92%)"
+        ]
+      },
+      "day-paper": {
+        "role": "neutral",
+        "displayName": "Day Paper",
+        "canonical": "hsl(212 32% 96%)",
+        "tonalRamp": [
+          "hsl(212 24% 12%)",
+          "hsl(212 18% 28%)",
+          "hsl(212 16% 48%)",
+          "hsl(212 14% 68%)",
+          "hsl(212 18% 84%)",
+          "hsl(212 24% 90%)",
+          "hsl(212 32% 96%)",
+          "hsl(212 40% 99%)"
+        ]
+      },
+      "day-card": {
+        "role": "neutral",
+        "displayName": "Day Card",
+        "canonical": "hsl(212 40% 99%)",
+        "tonalRamp": [
+          "hsl(212 20% 16%)",
+          "hsl(212 16% 32%)",
+          "hsl(212 14% 52%)",
+          "hsl(212 14% 72%)",
+          "hsl(212 20% 88%)",
+          "hsl(212 28% 94%)",
+          "hsl(212 36% 97%)",
+          "hsl(212 40% 99%)"
+        ]
+      },
+      "day-ink": {
+        "role": "neutral",
+        "displayName": "Day Ink",
+        "canonical": "hsl(214 28% 12%)",
+        "tonalRamp": [
+          "hsl(214 28% 8%)",
+          "hsl(214 28% 12%)",
+          "hsl(214 22% 22%)",
+          "hsl(214 16% 38%)",
+          "hsl(211 12% 52%)",
+          "hsl(211 10% 68%)",
+          "hsl(212 14% 84%)",
+          "hsl(212 32% 96%)"
+        ]
+      },
+      "day-muted": {
+        "role": "neutral",
+        "displayName": "Day Muted",
+        "canonical": "hsl(211 10% 40%)",
+        "tonalRamp": [
+          "hsl(211 12% 18%)",
+          "hsl(211 12% 28%)",
+          "hsl(211 10% 40%)",
+          "hsl(211 10% 52%)",
+          "hsl(211 10% 64%)",
+          "hsl(212 12% 76%)",
+          "hsl(212 14% 88%)",
+          "hsl(212 20% 96%)"
+        ]
+      },
+      "day-edge": {
+        "role": "neutral",
+        "displayName": "Day Edge",
+        "canonical": "hsl(212 14% 84%)",
+        "tonalRamp": [
+          "hsl(212 12% 28%)",
+          "hsl(212 12% 48%)",
+          "hsl(212 12% 64%)",
+          "hsl(212 14% 76%)",
+          "hsl(212 14% 84%)",
+          "hsl(212 16% 90%)",
+          "hsl(212 18% 94%)",
+          "hsl(212 22% 98%)"
+        ]
+      },
+      "danger": {
+        "role": "primary",
+        "displayName": "Danger",
+        "canonical": "hsl(0 55% 42%)",
+        "tonalRamp": [
+          "hsl(0 55% 18%)",
+          "hsl(0 55% 28%)",
+          "hsl(0 55% 36%)",
+          "hsl(0 55% 42%)",
+          "hsl(0 62% 52%)",
+          "hsl(0 72% 62%)",
+          "hsl(0 70% 78%)",
+          "hsl(0 50% 92%)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "title": { "displayName": "Title", "purpose": "Page and card titles only (15px medium)." },
+      "body": { "displayName": "Body", "purpose": "Descriptions and empty states." },
+      "label": { "displayName": "Label", "purpose": "Uppercase rail categories." },
+      "ui": { "displayName": "UI", "purpose": "Nav items and compact controls." },
+      "mono": { "displayName": "Mono", "purpose": "JSON/XML editors and results." }
+    },
+    "shadows": [],
+    "motion": [
+      {
+        "name": "color-swap",
+        "value": "150ms ease",
+        "purpose": "Button, nav, and theme color transitions. No entrance choreography."
+      },
+      {
+        "name": "sheet",
+        "value": "200ms ease-in-out",
+        "purpose": "Mobile nav sheet. Operate range; do not use 500ms overlay defaults."
+      }
+    ],
+    "breakpoints": [
+      { "name": "md", "value": "768px" },
+      { "name": "lg", "value": "1024px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Scarce Harbor Steel action: Generate, Anonymize, Validate.",
+      "html": "<button class=\"ds-btn-primary\"><svg class=\"ds-icon\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><path d=\"M13 2L3 14h9l-1 8 10-12h-9l1-8z\"/></svg>Generate</button>",
+      "css": ".ds-btn-primary { display: inline-flex; align-items: center; gap: 8px; height: 36px; padding: 8px 14px; border: none; border-radius: 8px; background: hsl(var(--primary)); color: hsl(var(--primary-foreground)); font: 500 13px/1.3 Inter, sans-serif; cursor: pointer; transition: background-color 150ms ease; } .ds-btn-primary:hover { background: hsl(var(--primary) / 0.9); } .ds-btn-primary:focus-visible { outline: 2px solid hsl(var(--ring)); outline-offset: 2px; } .ds-btn-primary:disabled { opacity: 0.5; cursor: not-allowed; } .ds-icon { width: 16px; height: 16px; }"
+    },
+    {
+      "name": "Outline Button",
+      "kind": "button",
+      "refersTo": "button-outline",
+      "description": "Secondary action: Clear, Copy, Export.",
+      "html": "<button class=\"ds-btn-outline\">Clear</button>",
+      "css": ".ds-btn-outline { display: inline-flex; align-items: center; height: 36px; padding: 8px 14px; border-radius: 8px; border: 1px solid hsl(var(--input)); background: transparent; color: hsl(var(--foreground)); font: 500 13px/1.3 Inter, sans-serif; cursor: pointer; transition: background-color 150ms ease; } .ds-btn-outline:hover { background: hsl(var(--accent)); } .ds-btn-outline:focus-visible { outline: 2px solid hsl(var(--ring)); outline-offset: 2px; }"
+    },
+    {
+      "name": "Ghost Button",
+      "kind": "button",
+      "refersTo": "button-ghost",
+      "description": "Rail footer and icon-only theme toggle.",
+      "html": "<button class=\"ds-btn-ghost\">EN</button>",
+      "css": ".ds-btn-ghost { display: inline-flex; align-items: center; justify-content: center; height: 32px; padding: 0 8px; border: none; border-radius: 8px; background: transparent; color: hsl(var(--muted-foreground)); font: 500 11px/1.2 Inter, sans-serif; letter-spacing: 0.06em; cursor: pointer; } .ds-btn-ghost:hover { background: hsl(var(--accent)); color: hsl(var(--accent-foreground)); } .ds-btn-ghost:focus-visible { outline: 2px solid hsl(var(--ring)); outline-offset: 2px; }"
+    },
+    {
+      "name": "Workbench Card",
+      "kind": "card",
+      "refersTo": "card",
+      "description": "Input or result pane. Flat, hairline, 12px corners.",
+      "html": "<section class=\"ds-card\"><header class=\"ds-card-h\"><div class=\"ds-card-t\">JSON Skeleton</div><p class=\"ds-card-d\">Paste a skeleton, then generate.</p></header><div class=\"ds-card-b\">Editor</div></section>",
+      "css": ".ds-card { border: 1px solid hsl(var(--border)); border-radius: 12px; background: hsl(var(--card)); color: hsl(var(--card-foreground)); } .ds-card-h { display: flex; flex-direction: column; gap: 4px; padding: 16px; } .ds-card-t { font: 500 15px/1.2 Inter, sans-serif; letter-spacing: -0.01em; } .ds-card-d { margin: 0; font: 400 14px/1.5 Inter, sans-serif; color: hsl(var(--muted-foreground)); } .ds-card-b { padding: 0 16px 16px; }"
+    },
+    {
+      "name": "Field",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Single-line options (seed, count, path).",
+      "html": "<input class=\"ds-input\" placeholder=\"Seed (optional)\" />",
+      "css": ".ds-input { height: 40px; width: 100%; padding: 8px 12px; border: 1px solid hsl(var(--input)); border-radius: 8px; background: hsl(var(--background)); color: hsl(var(--foreground)); font: 400 14px/1.5 Inter, sans-serif; } .ds-input::placeholder { color: hsl(var(--muted-foreground)); } .ds-input:focus-visible { outline: 2px solid hsl(var(--ring)); outline-offset: 2px; }"
+    },
+    {
+      "name": "Editor",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "JSON/XML textarea. Mono, muted wash, fills the pane.",
+      "html": "<textarea class=\"ds-editor\" placeholder=\"Paste your JSON skeleton here...\"></textarea>",
+      "css": ".ds-editor { min-height: 12rem; width: 100%; padding: 8px 12px; border: 1px solid hsl(var(--input)); border-radius: 8px; background: hsl(var(--muted) / 0.3); color: hsl(var(--foreground)); font: 400 14px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace; resize: vertical; } .ds-editor:focus-visible { outline: 2px solid hsl(var(--ring)); outline-offset: 2px; }"
+    },
+    {
+      "name": "Nav Item",
+      "kind": "nav",
+      "refersTo": "nav-item",
+      "description": "Idle tool in the rail.",
+      "html": "<button class=\"ds-nav\">Anonymize</button>",
+      "css": ".ds-nav { display: flex; align-items: center; width: 100%; height: 32px; padding: 0 8px; border: none; border-radius: 8px; background: transparent; color: hsl(var(--muted-foreground)); font: 400 13px/1.3 Inter, sans-serif; text-align: left; cursor: pointer; } .ds-nav:hover { background: hsl(var(--sidebar-accent) / 0.6); color: hsl(var(--sidebar-accent-foreground)); }"
+    },
+    {
+      "name": "Nav Item Active",
+      "kind": "nav",
+      "refersTo": "nav-item-active",
+      "description": "Current tool. Fill, not a colored bar.",
+      "html": "<button class=\"ds-nav-active\">Generate</button>",
+      "css": ".ds-nav-active { display: flex; align-items: center; width: 100%; height: 32px; padding: 0 8px; border: none; border-radius: 8px; background: hsl(var(--sidebar-accent)); color: hsl(var(--sidebar-accent-foreground)); font: 500 13px/1.3 Inter, sans-serif; text-align: left; cursor: pointer; } .ds-nav-active:focus-visible { outline: 2px solid hsl(var(--sidebar-ring)); outline-offset: 2px; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Night Bench",
+    "overview": "My Data Toolbox looks like a workbench after hours: dark, quiet, tools within reach, no theater. The visitor came to paste a skeleton, run an action, and copy a result. Chrome exists so the editors can disappear into the task.\n\nThe system is dense and cool. Inter carries every UI role. Harbor Steel is the only accent and it is scarce. Surfaces stack as inkwell → sidebar well → night paper, with hairline edges instead of shadows. Light mode inverts the same steel-and-ink pair; it is not a second identity.",
+    "keyCharacteristics": [
+      "Dark-first (default theme); light is the same grammar inverted",
+      "One accent, used on primary actions and selection only",
+      "Flat tonal layering; no rest-state shadows",
+      "Compact Operate density: 32–36px controls, 15px titles, 4px spacing base",
+      "Editors (mono fields) occupy most of the viewport"
+    ],
+    "rules": [
+      { "name": "The One Steel Rule", "body": "Harbor Steel appears on primary actions, focus, and selection. It does not fill backgrounds, cards, or decorative bars. Rarity is the point.", "section": "colors" },
+      { "name": "The Inkwell Rule", "body": "Neutrals stay in the 209–214 hue band. Do not introduce warm grays or pure #000 / #fff slabs except on destructive text.", "section": "colors" },
+      { "name": "The No-Display Rule", "body": "No hero type, no fluid clamp headings, no second family for “tech personality.” Inter plus mono for data.", "section": "typography" },
+      { "name": "The Editor Leads Rule", "body": "After the rail and a one-line title, remaining pixels belong to the editors. Do not reintroduce a marketing header, hero, or duplicated page chrome.", "section": "typography" },
+      { "name": "The Flat-By-Default Rule", "body": "Surfaces are flat at rest. Do not add ambient shadows, glows, or glass blur to the shell or cards.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do keep Harbor Steel scarce: primary button, focus ring, selection.",
+      "Do let the two editors fill the remaining viewport on desktop.",
+      "Do stack panes and scroll the workspace on small screens (h-full only from lg).",
+      "Do use Inter at 15 / 14 / 13 / 11px and a 4px spacing scale.",
+      "Do separate layers with 1px Bench Edge and hue-matched neutrals."
+    ],
+    "donts": [
+      "Don't add rest-state card shadows, backdrop-blur headers, or gradient text.",
+      "Don't use a 4px (or thicker) accent border on nav, cards, or alerts.",
+      "Don't introduce a display serif, geometric “tech” mono as UI type, or emoji as icons.",
+      "Don't rebuild a marketing hero above the bench.",
+      "Don't invent testimonials, customer logos, or usage metrics in the chrome."
+    ]
+  }
+}

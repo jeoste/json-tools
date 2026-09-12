@@ -2,8 +2,13 @@ import { Moon, Sun } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useTranslation } from 'react-i18next'
 import { useTheme, type Theme } from '@/components/theme-provider'
+import { cn } from '@/lib/utils'
 
-export function ThemeSelector() {
+interface ThemeSelectorProps {
+  compact?: boolean
+}
+
+export function ThemeSelector({ compact = false }: ThemeSelectorProps) {
   const { t } = useTranslation()
   const { theme, setTheme } = useTheme()
 
@@ -17,14 +22,19 @@ export function ThemeSelector() {
   const label = isDark ? t('theme.light') : t('theme.dark')
 
   return (
-    <Button 
-      variant="ghost" 
-      className="w-full justify-start font-normal text-muted-foreground hover:text-foreground"
+    <Button
+      variant="ghost"
+      size={compact ? 'icon' : 'default'}
+      className={cn(
+        'font-normal text-muted-foreground hover:text-foreground',
+        compact ? 'h-8 w-8 shrink-0' : 'w-full justify-start'
+      )}
       onClick={toggleTheme}
       title={t('theme.tooltip')}
+      aria-label={t('theme.tooltip')}
     >
-      <Icon className="w-4 h-4 mr-2" />
-      {label}
+      <Icon className="h-4 w-4" />
+      {!compact && <span className="ml-2">{label}</span>}
     </Button>
   )
-} 
+}

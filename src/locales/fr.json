@@ -19,6 +19,7 @@
   },
   "layout": {
     "appName": "My Data Toolbox",
+    "openMenu": "Ouvrir le menu",
     "navigation": {
       "anonymize": "Anonymize",
       "generate": "Generate", 

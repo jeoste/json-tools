@@ -15,6 +15,7 @@ import { Search, FileText, Copy, BookOpen, ChevronDown, ChevronUp } from 'lucide
 import { useToast } from '@/hooks/use-toast-simple'
 import { useTranslation } from 'react-i18next'
 import { apiClient } from '@/lib/api-client'
+import { ToolWorkspace } from '@/components/tool-workspace'
 
 export function XmlPathView() {
   const [xmlInput, setXmlInput] = useState('')
@@ -148,14 +149,13 @@ export function XmlPathView() {
 </employees>`
 
   return (
-    <div className="container mx-auto p-6 max-w-7xl">
-      <div className="space-y-6">
+    <ToolWorkspace columns={1}>
         {/* Instructions Panel - Collapsible at top */}
         <Card>
           <CardHeader>
             <div className="flex items-center justify-between">
               <CardTitle className="flex items-center gap-2">
-                <BookOpen className="w-5 h-5" />
+                <BookOpen className="h-4 w-4" />
                 {t('xmlPath.instructions.title')}
               </CardTitle>
               <Button
@@ -195,7 +195,7 @@ export function XmlPathView() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <FileText className="w-5 h-5" />
+                <FileText className="h-4 w-4" />
                 {t('xmlPath.inputTitle')}
               </CardTitle>
               <CardDescription>
@@ -222,7 +222,7 @@ export function XmlPathView() {
                   placeholder={t('xmlPath.xmlPlaceholder')}
                   value={xmlInput}
                   onChange={(e) => setXmlInput(e.target.value)}
-                  className="min-h-[300px] font-mono text-sm"
+                  className="min-h-[12rem] flex-1 font-mono text-sm"
                 />
               </div>
               <FileUpload
@@ -274,7 +274,7 @@ export function XmlPathView() {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Search className="w-5 h-5" />
+                <Search className="h-4 w-4" />
                 {t('xmlPath.resultTitle')}
               </CardTitle>
               <CardDescription>
@@ -312,9 +312,9 @@ export function XmlPathView() {
               )}
               
               {!result && !error && (
-                <div className="flex items-center justify-center h-[400px] text-muted-foreground">
+                <div className="flex min-h-[10rem] flex-1 items-center justify-center text-muted-foreground">
                   <div className="text-center">
-                    <Search className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                    <Search className="mx-auto mb-2 h-5 w-5 opacity-50" />
                     <p>{t('xmlPath.noResult')}</p>
                     <p className="text-sm">{t('xmlPath.submitToEvaluate')}</p>
                   </div>
@@ -323,8 +323,7 @@ export function XmlPathView() {
             </CardContent>
           </Card>
         </div>
-      </div>
-    </div>
+    </ToolWorkspace>
   )
 }
 

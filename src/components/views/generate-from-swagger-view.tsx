@@ -9,6 +9,7 @@ import { useTranslation } from 'react-i18next'
 import { apiClient } from '@/lib/api-client'
 import { FileUpload, readFileAsText, downloadFile } from '@/components/file-upload'
 import * as yaml from 'yaml'
+import { ToolWorkspace } from '@/components/tool-workspace'
 
 // Simple helper to construire un squelette à partir d'un schéma OpenAPI 3.0 (objet uniquement)
 function buildSkeletonFromSchema(schema: any): any {
@@ -145,12 +146,11 @@ export function GenerateFromSwaggerView() {
   }
 
   return (
-    <div className="container mx-auto p-6 max-w-7xl">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <ToolWorkspace>
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <FileText className="w-5 h-5" />
+              <FileText className="h-4 w-4" />
               {t('swaggerToJson.inputTitle')}
             </CardTitle>
             <CardDescription>{t('swaggerToJson.instruction')}</CardDescription>
@@ -160,7 +160,7 @@ export function GenerateFromSwaggerView() {
               placeholder={t('swaggerToJson.placeholder')}
               value={swaggerContent}
               onChange={(e) => setSwaggerContent(e.target.value)}
-              className="min-h-[400px] font-mono text-sm"
+              className="min-h-[12rem] flex-1 font-mono text-sm"
             />
             <FileUpload
               accept=".json,.yaml,.yml"
@@ -183,7 +183,7 @@ export function GenerateFromSwaggerView() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <FileText className="w-5 h-5" />
+              <FileText className="h-4 w-4" />
               {t('swaggerToJson.resultTitle')}
             </CardTitle>
             <CardDescription>{generatedJson ? t('swaggerToJson.resultLabel') : t('swaggerToJson.resultPlaceholder')}</CardDescription>
@@ -204,21 +204,20 @@ export function GenerateFromSwaggerView() {
                     </Button>
                   </div>
                 </div>
-                <pre className="bg-muted p-4 rounded-lg overflow-auto max-h-[350px] text-sm">
+                <pre className="min-h-[10rem] max-h-[28rem] flex-1 overflow-auto rounded-lg bg-muted/40 p-3 text-sm">
                   <code>{generatedJson}</code>
                 </pre>
               </div>
             ) : (
-              <div className="flex items-center justify-center h-[400px] text-muted-foreground">
+              <div className="flex min-h-[10rem] flex-1 items-center justify-center text-muted-foreground">
                 <div className="text-center">
-                  <FileText className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                  <FileText className="mx-auto mb-2 h-5 w-5 opacity-50" />
                   <p>{t('swaggerToJson.noDataTitle')}</p>
                 </div>
               </div>
             )}
           </CardContent>
         </Card>
-      </div>
-    </div>
+    </ToolWorkspace>
   )
 } 

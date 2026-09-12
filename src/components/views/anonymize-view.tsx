@@ -8,6 +8,7 @@ import { useToast } from '@/hooks/use-toast-simple'
 import { useTranslation } from 'react-i18next'
 import { apiClient } from '@/lib/api-client'
 import { FileUpload, readFileAsText, downloadFile } from '@/components/file-upload'
+import { ToolWorkspace } from '@/components/tool-workspace'
 
 export function AnonymizeView() {
   const [jsonInput, setJsonInput] = useState('')
@@ -142,23 +143,22 @@ export function AnonymizeView() {
   }
 
   return (
-    <div className="container mx-auto p-6 max-w-7xl">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <ToolWorkspace>
         {/* Panneau de saisie */}
-        <Card>
+        <Card className="flex min-h-0 flex-col lg:h-full">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Lock className="w-5 h-5" />
+              <Lock className="h-4 w-4" />
               {t('anonymize.rawData')}
             </CardTitle>
             <CardDescription>
               {t('anonymize.instruction')}
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
+          <CardContent className="flex flex-1 flex-col space-y-4">
             <Textarea
               placeholder={t('anonymize.placeholder')}
-              className="min-h-[300px] font-mono text-sm"
+              className="min-h-[12rem] flex-1 font-mono text-sm"
               value={jsonInput}
               onChange={(e) => setJsonInput(e.target.value)}
             />
@@ -191,17 +191,17 @@ export function AnonymizeView() {
         </Card>
 
         {/* Panneau de résultat */}
-        <Card>
+        <Card className="flex min-h-0 flex-col lg:h-full">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <FileText className="w-5 h-5" />
+              <FileText className="h-4 w-4" />
               {t('anonymize.resultTitle')}
             </CardTitle>
             <CardDescription>
               {anonymized ? t('anonymize.resultLabel') : t('anonymize.resultPlaceholder')}
             </CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="flex min-h-0 flex-1 flex-col">
             {anonymized ? (
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
@@ -217,14 +217,14 @@ export function AnonymizeView() {
                     </Button>
                   </div>
                 </div>
-                <pre className="bg-muted p-4 rounded-lg overflow-auto max-h-[350px] text-sm">
+                <pre className="min-h-[10rem] max-h-[28rem] flex-1 overflow-auto rounded-lg bg-muted/40 p-3 text-sm">
                   <code>{anonymized}</code>
                 </pre>
               </div>
             ) : (
-              <div className="flex items-center justify-center h-[400px] text-muted-foreground">
+              <div className="flex min-h-[10rem] flex-1 items-center justify-center text-muted-foreground">
                 <div className="text-center">
-                  <Lock className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                  <Lock className="mx-auto mb-2 h-5 w-5 opacity-50" />
                   <p>{t('anonymize.noDataTitle')}</p>
                   <p className="text-sm">{t('anonymize.noDataDesc')}</p>
                 </div>
@@ -232,7 +232,6 @@ export function AnonymizeView() {
             )}
           </CardContent>
         </Card>
-      </div>
-    </div>
+    </ToolWorkspace>
   )
 } 

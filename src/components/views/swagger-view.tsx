@@ -7,6 +7,7 @@ import { FileText, Copy, Loader2, Save, Code } from 'lucide-react'
 import { useToast } from '@/hooks/use-toast-simple'
 import { useTranslation } from 'react-i18next'
 import { downloadFile } from '@/components/file-upload'
+import { ToolWorkspace } from '@/components/tool-workspace'
 
 function inferSchema(value: any): any {
   if (Array.isArray(value)) {
@@ -126,13 +127,12 @@ export function SwaggerView() {
   }
 
   return (
-    <div className="container mx-auto p-6 max-w-7xl">
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <ToolWorkspace>
         {/* Input panel */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <Code className="w-5 h-5" />
+              <Code className="h-4 w-4" />
               {t('swagger.inputTitle')}
             </CardTitle>
             <CardDescription>{t('swagger.instruction')}</CardDescription>
@@ -140,7 +140,7 @@ export function SwaggerView() {
           <CardContent className="space-y-4">
             <Textarea
               placeholder={t('swagger.placeholder')}
-              className="min-h-[400px] font-mono text-sm"
+              className="min-h-[12rem] flex-1 font-mono text-sm"
               value={jsonInput}
               onChange={(e) => setJsonInput(e.target.value)}
             />
@@ -166,7 +166,7 @@ export function SwaggerView() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <FileText className="w-5 h-5" />
+              <FileText className="h-4 w-4" />
               {t('swagger.resultTitle')}
             </CardTitle>
             <CardDescription>{openapiSpec ? t('swagger.resultLabel') : t('swagger.resultPlaceholder')}</CardDescription>
@@ -187,14 +187,14 @@ export function SwaggerView() {
                     </Button>
                   </div>
                 </div>
-                <pre className="bg-muted p-4 rounded-lg overflow-auto max-h-[350px] text-sm">
+                <pre className="min-h-[10rem] max-h-[28rem] flex-1 overflow-auto rounded-lg bg-muted/40 p-3 text-sm">
                   <code>{openapiSpec}</code>
                 </pre>
               </div>
             ) : (
-              <div className="flex items-center justify-center h-[400px] text-muted-foreground">
+              <div className="flex min-h-[10rem] flex-1 items-center justify-center text-muted-foreground">
                 <div className="text-center">
-                  <FileText className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                  <FileText className="mx-auto mb-2 h-5 w-5 opacity-50" />
                   <p>{t('swagger.noDataTitle')}</p>
                   <p className="text-sm">{t('swagger.noDataDesc')}</p>
                 </div>
@@ -202,7 +202,6 @@ export function SwaggerView() {
             )}
           </CardContent>
         </Card>
-      </div>
-    </div>
+    </ToolWorkspace>
   )
 } 
